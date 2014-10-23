@@ -1,5 +1,5 @@
-#ifndef DEBUGGER_H_
-#define DEBUGGER_H_
+#ifndef DEBUGGER_HPP_
+#define DEBUGGER_HPP_
 
 #include <ch.hpp>
 

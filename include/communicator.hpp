@@ -1,5 +1,5 @@
-#ifndef COMMUNICATOR_H_
-#define COMMUNICATOR_H_
+#ifndef COMMUNICATOR_HPP_
+#define COMMUNICATOR_HPP_
 
 const uint16_t MAX_PACKET_SIZE = 255;
 const uint16_t MAGIC = 0xF0F0;
