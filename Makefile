@@ -65,7 +65,7 @@ endif
 #
 
 # Define project name here
-PROJECT = fly
+PROJECT = osuar_control
 
 # Imported source files and paths
 include $(CHIBIOS)/boards/ST_STM32F3_DISCOVERY/board.mk
