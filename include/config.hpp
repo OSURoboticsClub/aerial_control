@@ -2,7 +2,6 @@
 #define CONFIG_HPP_
 
 #include <hal.h>
-#include <mixers.hpp>
 
 // TODO: Put this in the Makefile
 #include <configs/osuar_apollo.h>

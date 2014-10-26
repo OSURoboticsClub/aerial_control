@@ -1,8 +1,6 @@
 #ifndef ACCELEROMETER_HPP_
 #define ACCELEROMETER_HPP_
 
-#include <ch.hpp>
-
 struct accelerometer_reading_t {
   float axes[3];
 };

@@ -4,8 +4,6 @@
 
 #include <config.hpp>
 
-#include <multirotor_controller.hpp>
-
 // Estimators
 #include <estimator/dcm_attitude_estimator.hpp>
 
@@ -22,11 +20,12 @@
 #include <controller/attitude_rate_controller.hpp>
 
 // Misc
-#include <motor_mapper.hpp>
-#include <pwm_motor.hpp>
 // #include <communicator.hpp>
 // TODO: Think about how to integrate debugging cleanly.
 // #include <debugger.hpp>
+
+// Systems
+#include <system/default_multirotor_vehicle_system.hpp>
 
 using namespace chibios_rt;
 
@@ -67,32 +66,15 @@ int main(void) {
   palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(7));
   palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(7));
 
-  // Build and initialize the controller
+  // Build and initialize the system
   L3GD20 gyro(&SPID1);
   LSM303DLHC accel(&I2CD1);
 
-  DCMAttitudeEstimator estimator;
-  PWMReceiverInputSource inputSource;
+  gyro.init();
+  accel.init();
 
-  AttitudeController attController;
-  AttitudeRateController attRateController;
-
-  Controller *controllers[] = {
-    &attController,
-    &attRateController
-  };
-
-  ControllerPipeline pipeline(controllers, 2);
-
-  PWMMotor motors[NUM_ROTORS] = {
-    PWMMotor(&PWMD1, 0),
-    PWMMotor(&PWMD1, 1),
-    PWMMotor(&PWMD1, 2),
-    PWMMotor(&PWMD1, 3)
-  };
-
-  MultirotorController mc(&accel, &gyro, &estimator, &inputSource, &pipeline, motors);
-  mc.init();
+  DefaultMultirotorVehicleSystem system(&accel, &gyro);
+  system.init();
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
@@ -100,10 +82,10 @@ int main(void) {
   while(true) {
     deadline += MS2ST(DT * 1000);
 
-    mc.update();
+    system.update();
 
     BaseThread::sleepUntil(deadline);
-  }
+ }
 
   return 0;
 }

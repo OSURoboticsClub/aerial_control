@@ -369,7 +369,7 @@ struct atanh2_impl
   static inline Scalar run(const Scalar& x, const Scalar& r)
   {
     EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar)
-    #if (__cplusplus >= 201103L) && !defined(__CYGWIN__)
+    #if (__cplusplus >= 201103L) && !defined(__CYGWIN__)  && 0
       using std::log1p;
       return log1p(2 * x / (r - x)) / 2;
     #else
