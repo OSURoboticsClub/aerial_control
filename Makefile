@@ -68,16 +68,16 @@ endif
 PROJECT = osuar_control
 
 # Imported source files and paths
-include $(CHIBIOS)/boards/ST_STM32F3_DISCOVERY/board.mk
-include $(CHIBIOS)/os/hal/platforms/STM32F30x/platform.mk
+#include $(CHIBIOS)/boards/ST_STM32F3_DISCOVERY/board.mk
+#include $(CHIBIOS)/os/hal/platforms/STM32F30x/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F3xx/port.mk
+#include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F3xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 include $(CHIBIOS)/test/test.mk
 include $(CHIBIOS)/os/various/cpp_wrappers/kernel.mk
 
 # Define linker script file here
-LDSCRIPT= $(PORTLD)/STM32F303xC.ld
+#LDSCRIPT= $(PORTLD)/STM32F303xC.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -89,8 +89,6 @@ CSRC = $(PORTSRC) \
        $(BOARDSRC) \
        $(CHIBIOS)/os/various/chprintf.c \
        $(CHIBIOS)/os/various/syscalls.c \
-
-SRCPATHS = src/**
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -172,6 +170,29 @@ CPPWARN = -Wall -Wextra -Wno-unused-variable
 ##############################################################################
 
 ##############################################################################
+# Start of default section
+#
+
+# List all default C defines here, like -D_DEBUG=1
+DDEFS = -D$(BOARD)
+
+# List all default ASM defines here, like -D_DEBUG=1
+DADEFS =
+
+# List all default directories to look for include files here
+DINCDIR =
+
+# List the default directory to look for the libraries here
+DLIBDIR =
+
+# List all default libraries here
+DLIBS =
+
+#
+# End of default section
+##############################################################################
+
+##############################################################################
 # Start of user section
 #
 
@@ -194,7 +215,9 @@ ULIBS =
 # End of user defines
 ##############################################################################
 
-include rules.mk
+RULESPATH = $(CHIBIOS)/os/ports/GCC/ARMCMx
+include $(RULESPATH)/rules.mk
+SRCPATHS += src/**
 
-flash: all
+upload: all
 	st-flash write build/$(PROJECT).bin 0x08000000
