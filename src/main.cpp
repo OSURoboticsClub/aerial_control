@@ -27,11 +27,9 @@
 // Systems
 #include <system/default_multirotor_vehicle_system.hpp>
 
-using namespace chibios_rt;
-
-class HeartbeatThread : public BaseStaticThread<64> {
+class HeartbeatThread : public chibios_rt::BaseStaticThread<64> {
 public:
-  HeartbeatThread() : BaseStaticThread<64>() {
+  HeartbeatThread() : chibios_rt::BaseStaticThread<64>() {
   }
 
   virtual msg_t main() {
@@ -53,7 +51,7 @@ static Debugger debugger;
 
 int main(void) {
   halInit();
-  System::init();
+  chibios_rt::System::init();
 
   // Start the background threads
   heartbeatThread.start(NORMALPRIO + 10);
@@ -85,7 +83,7 @@ int main(void) {
 
     system.update();
 
-    BaseThread::sleepUntil(deadline);
+    chibios_rt::BaseThread::sleepUntil(deadline);
  }
 
   return 0;
