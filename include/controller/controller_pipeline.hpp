@@ -2,7 +2,6 @@
 #define CONTROLLER_PIPELINE_HPP_
 
 #include <cstdint>
-#include <array>
 
 #include <controller/controller.hpp>
 
