@@ -13,6 +13,9 @@
 all:
 	@echo "Specify a board!"
 
+upload:
+	st-flash write build/$(PROJECT).bin 0x08000000
+
 clean:
 	rm -r build
 
