@@ -81,11 +81,9 @@ int main(void) {
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
   systime_t deadline = chTimeNow();
   while(true) {
-    deadline += MS2ST(DT * 2000);
+    deadline += MS2ST(DT * 1000);
 
     system.update();
-
-    debugger.printf("Hello world 1!!!\r\n");
 
     BaseThread::sleepUntil(deadline);
  }
