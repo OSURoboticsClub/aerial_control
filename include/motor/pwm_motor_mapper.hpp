@@ -8,7 +8,7 @@ template <int motor_count>
 class PWMMotorMapper : public MotorMapper {
 public:
   void init();
-  virtual void run(struct controller_output_t& input) =0;
+  virtual void run(controller_output_t& input) =0;
 
 protected:
   PWMMotorMapper();

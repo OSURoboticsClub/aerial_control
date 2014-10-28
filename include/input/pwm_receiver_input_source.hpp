@@ -5,7 +5,7 @@
 
 class PWMReceiverInputSource : public InputSource {
 public:
-  struct controller_input_t read();
+  controller_input_t read();
 };
 
 #endif

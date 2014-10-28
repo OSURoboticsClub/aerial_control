@@ -8,7 +8,7 @@ public:
   MultirotorQuadXMotorMapper();
 
   void init();
-  void run(struct controller_output_t& input);
+  void run(controller_output_t& input);
 };
 
 #endif

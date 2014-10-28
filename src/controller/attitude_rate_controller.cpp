@@ -10,12 +10,12 @@ AttitudeRateController::AttitudeRateController()
     yawRatePid(10.0, 0.0, 0.0) {
 }
 
-struct controller_output_t AttitudeRateController::run(struct attitude_estimate_t& estimate, struct controller_output_t& input) {
+controller_output_t AttitudeRateController::run(const attitude_estimate_t& estimate, const controller_output_t& input) {
   float pitchRateSp = pitchRatePid.calculate(input.setpoints[0], estimate.roll_vel, DT);
   float rollRateSp = rollRatePid.calculate(input.setpoints[1], estimate.pitch_vel, DT);
   float yawRateSp = yawRatePid.calculate(input.setpoints[2], estimate.yaw_vel, DT);
 
-  struct controller_output_t output = {
+  controller_output_t output = {
     .setpoints = {
       pitchRateSp,
       rollRateSp,

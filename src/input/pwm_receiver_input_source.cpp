@@ -1,7 +1,7 @@
 #include <input/pwm_receiver_input_source.hpp>
 
-struct controller_input_t PWMReceiverInputSource::read() {
-  struct controller_input_t input = {
+controller_input_t PWMReceiverInputSource::read() {
+  controller_input_t input = {
     .roll_sp = 0.0f,
     .pitch_sp = 0.0f,
     .yaw_sp = 0.0f,

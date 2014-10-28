@@ -1,6 +1,6 @@
 #include <controller/controller.hpp>
 
-bool Controller::isPassthrough() {
+bool Controller::isPassthrough() const {
   return passthrough;
 }
 

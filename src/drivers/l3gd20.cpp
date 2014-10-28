@@ -17,7 +17,7 @@ void L3GD20::init() {
   writeRegister(L3GD20_SPI_AD_CTRL_REG4, (1 << 5) | (1 << 4));
 }
 
-struct gyroscope_reading_t L3GD20::read() {
+gyroscope_reading_t L3GD20::read() {
   uint8_t txbuf[8];
   uint8_t rxbuf[8];
   int16_t raw[3];
@@ -35,7 +35,7 @@ struct gyroscope_reading_t L3GD20::read() {
   raw[1] = (rxbuf[2] << 8) | rxbuf[1];
   raw[2] = (rxbuf[6] << 8) | rxbuf[5];
 
-  struct gyroscope_reading_t reading;
+  gyroscope_reading_t reading;
 
   for(int i = 0; i < 3; i++) {
     reading.axes[i] = (float) raw[i] * L3GD20_SENSITIVITY_2000DPS * L3GD20_DPS_TO_RADS;

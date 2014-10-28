@@ -1,23 +1,10 @@
-
-%:
-	@echo
-	@echo Building $@
-	@echo
-	$(eval BOARD := boards/$@.mk)
-	#ifneq ("$(wildcard $(BOARD))","")
-	#	@echo "Invalid board"
-	#else
-		@make -f $(BOARD)
-	#endif
-
-all:
-	@echo "Specify a board!"
-
 upload:
-	st-flash write build/$(PROJECT).bin 0x08000000
+	st-flash write build/osuar_control.bin 0x08000000
 
-clean:
-	rm -r build
-
-upload: all
-	st-flash write build/$(PROJECT).bin 0x08000000
+POSSIBLE_BOARD_NAME = $(addsuffix .mk, $(addprefix boards/, $(MAKECMDGOALS)))
+ifneq (,$(wildcard $(POSSIBLE_BOARD_NAME)))
+include $(POSSIBLE_BOARD_NAME)
+else
+all:
+	@echo "Specify a board"
+endif

@@ -12,7 +12,7 @@ struct controller_input_t {
 
 class InputSource {
 public:
-  virtual struct controller_input_t read() =0;
+  virtual controller_input_t read() =0;
 };
 
 #endif

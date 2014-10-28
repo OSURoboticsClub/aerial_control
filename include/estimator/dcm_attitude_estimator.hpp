@@ -9,7 +9,7 @@ class DCMAttitudeEstimator : public AttitudeEstimator {
 public:
   DCMAttitudeEstimator();
 
-  struct attitude_estimate_t update(struct accelerometer_reading_t& accel_reading, struct gyroscope_reading_t& gyro_reading);
+  attitude_estimate_t update(accelerometer_reading_t& accel_reading, gyroscope_reading_t& gyro_reading);
 
 private:
   Eigen::Matrix3f dcm;

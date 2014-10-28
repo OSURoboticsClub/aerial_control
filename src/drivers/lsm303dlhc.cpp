@@ -14,7 +14,7 @@ void LSM303DLHC::init() {
   writeRegister(LSM303_I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
 }
 
-struct accelerometer_reading_t LSM303DLHC::read() {
+accelerometer_reading_t LSM303DLHC::read() {
   uint8_t txbuf[8];
   uint8_t rxbuf[8];
   int16_t raw[3];
@@ -30,7 +30,7 @@ struct accelerometer_reading_t LSM303DLHC::read() {
   raw[1] = -((rxbuf[3] << 8) | rxbuf[2]);
   raw[2] = (rxbuf[5] << 8) | rxbuf[4];
 
-  struct accelerometer_reading_t reading;
+  accelerometer_reading_t reading;
 
   for(int i = 0; i < 3; i++) {
     // TODO: Scale to m/s^2

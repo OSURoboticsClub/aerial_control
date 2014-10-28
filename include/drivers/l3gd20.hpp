@@ -63,7 +63,7 @@ public:
   L3GD20(SPIDriver *spi);
 
   void init();
-  struct gyroscope_reading_t read();
+  gyroscope_reading_t read();
 
 private:
   uint8_t readRegister(uint8_t reg);

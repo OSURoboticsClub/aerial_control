@@ -22,16 +22,16 @@ struct log_message_t {
 uint16_t message_length(uint16_t id) {
   switch(id) {
     case HEARTBEAT_MESSAGE_ID:
-      return sizeof(struct heartbeat_message_t);
+      return sizeof(heartbeat_message_t);
     case LOG_MESSAGE_ID:
-      return sizeof(struct log_message_t);
+      return sizeof(log_message_t);
   }
 
   return 0;
 }
 
 class Communicator {
-  uint16_t read(uint8_t *buffer, struct message_header_t *header, void *message) {
+  uint16_t read(uint8_t *buffer, message_header_t *header, void *message) {
     // Scan for the first magic in the buffer
     for(int16_t i = 0; i < MAX_PACKET_SIZE; i++) {
     }

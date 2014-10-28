@@ -9,7 +9,7 @@ class AttitudeController : public Controller {
 public:
   AttitudeController();
 
-  struct controller_output_t run(struct attitude_estimate_t& estimate, struct controller_output_t& input);
+  controller_output_t run(const attitude_estimate_t& estimate, const controller_output_t& input);
 
 private:
   PIDController pitchPosPid;

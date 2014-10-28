@@ -6,7 +6,7 @@ DCMAttitudeEstimator::DCMAttitudeEstimator() {
   dcm.setIdentity();
 }
 
-struct attitude_estimate_t DCMAttitudeEstimator::update(struct accelerometer_reading_t& accel_reading, struct gyroscope_reading_t& gyro_reading) {
+attitude_estimate_t DCMAttitudeEstimator::update(accelerometer_reading_t& accel_reading, gyroscope_reading_t& gyro_reading) {
   Eigen::Vector3f accel(accel_reading.axes);
   Eigen::Vector3f gyro(gyro_reading.axes);
 
@@ -25,7 +25,7 @@ struct attitude_estimate_t DCMAttitudeEstimator::update(struct accelerometer_rea
 
   orthonormalize();
 
-  struct attitude_estimate_t estimate = {
+  attitude_estimate_t estimate = {
     // TODO: Are these trig functions safe at extreme angles?
     .roll = atan2f(dcm(2, 1), dcm(2, 2)) * 180 / M_PI,
     .pitch = -asinf(dcm(2, 0)) * 180 / M_PI,

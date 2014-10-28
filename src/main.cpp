@@ -22,7 +22,7 @@
 // Misc
 // #include <communicator.hpp>
 // TODO: Think about how to integrate debugging cleanly.
-// #include <debugger.hpp>
+#include <debugger.hpp>
 
 // Systems
 #include <system/default_multirotor_vehicle_system.hpp>
@@ -49,6 +49,7 @@ public:
 };
 
 static HeartbeatThread heartbeatThread;
+static Debugger debugger;
 
 int main(void) {
   halInit();
@@ -56,7 +57,7 @@ int main(void) {
 
   // Start the background threads
   heartbeatThread.start(NORMALPRIO + 10);
-  // debugger.start(NORMALPRIO + 10);
+  debugger.start(NORMALPRIO + 10);
 
   spiInit();
   i2cInit();
@@ -80,9 +81,11 @@ int main(void) {
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
   systime_t deadline = chTimeNow();
   while(true) {
-    deadline += MS2ST(DT * 1000);
+    deadline += MS2ST(DT * 2000);
 
     system.update();
+
+    debugger.printf("Hello world 1!!!\r\n");
 
     BaseThread::sleepUntil(deadline);
  }

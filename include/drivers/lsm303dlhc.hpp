@@ -44,7 +44,7 @@ public:
   LSM303DLHC(I2CDriver *i2c);
 
   void init();
-  struct accelerometer_reading_t read();
+  accelerometer_reading_t read();
 
 private:
   uint8_t readRegister(uint8_t reg);

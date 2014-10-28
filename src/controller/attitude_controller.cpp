@@ -14,7 +14,7 @@ AttitudeController::AttitudeController()
     yawVelPid(10.0, 0.0, 0.0) {
 }
 
-struct controller_output_t AttitudeController::run(struct attitude_estimate_t& estimate, struct controller_output_t& input) {
+controller_output_t AttitudeController::run(const attitude_estimate_t& estimate, const controller_output_t& input) {
   float pitchPosSp = pitchPosPid.calculate(input.setpoints[0], estimate.roll, DT);
   float rollPosSp = rollPosPid.calculate(input.setpoints[1], estimate.pitch, DT);
   float yawPosSp = yawPosPid.calculate(input.setpoints[2], estimate.yaw, DT);
@@ -31,7 +31,7 @@ struct controller_output_t AttitudeController::run(struct attitude_estimate_t& e
   pitchVelSp = std::max(-MAX_PITCH_ROLL_VEL, std::min(MAX_PITCH_ROLL_VEL, pitchVelSp));
   rollVelSp = std::max(-MAX_PITCH_ROLL_VEL, std::min(MAX_PITCH_ROLL_VEL, rollVelSp));
 
-  struct controller_output_t output = {
+  controller_output_t output = {
     .setpoints = {
       pitchVelSp,
       rollVelSp,

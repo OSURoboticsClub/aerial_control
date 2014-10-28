@@ -9,7 +9,7 @@ void MultirotorQuadXMotorMapper::init() {
   PWMMotorMapper::init();
 }
 
-void MultirotorQuadXMotorMapper::run(struct controller_output_t& input) {
+void MultirotorQuadXMotorMapper::run(controller_output_t& input) {
   float outputs[4] = {
      1.0f * input.setpoints[0] + 1.0f * input.setpoints[1] + 1.0f * input.setpoints[2], // front left
     -1.0f * input.setpoints[0] + 1.0f * input.setpoints[1] - 1.0f * input.setpoints[2], // front right
@@ -18,6 +18,6 @@ void MultirotorQuadXMotorMapper::run(struct controller_output_t& input) {
   };
 
   for(int i = 0; i < 4; i++) {
-    setMotorSpeed(i, outputs[i]);
+    setMotorSpeed(i, 0.50f); // TODO: Fix this
   }
 }

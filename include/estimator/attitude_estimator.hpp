@@ -16,7 +16,7 @@ struct attitude_estimate_t {
 
 class AttitudeEstimator {
 public:
-  virtual struct attitude_estimate_t update(struct accelerometer_reading_t& accel_reading, struct gyroscope_reading_t& gyro_reading) =0;
+  virtual attitude_estimate_t update(accelerometer_reading_t& accel_reading, gyroscope_reading_t& gyro_reading) =0;
 };
 
 #endif
