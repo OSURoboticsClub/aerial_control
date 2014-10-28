@@ -218,6 +218,3 @@ ULIBS =
 RULESPATH = $(CHIBIOS)/os/ports/GCC/ARMCMx
 include $(RULESPATH)/rules.mk
 SRCPATHS += src/**
-
-upload: all
-	st-flash write build/$(PROJECT).bin 0x08000000

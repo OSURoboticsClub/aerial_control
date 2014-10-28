@@ -15,3 +15,6 @@ all:
 
 clean:
 	rm -r build
+
+upload: all
+	st-flash write build/$(PROJECT).bin 0x08000000
