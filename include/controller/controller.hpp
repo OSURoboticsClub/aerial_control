@@ -3,19 +3,10 @@
 
 #include <estimator/attitude_estimator.hpp>
 
-struct controller_output_t {
-  float setpoints[4];
-};
-
+template <typename I, typename O>
 class Controller {
 public:
-  virtual controller_output_t run(const attitude_estimate_t& estimate, const controller_output_t& input) =0;
-
-  bool isPassthrough() const;
-  void setPassthrough(bool passthrough);
-
-private:
-  bool passthrough;
+  virtual O run(const attitude_estimate_t& estimate, const I& input) =0;
 };
 
 #endif

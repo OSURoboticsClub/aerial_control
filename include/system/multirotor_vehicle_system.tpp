@@ -15,17 +15,16 @@ void MultirotorVehicleSystem<num_rotors>::update() {
   controller_input_t input = getInputSource()->read();
 
   // Run the controllers
-  controller_output_t controller_input = {
-    .setpoints = {
-      input.roll_sp,
-      input.pitch_sp,
-      input.yaw_sp,
-      input.thrust_sp
-    }
+  attitude_setpoint_t attitude_setpoint = {
+    .pitch_pos_sp = input.roll_sp,
+    .roll_pos_sp = input.pitch_sp,
+    .yaw_pos_sp = input.yaw_sp
+    // TODO: thrust setpoint?
   };
 
-  controller_output_t controller_output = getPipeline()->run(estimate, controller_input);
+  // actuator_setpoint_t controller_output = getPipeline()->run(estimate, controller_input);
+  actuator_setpoint_t setpoint = runController(estimate, attitude_setpoint);
 
-  // Update motor outputs
-  getMotorMapper()->run(controller_output);
+  // TODO: Update motor outputs
+  // getMotorMapper()->run(controller_output);
 }

@@ -1,27 +1,14 @@
 #include <ch.hpp>
 #include <hal.h>
-#include <chprintf.h>
 
 #include <config.hpp>
-
-// Estimators
-#include <estimator/dcm_attitude_estimator.hpp>
 
 // Drivers
 #include <drivers/l3gd20.hpp>
 #include <drivers/lsm303dlhc.hpp>
 
-// Input sources
-#include <input/pwm_receiver_input_source.hpp>
-
-// Controllers
-#include <controller/controller_pipeline.hpp>
-#include <controller/attitude_controller.hpp>
-#include <controller/attitude_rate_controller.hpp>
-
 // Misc
 // #include <communicator.hpp>
-// TODO: Think about how to integrate debugging cleanly.
 #include <debugger.hpp>
 
 // Systems

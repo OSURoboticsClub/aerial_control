@@ -1,7 +1,5 @@
 DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Accelerometer *accelerometer, Gyroscope *gyroscope)
-  : accelerometer(accelerometer), gyroscope(gyroscope),
-    controllers{ &attController, &attRateController },
-    pipeline(controllers, 2) {
+  : accelerometer(accelerometer), gyroscope(gyroscope) {
 }
 
 void DefaultMultirotorVehicleSystem::init() {
@@ -30,10 +28,10 @@ InputSource *DefaultMultirotorVehicleSystem::getInputSource() {
   return &inputSource;
 }
 
-ControllerPipeline *DefaultMultirotorVehicleSystem::getPipeline() {
-  return &pipeline;
-}
-
 MotorMapper *DefaultMultirotorVehicleSystem::getMotorMapper() {
   return &motorMapper;
+}
+
+actuator_setpoint_t DefaultMultirotorVehicleSystem::runController(attitude_estimate_t &estimate, attitude_setpoint_t& setpoint) {
+  return pipeline.run(estimate, setpoint, attPosController, attVelController);
 }

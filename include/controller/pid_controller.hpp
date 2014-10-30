@@ -12,9 +12,9 @@ private:
   float ki;
   float kd;
 
-  float curr_error;
-  float prev_error;
-  float accum_error;
+  float currError;
+  float prevError;
+  float accumError;
 };
 
 #endif

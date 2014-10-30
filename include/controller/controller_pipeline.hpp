@@ -1,19 +1,19 @@
 #ifndef CONTROLLER_PIPELINE_HPP_
 #define CONTROLLER_PIPELINE_HPP_
 
-#include <cstdint>
-
 #include <controller/controller.hpp>
+#include <controller/setpoint_types.hpp>
 
+template <typename R>
 class ControllerPipeline {
 public:
-  ControllerPipeline(Controller *controllers[], std::uint8_t size);
+  template <typename SP, typename C>
+  R run(attitude_estimate_t& estimate, SP& input, C& tail);
 
-  controller_output_t run(attitude_estimate_t& estimate, controller_output_t& input);
-
-private:
-  Controller **controllers;
-  std::uint8_t size;
+  template <typename SP, typename C, typename... Cs>
+  R run(attitude_estimate_t& estimate, SP& input, C& head, Cs&... controllers);
 };
+
+#include <controller/controller_pipeline.tpp>
 
 #endif
