@@ -15,7 +15,7 @@ void MultirotorVehicleSystem<num_rotors>::update() {
   controller_input_t input = getInputSource()->read();
 
   // Run the controllers
-  attitude_setpoint_t attitude_setpoint = {
+  attitude_position_setpoint_t attitude_setpoint = {
     .pitch_pos_sp = input.roll_sp,
     .roll_pos_sp = input.pitch_sp,
     .yaw_pos_sp = input.yaw_sp

@@ -27,7 +27,7 @@ protected:
   InputSource *getInputSource();
   MotorMapper *getMotorMapper();
 
-  actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_setpoint_t& setpoint);
+  actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_position_setpoint_t& setpoint);
 
 private:
   Accelerometer *accelerometer;

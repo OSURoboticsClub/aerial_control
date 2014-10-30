@@ -21,7 +21,7 @@ protected:
   virtual InputSource *getInputSource() =0;
   virtual MotorMapper *getMotorMapper() =0;
 
-  virtual actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_setpoint_t& setpoint);
+  virtual actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_position_setpoint_t& setpoint) =0;
 };
 
 #include <system/multirotor_vehicle_system.tpp>

@@ -8,7 +8,7 @@ AttitudePositionController::AttitudePositionController()
     yawPosPid(10.0, 0.0, 0.0) {
 }
 
-attitude_velocity_setpoint_t AttitudePositionController::run(const attitude_estimate_t& estimate, const attitude_setpoint_t& input) {
+attitude_velocity_setpoint_t AttitudePositionController::run(const attitude_estimate_t& estimate, const attitude_position_setpoint_t& input) {
   // Limit to maximum angles
   float pitchPosSp = std::max(-MAX_PITCH_ROLL_POS, std::min(MAX_PITCH_ROLL_POS, input.pitch_pos_sp));
   float rollPosSp = std::max(-MAX_PITCH_ROLL_POS, std::min(MAX_PITCH_ROLL_POS, input.roll_pos_sp));

@@ -7,11 +7,11 @@
 #include <controller/setpoint_types.hpp>
 #include <estimator/attitude_estimator.hpp>
 
-class AttitudePositionController : public Controller<attitude_setpoint_t, attitude_velocity_setpoint_t> {
+class AttitudePositionController : public Controller<attitude_position_setpoint_t, attitude_velocity_setpoint_t> {
 public:
   AttitudePositionController();
 
-  attitude_velocity_setpoint_t run(const attitude_estimate_t& estimate, const attitude_setpoint_t& input);
+  attitude_velocity_setpoint_t run(const attitude_estimate_t& estimate, const attitude_position_setpoint_t& input) override;
 
 private:
   PIDController pitchPosPid;

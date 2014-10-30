@@ -11,7 +11,7 @@ class AttitudeVelocityController : public Controller<attitude_velocity_setpoint_
 public:
   AttitudeVelocityController();
 
-  actuator_setpoint_t run(const attitude_estimate_t& estimate, const attitude_velocity_setpoint_t& input);
+  actuator_setpoint_t run(const attitude_estimate_t& estimate, const attitude_velocity_setpoint_t& input) override;
 
 private:
   PIDController pitchVelPid;
