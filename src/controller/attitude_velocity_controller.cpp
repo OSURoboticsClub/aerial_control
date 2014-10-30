@@ -20,8 +20,8 @@ actuator_setpoint_t AttitudeVelocityController::run(const attitude_estimate_t& e
   actuator_setpoint_t setpoint = {
     .pitch_sp = pitchActuatorSp,
     .roll_sp = rollActuatorSp,
-    .yaw_sp = yawActuatorSp
-    // TODO: passthrough throttle?
+    .yaw_sp = yawActuatorSp,
+    .throttle_sp = input.throttle_sp
   };
 
   return setpoint;

@@ -20,8 +20,8 @@ attitude_velocity_setpoint_t AttitudePositionController::run(const attitude_esti
   attitude_velocity_setpoint_t setpoint = {
     .pitch_vel_sp = pitchVelSp,
     .roll_vel_sp = rollVelSp,
-    .yaw_vel_sp = yawVelSp
-    // TODO: passthrough throttle?
+    .yaw_vel_sp = yawVelSp,
+    .throttle_sp = input.throttle_sp
   };
 
   return setpoint;

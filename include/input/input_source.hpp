@@ -7,7 +7,7 @@ struct controller_input_t {
   float roll_sp;
   float pitch_sp;
   float yaw_sp;
-  float thrust_sp;
+  float throttle_sp;
 };
 
 class InputSource {

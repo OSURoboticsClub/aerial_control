@@ -18,8 +18,8 @@ void MultirotorVehicleSystem<num_rotors>::update() {
   attitude_position_setpoint_t attitude_setpoint = {
     .pitch_pos_sp = input.roll_sp,
     .roll_pos_sp = input.pitch_sp,
-    .yaw_pos_sp = input.yaw_sp
-    // TODO: thrust setpoint?
+    .yaw_pos_sp = input.yaw_sp,
+    .throttle_sp = input.throttle_sp
   };
 
   // actuator_setpoint_t controller_output = getPipeline()->run(estimate, controller_input);
