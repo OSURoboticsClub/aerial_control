@@ -16,8 +16,8 @@ void MultirotorVehicleSystem<num_rotors>::update() {
 
   // Run the controllers
   attitude_position_setpoint_t attitude_setpoint = {
-    .pitch_pos_sp = input.roll_sp,
-    .roll_pos_sp = input.pitch_sp,
+    .pitch_pos_sp = input.pitch_sp,
+    .roll_pos_sp = input.roll_sp,
     .yaw_pos_sp = input.yaw_sp,
     .throttle_sp = input.throttle_sp
   };

@@ -13,8 +13,8 @@ attitude_velocity_setpoint_t AttitudePositionController::run(const attitude_esti
   float pitchPosSp = std::max(-MAX_PITCH_ROLL_POS, std::min(MAX_PITCH_ROLL_POS, input.pitch_pos_sp));
   float rollPosSp = std::max(-MAX_PITCH_ROLL_POS, std::min(MAX_PITCH_ROLL_POS, input.roll_pos_sp));
 
-  float pitchVelSp = pitchPosPid.calculate(pitchPosSp, estimate.roll, DT);
-  float rollVelSp = rollPosPid.calculate(rollPosSp, estimate.pitch, DT);
+  float pitchVelSp = pitchPosPid.calculate(pitchPosSp, estimate.pitch, DT);
+  float rollVelSp = rollPosPid.calculate(rollPosSp, estimate.roll, DT);
   float yawVelSp = yawPosPid.calculate(input.yaw_pos_sp, estimate.yaw, DT);
 
   attitude_velocity_setpoint_t setpoint = {
