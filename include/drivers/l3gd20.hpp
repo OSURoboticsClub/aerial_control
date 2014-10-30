@@ -62,8 +62,8 @@ class L3GD20 : public Gyroscope {
 public:
   L3GD20(SPIDriver *spi);
 
-  void init();
-  gyroscope_reading_t read();
+  void init() override;
+  gyroscope_reading_t read() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

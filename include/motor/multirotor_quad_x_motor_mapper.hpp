@@ -8,8 +8,8 @@ class MultirotorQuadXMotorMapper : public PWMMotorMapper<4> {
 public:
   MultirotorQuadXMotorMapper();
 
-  void init();
-  void run(actuator_setpoint_t& input);
+  void init() override;
+  void run(actuator_setpoint_t& input) override;
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 class PWMReceiverInputSource : public InputSource {
 public:
-  controller_input_t read();
+  controller_input_t read() override;
 };
 
 #endif

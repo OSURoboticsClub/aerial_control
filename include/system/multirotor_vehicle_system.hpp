@@ -11,8 +11,8 @@
 template <int num_rotors>
 class MultirotorVehicleSystem : public VehicleSystem {
 public:
-  void init();
-  void update();
+  void init() override;
+  void update() override;
 
 protected:
   virtual Accelerometer *getAccelerometer() =0;
