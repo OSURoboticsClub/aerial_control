@@ -1,6 +1,8 @@
 #ifndef PWM_MOTOR_MAPPER_HPP_
 #define PWM_MOTOR_MAPPER_HPP_
 
+#include <array>
+
 #include <hal.h>
 #include <controller/setpoint_types.hpp>
 #include <motor/motor_mapper.hpp>
@@ -14,9 +16,11 @@ public:
 protected:
   PWMMotorMapper();
 
-  void setMotorSpeed(int motor, float percent);
+  void setMotorSpeeds(std::array<float, motor_count> percents);
 
 private:
+  void mapToBounds(std::array<float, motor_count> percents);
+
   PWMDriver *pwm;
   pwmchannel_t channels[motor_count];
 };

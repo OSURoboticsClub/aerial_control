@@ -44,6 +44,7 @@ int main(void) {
   heartbeatThread.start(NORMALPRIO + 10);
   debugger.start(NORMALPRIO + 10);
 
+  pwmInit();
   spiInit();
   i2cInit();
 

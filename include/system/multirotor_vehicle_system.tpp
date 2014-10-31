@@ -26,5 +26,5 @@ void MultirotorVehicleSystem<num_rotors>::update() {
   actuator_setpoint_t setpoint = runController(estimate, attitude_setpoint);
 
   // TODO: Update motor outputs
-  // getMotorMapper()->run(controller_output);
+  getMotorMapper()->run(setpoint);
 }
