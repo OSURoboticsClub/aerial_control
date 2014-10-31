@@ -6,10 +6,26 @@
 // TODO: Put this in the Makefile
 #include <configs/osuar_apollo.h>
 
-static const float DT = 0.001;
+const float DT = 0.001;
+
+// TODO: Move these to board configuration include
+// Motor PWM configuration
+const PWMConfig motor_pwm_config = {
+  500000,    // 500 kHz PWM clock frequency.
+  1000,      // PWM period 2.0 ms.
+  NULL,      // No callback.
+  {
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL}
+  },   // Channel configurations
+  0,0   // HW dependent
+};
+
 
 // L3GD20 SPI configuration
-static const SPIConfig l3gd20_spi_config = {
+const SPIConfig l3gd20_spi_config = {
   NULL,
   GPIOE,
   GPIOE_SPI1_CS,
@@ -18,14 +34,14 @@ static const SPIConfig l3gd20_spi_config = {
 };
 
 // LSM303DHLC I2C configuration
-static const I2CConfig lsm303dlhc_i2c_config = {
+const I2CConfig lsm303dlhc_i2c_config = {
   0x00902025, // voodoo magic
   0,
   0
 };
 
 // USART1 configuration
-static const SerialConfig usart1_config = {
+const SerialConfig usart1_config = {
   115200,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,

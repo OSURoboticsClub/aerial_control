@@ -2,6 +2,8 @@
 #include <limits>
 #include <tuple>
 
+#include <config.hpp>
+
 template <int motor_count>
 PWMMotorMapper<motor_count>::PWMMotorMapper() {
   // TODO: Make this configurable
@@ -13,31 +15,18 @@ PWMMotorMapper<motor_count>::PWMMotorMapper() {
 
 template <int motor_count>
 void PWMMotorMapper<motor_count>::init() {
-  PWMConfig pwmConfig = {
-    500000,    // 500 kHz PWM clock frequency.
-    1000,      // PWM period 2.0 ms.
-    NULL,      // No callback.
-    {
-      {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-      {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-      {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-      {PWM_OUTPUT_ACTIVE_HIGH, NULL}
-    },   // Channel configurations
-    0,0   // HW dependent
-  };
-
-  pwmStart(pwm, &pwmConfig);
-  palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(3));
-  palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(3));
-  palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(3));
-  palSetPadMode(GPIOC, 9, PAL_MODE_ALTERNATE(3));
+  pwmStart(pwm, &motor_pwm_config);
+  palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(4));
+  palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(4));
+  palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(4));
+  palSetPadMode(GPIOC, 9, PAL_MODE_ALTERNATE(4));
 }
 
 template <int motor_count>
 void PWMMotorMapper<motor_count>::setMotorSpeeds(std::array<float, motor_count> percents) {
   for(int i = 0; i < motor_count; i++) {
     pwmcnt_t dc = PWM_PERCENTAGE_TO_WIDTH(pwm, percents[i] * 10000);
-    // pwmEnableChannel(pwm, channels[i], dc); // TODO: This crashes on F3
+    pwmEnableChannel(pwm, channels[i], dc);
   }
 }
 
