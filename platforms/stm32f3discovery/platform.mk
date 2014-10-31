@@ -7,4 +7,4 @@ include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F3xx/port.mk
 LDSCRIPT = $(PORTLD)/STM32F303xC.ld
 
 # Include directory for mcuconf.h
-CONFINC = boards/stm32f3discovery
+CONFINC = platforms/stm32f3discovery

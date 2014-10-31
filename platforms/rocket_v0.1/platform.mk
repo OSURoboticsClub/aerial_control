@@ -7,4 +7,4 @@ include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 LDSCRIPT= $(PORTLD)/STM32F405xG.ld
 
 # Include directory for mcuconf.h
-CONFINC = boards/rocket_v0.1
+CONFINC = platforms/rocket_v0.1
