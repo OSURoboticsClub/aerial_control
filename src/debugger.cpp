@@ -16,8 +16,6 @@ Debugger::Debugger() : chibios_rt::BaseStaticThread<256>() {
 }
 
 msg_t Debugger::main() {
-  setName("debug");
-
   while(true) {
     // TODO: chprintf is really slow at printing floats and causes us to
     // miss our deadline.

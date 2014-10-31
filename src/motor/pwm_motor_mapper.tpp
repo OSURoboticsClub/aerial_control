@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <limits>
-#include <tuple>
 
 #include <config.hpp>
 

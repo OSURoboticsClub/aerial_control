@@ -122,7 +122,8 @@ INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(CONFINC) \
          $(CHIBIOS)/os/various \
          $(CHIBIOS)/os/various/cpp_wrappers \
-         include
+         include \
+         src
 
 #
 # Project, sources and paths

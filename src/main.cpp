@@ -20,8 +20,6 @@ public:
   }
 
   virtual msg_t main() {
-    setName("heartbeat");
-
     while(true) {
       palSetPad(GPIOE, GPIOE_LED3_RED);
       sleep(MS2ST(500));
