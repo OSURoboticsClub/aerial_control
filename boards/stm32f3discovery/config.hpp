@@ -3,12 +3,10 @@
 
 #include <hal.h>
 
-// TODO: Put this in the Makefile
-#include <configs/osuar_apollo.h>
+#include <unit_config.hpp>
 
 const float DT = 0.001;
 
-// TODO: Move these to board configuration include
 // Motor PWM configuration
 const PWMConfig motor_pwm_config = {
   500000,    // 500 kHz PWM clock frequency.
