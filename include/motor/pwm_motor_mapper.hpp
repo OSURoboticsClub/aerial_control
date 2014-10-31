@@ -16,10 +16,10 @@ public:
 protected:
   PWMMotorMapper();
 
-  void setMotorSpeeds(std::array<float, motor_count> percents);
+  void setMotorSpeeds(const std::array<float, motor_count>& percents);
 
 private:
-  void mapToBounds(std::array<float, motor_count> percents);
+  void mapToBounds(std::array<float, motor_count>& percents, std::array<float, motor_count>* mapped);
 
   PWMDriver *pwm;
   pwmchannel_t channels[motor_count];
