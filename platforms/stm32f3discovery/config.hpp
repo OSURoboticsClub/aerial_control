@@ -35,4 +35,10 @@ const SerialConfig usart1_config = {
   0
 };
 
+// System config
+// TODO(yoos): Can we make this safer?
+#define GYRO L3GD20
+#define ACCEL LSM303DLHC
+#define SYSTEM DefaultMultirotorVehicleSystem
+
 #endif

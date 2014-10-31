@@ -54,13 +54,13 @@ int main(void) {
   palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(7));
 
   // Build and initialize the system
-  L3GD20 gyro(&SPID1);
-  LSM303DLHC accel(&I2CD1);
+  GYRO gyro(&SPID1);
+  ACCEL accel(&I2CD1);
 
   gyro.init();
   accel.init();
 
-  DefaultMultirotorVehicleSystem system(&accel, &gyro);
+  SYSTEM system(&accel, &gyro);
   system.init();
 
   // Loop at a fixed rate forever
