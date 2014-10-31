@@ -1,5 +1,7 @@
 #include <motor/multirotor_quad_x_motor_mapper.hpp>
 
+#include <array>
+
 MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper() {
 }
 
@@ -8,14 +10,19 @@ void MultirotorQuadXMotorMapper::init() {
 }
 
 void MultirotorQuadXMotorMapper::run(actuator_setpoint_t& input) {
-  float outputs[4] = {
+  // Calculate output shifts
+  std::array<float, 4> output_shifts = {
      1.0f * input.pitch_sp + 1.0f * input.roll_sp + 1.0f * input.yaw_sp, // front left
     -1.0f * input.pitch_sp + 1.0f * input.roll_sp - 1.0f * input.yaw_sp, // front right
     -1.0f * input.pitch_sp - 1.0f * input.roll_sp + 1.0f * input.yaw_sp, // back right
      1.0f * input.pitch_sp - 1.0f * input.roll_sp - 1.0f * input.yaw_sp  // back left
   };
 
+  // Add throttle to shifts to get absolute output value
+  std::array<float, 4> outputs = { 0 };
   for(int i = 0; i < 4; i++) {
-    setMotorSpeed(i, 0.50f); // TODO: Fix this
+    outputs[i] = input.throttle_sp + output_shifts[i];
   }
+
+  setMotorSpeeds(outputs);
 }
