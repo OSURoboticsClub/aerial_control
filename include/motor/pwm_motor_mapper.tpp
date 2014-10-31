@@ -6,8 +6,6 @@
 
 template <int motor_count>
 PWMMotorMapper<motor_count>::PWMMotorMapper() {
-  // TODO: Make this configurable
-  pwm = &PWMD8;
   for(int i = 0; i < motor_count; i++) {
     channels[i] = i;
   }
@@ -15,11 +13,7 @@ PWMMotorMapper<motor_count>::PWMMotorMapper() {
 
 template <int motor_count>
 void PWMMotorMapper<motor_count>::init() {
-  pwmStart(pwm, &motor_pwm_config);
-  palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(4));
-  palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(4));
-  palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(4));
-  palSetPadMode(GPIOC, 9, PAL_MODE_ALTERNATE(4));
+  pwm = pwmPlatformInit();
 }
 
 template <int motor_count>

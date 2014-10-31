@@ -3,24 +3,13 @@
 
 #include <hal.h>
 
+// Platform config
+#include <pwm_config.hpp>
+
+// Unit config
 #include <unit_config.hpp>
 
 const float DT = 0.001;
-
-// Motor PWM configuration
-const PWMConfig motor_pwm_config = {
-  500000,    // 500 kHz PWM clock frequency.
-  1000,      // PWM period 2.0 ms.
-  NULL,      // No callback.
-  {
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL}
-  },   // Channel configurations
-  0,0   // HW dependent
-};
-
 
 // L3GD20 SPI configuration
 const SPIConfig l3gd20_spi_config = {

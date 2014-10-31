@@ -8,3 +8,6 @@ LDSCRIPT = $(PORTLD)/STM32F303xC.ld
 
 # Include directory for mcuconf.h
 CONFINC = platforms/stm32f3discovery
+
+# Sources for config
+CPPSRC += $(wildcard platforms/stm32f3discovery/*.cpp)
