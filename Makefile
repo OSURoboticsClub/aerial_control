@@ -10,5 +10,5 @@ upload:
 	st-flash write build/osuar_control.bin 0x08000000
 
 clean:
-	rm -r build
+	rm -r build .dep
 
