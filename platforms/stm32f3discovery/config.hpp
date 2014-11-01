@@ -3,8 +3,18 @@
 
 #include <hal.h>
 
+// Drivers
+//#include <drivers/l3gd20.hpp>
+//#include <drivers/lsm303dlhc.hpp>
+
+// Systems
+//#include <system/default_multirotor_vehicle_system.hpp>
+
 // Platform config
+#include <i2c_config.hpp>
 #include <pwm_config.hpp>
+#include <spi_config.hpp>
+#include <usart_config.hpp>
 
 // Unit config
 #include <unit_config.hpp>
@@ -27,16 +37,11 @@ const I2CConfig lsm303dlhc_i2c_config = {
   0
 };
 
-// USART1 configuration
-const SerialConfig usart1_config = {
-  115200,
-  0,
-  USART_CR2_STOP1_BITS | USART_CR2_LINEN,
-  0
-};
-
 // System config
 // TODO(yoos): Can we make this safer?
+//static L3GD20 gyro(&SPID1);
+//static LSM303DLHC accel(&I2CD1);
+//static DefaultMultirotorVehicleSystem system(&accel, &gyro);
 #define GYRO L3GD20
 #define ACCEL LSM303DLHC
 #define SYSTEM DefaultMultirotorVehicleSystem

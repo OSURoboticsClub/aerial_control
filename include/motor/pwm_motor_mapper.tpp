@@ -22,8 +22,7 @@ void PWMMotorMapper<motor_count>::setMotorSpeeds(const std::array<float, motor_c
   mapToBounds(mappedPercents, &mappedPercents);
 
   for(int i = 0; i < motor_count; i++) {
-    pwmcnt_t dc = PWM_PERCENTAGE_TO_WIDTH(pwm, percents[i] * 10000);
-    pwmEnableChannel(pwm, channels[i], dc);
+    pwmPlatformSet(i, percents[i]);
   }
 }
 

@@ -48,10 +48,7 @@ int main(void) {
   spiInit();
   i2cInit();
 
-  // Start USART
-  sdStart(&SD1, &usart1_config);
-  palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(7));
-  palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(7));
+  usartPlatformInit();
 
   // Build and initialize the system
   GYRO gyro(&SPID1);

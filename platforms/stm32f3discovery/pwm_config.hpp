@@ -17,5 +17,6 @@ const PWMConfig motor_pwm_config = {
 };
 
 PWMDriver *pwmPlatformInit(void);
+void pwmPlatformSet(uint8_t ch, float dc);
 
 #endif // PWM_CONFIG_HPP_
