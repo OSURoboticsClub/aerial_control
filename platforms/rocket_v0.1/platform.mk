@@ -8,3 +8,6 @@ LDSCRIPT= $(PORTLD)/STM32F405xG.ld
 
 # Include directory for mcuconf.h
 CONFINC = platforms/rocket_v0.1
+
+# Sources for config
+CPPSRC += $(wildcard platforms/rocket_v0.1/*.cpp)
