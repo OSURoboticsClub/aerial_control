@@ -1,8 +1,8 @@
 #ifndef DEFAULT_MULTIROTOR_VEHICLE_SYSTEM_HPP_
 #define DEFAULT_MULTIROTOR_VEHICLE_SYSTEM_HPP_
 
-#include <controller/attitude_position_controller.hpp>
-#include <controller/attitude_velocity_controller.hpp>
+#include <controller/angular_position_controller.hpp>
+#include <controller/angular_velocity_controller.hpp>
 #include <controller/controller_pipeline.hpp>
 #include <estimator/attitude_estimator.hpp>
 #include <estimator/dcm_attitude_estimator.hpp>
@@ -27,7 +27,7 @@ protected:
   inline InputSource *getInputSource() override;
   inline MotorMapper *getMotorMapper() override;
 
-  inline actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_position_setpoint_t& setpoint) override;
+  inline actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) override;
 
 private:
   Accelerometer *accelerometer;
@@ -36,8 +36,8 @@ private:
   DCMAttitudeEstimator estimator;
   PWMReceiverInputSource inputSource;
 
-  AttitudePositionController attPosController;
-  AttitudeVelocityController attVelController;
+  AngularPositionController attPosController;
+  AngularVelocityController attVelController;
   ControllerPipeline<actuator_setpoint_t> pipeline;
 
   MultirotorQuadXMotorMapper motorMapper;

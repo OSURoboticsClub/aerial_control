@@ -32,6 +32,6 @@ MotorMapper *DefaultMultirotorVehicleSystem::getMotorMapper() {
   return &motorMapper;
 }
 
-actuator_setpoint_t DefaultMultirotorVehicleSystem::runController(attitude_estimate_t &estimate, attitude_position_setpoint_t& setpoint) {
+actuator_setpoint_t DefaultMultirotorVehicleSystem::runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) {
   return pipeline.run(estimate, setpoint, attPosController, attVelController);
 }

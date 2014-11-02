@@ -1,16 +1,16 @@
-#include <controller/attitude_velocity_controller.hpp>
+#include <controller/angular_velocity_controller.hpp>
 
 #include <config.hpp>
 
 #include <algorithm>
 
-AttitudeVelocityController::AttitudeVelocityController()
+AngularVelocityController::AngularVelocityController()
   : pitchVelPid(10.0, 0.0, 0.0),
     rollVelPid(10.0, 0.0, 0.0),
     yawVelPid(10.0, 0.0, 0.0) {
 }
 
-actuator_setpoint_t AttitudeVelocityController::run(const attitude_estimate_t& estimate, const attitude_velocity_setpoint_t& input) {
+actuator_setpoint_t AngularVelocityController::run(const attitude_estimate_t& estimate, const angular_velocity_setpoint_t& input) {
   float pitchActuatorSp = pitchVelPid.calculate(input.pitch_vel_sp, estimate.pitch_vel, DT);
   float rollActuatorSp = rollVelPid.calculate(input.roll_vel_sp, estimate.roll_vel, DT);
   float yawActuatorSp = yawVelPid.calculate(input.yaw_vel_sp, estimate.yaw_vel, DT);
