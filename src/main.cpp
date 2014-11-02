@@ -2,17 +2,11 @@
 #include <hal.h>
 
 #include <config.hpp>
-
-// Drivers
-#include <drivers/l3gd20.hpp>
-#include <drivers/lsm303dlhc.hpp>
+#include <platform_config.hpp>
 
 // Misc
 // #include <communicator.hpp>
 #include <debugger.hpp>
-
-// Systems
-#include <system/default_multirotor_vehicle_system.hpp>
 
 class HeartbeatThread : public chibios_rt::BaseStaticThread<64> {
 public:
@@ -49,14 +43,9 @@ int main(void) {
   usartPlatformInit();
 
   // Build and initialize the system
-  GYRO gyro(&SPID1);
-  ACCEL accel(&I2CD1);
-
-  gyro.init();
-  accel.init();
-
-  SYSTEM system(&accel, &gyro);
-  system.init();
+  platform::gyro.init();
+  platform::accel.init();
+  platform::system.init();
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
@@ -64,10 +53,10 @@ int main(void) {
   while(true) {
     deadline += MS2ST(DT * 1000);
 
-    system.update();
+    platform::system.update();
 
     chibios_rt::BaseThread::sleepUntil(deadline);
- }
+  }
 
   return 0;
 }
