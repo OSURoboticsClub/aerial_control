@@ -15,19 +15,19 @@
 
 class DefaultMultirotorVehicleSystem : public MultirotorVehicleSystem<4> {
 public:
-  DefaultMultirotorVehicleSystem(Accelerometer *accelerometer, Gyroscope *gyroscope);
+  inline DefaultMultirotorVehicleSystem(Accelerometer *accelerometer, Gyroscope *gyroscope);
 
-  void init() override;
-  void update() override;
+  inline void init() override;
+  inline void update() override;
 
 protected:
-  Accelerometer *getAccelerometer() override;
-  Gyroscope *getGyroscope() override;
-  AttitudeEstimator *getAttitudeEstimator() override;
-  InputSource *getInputSource() override;
-  MotorMapper *getMotorMapper() override;
+  inline Accelerometer *getAccelerometer() override;
+  inline Gyroscope *getGyroscope() override;
+  inline AttitudeEstimator *getAttitudeEstimator() override;
+  inline InputSource *getInputSource() override;
+  inline MotorMapper *getMotorMapper() override;
 
-  actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_position_setpoint_t& setpoint) override;
+  inline actuator_setpoint_t runController(attitude_estimate_t &estimate, attitude_position_setpoint_t& setpoint) override;
 
 private:
   Accelerometer *accelerometer;
