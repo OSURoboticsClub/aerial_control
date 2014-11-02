@@ -1,7 +1,6 @@
 #ifndef ATTITUDE_VELOCITY_CONTROLLER_HPP_
 #define ATTITUDE_VELOCITY_CONTROLLER_HPP_
 
-#include <config.hpp>
 #include <controller/controller.hpp>
 #include <controller/pid_controller.hpp>
 #include <controller/setpoint_types.hpp>

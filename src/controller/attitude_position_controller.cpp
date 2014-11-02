@@ -1,5 +1,7 @@
 #include <controller/attitude_position_controller.hpp>
 
+#include <config.hpp>
+
 #include <algorithm>
 
 AttitudePositionController::AttitudePositionController()

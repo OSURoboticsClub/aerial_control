@@ -1,5 +1,7 @@
 #include <controller/attitude_velocity_controller.hpp>
 
+#include <config.hpp>
+
 #include <algorithm>
 
 AttitudeVelocityController::AttitudeVelocityController()

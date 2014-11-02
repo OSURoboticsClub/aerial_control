@@ -1,6 +1,6 @@
 #include <drivers/l3gd20.hpp>
 
-#include <ch.hpp>
+#include <hal.h>
 
 #include <config.hpp>
 
