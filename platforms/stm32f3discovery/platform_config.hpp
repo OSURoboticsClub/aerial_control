@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PLATFORM_CONFIG_HPP_
+#define PLATFORM_CONFIG_HPP_
 
 // Drivers
 #include <drivers/l3gd20.hpp>
@@ -15,3 +16,4 @@ extern DefaultMultirotorVehicleSystem system;
 
 }
 
+#endif // PLATFORM_CONFIG_HPP_
