@@ -2,7 +2,7 @@
 
 #include <hal.h>
 
-#include <config.hpp>
+#include <hal_config.hpp>
 
 LSM303DLHC::LSM303DLHC(I2CDriver *i2c) : i2c(i2c) {
 }

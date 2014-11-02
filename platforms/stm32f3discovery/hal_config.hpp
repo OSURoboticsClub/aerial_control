@@ -1,5 +1,5 @@
-#ifndef CONFIG_HPP_
-#define CONFIG_HPP_
+#ifndef HAL_CONFIG_HPP_
+#define HAL_CONFIG_HPP_
 
 #include <hal.h>
 

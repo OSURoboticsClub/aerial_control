@@ -1,7 +1,7 @@
 #include <ch.hpp>
 #include <hal.h>
 
-#include <config.hpp>
+#include <hal_config.hpp>
 #include <platform_config.hpp>
 
 // Misc

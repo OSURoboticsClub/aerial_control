@@ -2,7 +2,7 @@
 
 #include <hal.h>
 
-#include <config.hpp>
+#include <hal_config.hpp>
 
 L3GD20::L3GD20(SPIDriver *spi) : spi(spi) {
 }

@@ -1,6 +1,6 @@
 #include <controller/angular_velocity_controller.hpp>
 
-#include <config.hpp>
+#include <hal_config.hpp>
 
 #include <algorithm>
 
