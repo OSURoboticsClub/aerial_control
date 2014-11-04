@@ -8,8 +8,6 @@ LSM303DLHC::LSM303DLHC(I2CDriver *i2c) : i2c(i2c) {
 }
 
 void LSM303DLHC::init() {
-  i2cStart(i2c, &lsm303dlhc_i2c_config);
-
   // Wake up device and enable X, Y, and Z outputs.
   writeRegister(LSM303_I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
 }

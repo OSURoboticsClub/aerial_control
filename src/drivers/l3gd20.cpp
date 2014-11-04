@@ -8,8 +8,6 @@ L3GD20::L3GD20(SPIDriver *spi) : spi(spi) {
 }
 
 void L3GD20::init() {
-  spiStart(spi, &l3gd20_spi_config);
-
   // Wake up device, enable X, Y, and Z outputs, and set 760Hz mode.
   writeRegister(L3GD20_SPI_AD_CTRL_REG1, 0x0F | (1 << 7) | (1 << 6));
 
