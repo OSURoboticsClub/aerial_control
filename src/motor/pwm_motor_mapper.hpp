@@ -22,7 +22,6 @@ private:
   void mapToBounds(std::array<float, motor_count>& percents, std::array<float, motor_count>* mapped);
 
   PWMDriver *pwm;
-  pwmchannel_t channels[motor_count];
 };
 
 #include <motor/pwm_motor_mapper.tpp>

@@ -5,9 +5,6 @@
 
 template <int motor_count>
 PWMMotorMapper<motor_count>::PWMMotorMapper() {
-  for(int i = 0; i < motor_count; i++) {
-    channels[i] = i;
-  }
 }
 
 template <int motor_count>
