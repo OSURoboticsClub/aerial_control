@@ -38,6 +38,39 @@ attitude_estimate_t DCMAttitudeEstimator::update(accelerometer_reading_t& accel_
   return estimate;
 }
 
+// TODO(yoos): HACK. This is a copy of the above, only that it accepts imu_reading_t.
+attitude_estimate_t DCMAttitudeEstimator::update(imu_reading_t& imu_reading) {
+  Eigen::Vector3f accel(imu_reading.acc);
+  Eigen::Vector3f gyro(imu_reading.gyr);
+
+  accel.normalize();
+
+  Eigen::Vector3f corr(0.0f, 0.0f, 0.0f);
+  corr += gyro * DT;
+  corr -= dcm.col(2).cross(accel);
+
+  Eigen::Matrix3f dcmStep;
+  dcmStep <<      1.0f, -corr.z(), -corr.y(),
+             -corr.z(),      1.0f,  corr.x(),
+              corr.y(), -corr.x(),      1.0f;
+
+  dcm *= dcmStep;
+
+  orthonormalize();
+
+  attitude_estimate_t estimate = {
+    // TODO: Are these trig functions safe at extreme angles?
+    .pitch = -asinf(dcm(2, 0)),
+    .roll = atan2f(dcm(2, 1), dcm(2, 2)),
+    .yaw = atan2f(dcm(1, 0), dcm(0, 0)),
+    .pitch_vel = gyro.y(),
+    .roll_vel = gyro.x(),
+    .yaw_vel = gyro.z()
+  };
+
+  return estimate;
+}
+
 void DCMAttitudeEstimator::orthonormalize() {
   // Make the i and j vectors orthogonal
   float error = dcm.row(0).dot(dcm.row(1));

@@ -1,17 +1,15 @@
 template <int num_rotors>
-void MultirotorVehicleSystem<num_rotors>::init() {
-  getGyroscope()->init();
-  getAccelerometer()->init();
+void RocketSystem<num_rotors>::init() {
+  getIMU()->init();
 }
 
 template <int num_rotors>
-void MultirotorVehicleSystem<num_rotors>::update() {
-  // Poll the accelerometer and gyroscope
-  accelerometer_reading_t accel_reading = getAccelerometer()->read();
-  gyroscope_reading_t gyro_reading = getGyroscope()->read();
+void RocketSystem<num_rotors>::update() {
+  // Poll the IMU
+  imu_reading_t imu_reading = getIMU()->read();
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = getAttitudeEstimator()->update(accel_reading, gyro_reading);
+  attitude_estimate_t estimate = getAttitudeEstimator()->update(imu_reading);
 
   // Poll for controller input
   controller_input_t input = getInputSource()->read();

@@ -15,9 +15,9 @@ public:
 
   virtual msg_t main() {
     while(true) {
-      palSetPad(GPIOE, GPIOE_LED3_RED);
+      //palSetPad(GPIOE, GPIOE_LED3_RED);
       sleep(MS2ST(500));
-      palClearPad(GPIOE, GPIOE_LED3_RED);
+      //palClearPad(GPIOE, GPIOE_LED3_RED);
       sleep(MS2ST(500));
     }
 
@@ -46,8 +46,8 @@ int main(void) {
   usartPlatformInit();
 
   // Build and initialize the system
-  platform::gyro.init();
-  platform::accel.init();
+  //platform::gyro.init();
+  //platform::accel.init();
   platform::system.init();
 
   // Loop at a fixed rate forever
