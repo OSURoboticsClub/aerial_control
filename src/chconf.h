@@ -41,7 +41,7 @@
  *          setting also defines the system tick time unit.
  */
 #if !defined(CH_FREQUENCY) || defined(__DOXYGEN__)
-#define CH_FREQUENCY                    500000
+#define CH_FREQUENCY                    200000
 #endif
 
 /**
