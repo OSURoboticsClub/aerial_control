@@ -10,4 +10,6 @@ const SPIConfig l3gd20_spi_config = {
   SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0
 };
 
+void spiPlatformInit(void);
+
 #endif // SPI_CONFIG_HPP_

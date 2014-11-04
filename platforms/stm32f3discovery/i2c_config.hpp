@@ -8,4 +8,6 @@ const I2CConfig lsm303dlhc_i2c_config = {
   0
 };
 
+void i2cPlatformInit(void);
+
 #endif // I2C_CONFIG_HPP_
