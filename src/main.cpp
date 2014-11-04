@@ -40,6 +40,7 @@ int main(void) {
   spiInit();
   i2cInit();
 
+  pwmPlatformInit();
   usartPlatformInit();
 
   // Build and initialize the system

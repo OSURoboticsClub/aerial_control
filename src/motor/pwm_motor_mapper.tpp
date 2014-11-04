@@ -9,7 +9,6 @@ PWMMotorMapper<motor_count>::PWMMotorMapper() {
 
 template <int motor_count>
 void PWMMotorMapper<motor_count>::init() {
-  pwmPlatformInit();
 }
 
 template <int motor_count>
