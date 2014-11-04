@@ -20,8 +20,6 @@ protected:
 
 private:
   void mapToBounds(std::array<float, motor_count>& percents, std::array<float, motor_count>* mapped);
-
-  PWMDriver *pwm;
 };
 
 #include <motor/pwm_motor_mapper.tpp>
