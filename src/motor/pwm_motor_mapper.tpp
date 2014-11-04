@@ -14,16 +14,16 @@ void PWMMotorMapper<motor_count>::init() {
 
 template <int motor_count>
 void PWMMotorMapper<motor_count>::setMotorSpeeds(const std::array<float, motor_count>& percents) {
-  std::array<float, motor_count> mappedPercents = percents; // copy
-  mapToBounds(mappedPercents, &mappedPercents);
+  std::array<float, motor_count> mappedPercents;
+  mapToBounds(percents, &mappedPercents);
 
   for(int i = 0; i < motor_count; i++) {
-    pwmPlatformSet(i, percents[i]);
+    pwmPlatformSet(i, mappedPercents[i]);
   }
 }
 
 template <int motor_count>
-void PWMMotorMapper<motor_count>::mapToBounds(std::array<float, motor_count>& percents, std::array<float, motor_count>* mapped) {
+void PWMMotorMapper<motor_count>::mapToBounds(const std::array<float, motor_count>& percents, std::array<float, motor_count>* mapped) {
   // TODO: Make these configurable
   float output_min = 0.0f, output_max = 0.7f;
 
