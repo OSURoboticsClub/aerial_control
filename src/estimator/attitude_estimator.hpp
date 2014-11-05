@@ -5,12 +5,12 @@
 #include <sensor/gyroscope.hpp>
 
 struct attitude_estimate_t {
-  float pitch;
   float roll;
+  float pitch;
   float yaw;
 
-  float pitch_vel;
   float roll_vel;
+  float pitch_vel;
   float yaw_vel;
 };
 

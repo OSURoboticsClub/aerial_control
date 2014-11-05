@@ -24,8 +24,8 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
   i2cReleaseBus(this->i2c);
 
   // Swapped for board orientation
-  raw[0] = (rxbuf[1] << 8) | rxbuf[0];
-  raw[1] = -((rxbuf[3] << 8) | rxbuf[2]);
+  raw[0] = -((rxbuf[3] << 8) | rxbuf[2]);
+  raw[1] = (rxbuf[1] << 8) | rxbuf[0];
   raw[2] = (rxbuf[5] << 8) | rxbuf[4];
 
   accelerometer_reading_t reading;

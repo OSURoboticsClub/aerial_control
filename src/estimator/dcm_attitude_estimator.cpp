@@ -27,11 +27,11 @@ attitude_estimate_t DCMAttitudeEstimator::update(accelerometer_reading_t& accel_
 
   attitude_estimate_t estimate = {
     // TODO: Are these trig functions safe at extreme angles?
-    .pitch = -asinf(dcm(2, 0)),
     .roll = atan2f(dcm(2, 1), dcm(2, 2)),
+    .pitch = -asinf(dcm(2, 0)),
     .yaw = atan2f(dcm(1, 0), dcm(0, 0)),
-    .pitch_vel = gyro.y(),
     .roll_vel = gyro.x(),
+    .pitch_vel = gyro.y(),
     .yaw_vel = gyro.z()
   };
 

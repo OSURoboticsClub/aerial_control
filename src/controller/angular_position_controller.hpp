@@ -14,8 +14,8 @@ public:
   angular_velocity_setpoint_t run(const attitude_estimate_t& estimate, const angular_position_setpoint_t& input) override;
 
 private:
-  PIDController pitchPosPid;
   PIDController rollPosPid;
+  PIDController pitchPosPid;
   PIDController yawPosPid;
 };
 
