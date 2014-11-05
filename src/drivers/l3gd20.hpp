@@ -63,7 +63,7 @@ public:
   L3GD20(SPIDriver *spi);
 
   void init() override;
-  gyroscope_reading_t read() override;
+  gyroscope_reading_t readGyro() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

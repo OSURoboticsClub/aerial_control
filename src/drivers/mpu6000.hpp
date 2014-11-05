@@ -3,14 +3,16 @@
 
 #include <hal.h>
 
-#include <sensor/imu.hpp>
+#include <sensor/accelerometer.hpp>
+#include <sensor/gyroscope.hpp>
 
-class MPU6000 : public IMU {
+class MPU6000 : public Accelerometer, public Gyroscope {
 public:
   MPU6000(SPIDriver *spi);
 
   void init() override;
-  imu_reading_t read() override;
+  accelerometer_reading_t readAccel() override;
+  gyroscope_reading_t readGyro() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

@@ -15,7 +15,7 @@ void L3GD20::init() {
   writeRegister(L3GD20_SPI_AD_CTRL_REG4, (1 << 5) | (1 << 4));
 }
 
-gyroscope_reading_t L3GD20::read() {
+gyroscope_reading_t L3GD20::readGyro() {
   uint8_t txbuf[8];
   uint8_t rxbuf[8];
   int16_t raw[3];

@@ -1,15 +1,17 @@
 template <int num_rotors>
 void RocketSystem<num_rotors>::init() {
-  getIMU()->init();
+  getAccelerometer()->init();
+  getGyroscope()->init();
 }
 
 template <int num_rotors>
 void RocketSystem<num_rotors>::update() {
   // Poll the IMU
-  imu_reading_t imu_reading = getIMU()->read();
+  accelerometer_reading_t accel_reading = getAccelerometer()->readAccel();
+  gyroscope_reading_t gyro_reading = getGyroscope()->readGyro();
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = getAttitudeEstimator()->update(imu_reading);
+  attitude_estimate_t estimate = getAttitudeEstimator()->update(accel_reading, gyro_reading);
 
   // Poll for controller input
   controller_input_t input = getInputSource()->read();

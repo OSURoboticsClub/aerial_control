@@ -15,7 +15,15 @@ void MPU6000::init() {
   //writeRegister(mpu6000_SPI_AD_CTRL_REG4, (1 << 5) | (1 << 4));
 }
 
-imu_reading_t MPU6000::read() {
+gyroscope_reading_t MPU6000::readGyro() {
+  gyroscope_reading_t reading;
+
+  // TODO: Implement
+
+  return reading;
+}
+
+accelerometer_reading_t MPU6000::readAccel() {
   uint8_t txbuf[8];
   uint8_t rxbuf[8];
   int16_t raw_gyr[3];
@@ -34,11 +42,11 @@ imu_reading_t MPU6000::read() {
   raw_gyr[1] = (rxbuf[2] << 8) | rxbuf[1];
   raw_gyr[2] = (rxbuf[6] << 8) | rxbuf[5];
 
-  imu_reading_t reading;
+  accelerometer_reading_t reading;
 
-  for(int i = 0; i < 3; i++) {
-    reading.gyr[i] = 0;//(float) raw[i] * mpu6000_SENSITIVITY_2000DPS * mpu6000_DPS_TO_RADS;
-  }
+  // for(int i = 0; i < 3; i++) {
+  //   reading.gyr[i] = 0;//(float) raw[i] * mpu6000_SENSITIVITY_2000DPS * mpu6000_DPS_TO_RADS;
+  // }
 
   return reading;
 }

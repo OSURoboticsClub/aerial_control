@@ -1,5 +1,6 @@
-EsraRocketSystem::EsraRocketSystem(IMU *imu)
-  : imu(imu) {
+EsraRocketSystem::EsraRocketSystem(Accelerometer *accelerometer, Gyroscope *gyroscope)
+  : accelerometer(accelerometer),
+    gyroscope(gyroscope) {
 }
 
 void EsraRocketSystem::init() {
@@ -12,8 +13,12 @@ void EsraRocketSystem::update() {
   RocketSystem::update();
 }
 
-IMU *EsraRocketSystem::getIMU() {
-  return imu;
+Accelerometer *EsraRocketSystem::getAccelerometer() {
+  return accelerometer;
+}
+
+Gyroscope *EsraRocketSystem::getGyroscope() {
+  return gyroscope;
 }
 
 AttitudeEstimator *EsraRocketSystem::getAttitudeEstimator() {

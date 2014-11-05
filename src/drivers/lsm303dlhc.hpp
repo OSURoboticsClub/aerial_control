@@ -43,7 +43,7 @@ public:
   LSM303DLHC(I2CDriver *i2c);
 
   void init() override;
-  accelerometer_reading_t read() override;
+  accelerometer_reading_t readAccel() override;
 
 private:
   uint8_t readRegister(uint8_t reg);
