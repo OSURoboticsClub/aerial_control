@@ -13,7 +13,7 @@ PWMDriver *pwmPlatformInit(void) {
 
 // TODO(yoos): process multiple drivers
 void pwmPlatformSet(uint8_t ch, float dc) {
-  pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc * 10000);
+  pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc * 10000.0f);
   pwmEnableChannel(&PWMD8, ch, width);
 }
 
