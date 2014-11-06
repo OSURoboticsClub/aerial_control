@@ -14,6 +14,8 @@ extern L3GD20 gyro;
 extern LSM303DLHC accel;
 extern DefaultMultirotorVehicleSystem system;
 
+extern void init();
+
 }
 
 #endif // PLATFORM_CONFIG_HPP_

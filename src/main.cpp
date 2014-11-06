@@ -49,9 +49,7 @@ int main(void) {
   usartPlatformInit();
 
   // Build and initialize the system
-  //platform::gyro.init();
-  //platform::accel.init();
-  platform::system.init();
+  platform::init();
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
