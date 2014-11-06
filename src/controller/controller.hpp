@@ -3,6 +3,10 @@
 
 #include <estimator/attitude_estimator.hpp>
 
+/**
+ * A single stage in a pipeline of controllers accepting setpoints of type `I`
+ * and producing setpoints of type `O`.
+ */
 template <typename I, typename O>
 class Controller {
 public:

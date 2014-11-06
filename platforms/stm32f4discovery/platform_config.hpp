@@ -10,6 +10,8 @@ namespace platform {
 
 extern VehicleSystem system;
 
+extern void init();
+
 }
 
 #endif // PLATFORM_CONFIG_HPP_

@@ -16,6 +16,10 @@ struct attitude_estimate_t {
 
 class AttitudeEstimator {
 public:
+  /**
+   * Runs the estimator on the latest accelerometer and gyroscope readings,
+   * producing a new attitude estimate.
+   */
   virtual attitude_estimate_t update(accelerometer_reading_t& accel_reading, gyroscope_reading_t& gyro_reading) =0;
 };
 

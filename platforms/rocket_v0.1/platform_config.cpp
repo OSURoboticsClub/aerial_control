@@ -5,4 +5,9 @@ namespace platform {
 MPU6000 imu(&SPID1);
 EsraRocketSystem system(&imu, &imu);
 
+void init() {
+  imu.init();
+  system.init();
+}
+
 }

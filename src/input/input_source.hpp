@@ -10,8 +10,14 @@ struct controller_input_t {
   float throttle_sp;
 };
 
+/**
+ * A source for input setpoints.
+ */
 class InputSource {
 public:
+  /**
+   * Reads from the source and returns the setpoints.
+   */
   virtual controller_input_t read() =0;
 };
 

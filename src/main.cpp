@@ -8,6 +8,9 @@
 // #include <communicator.hpp>
 #include <debugger.hpp>
 
+/**
+ * Blinks an LED to show that the software is still alive.
+ */
 class HeartbeatThread : public chibios_rt::BaseStaticThread<64> {
 public:
   HeartbeatThread() : chibios_rt::BaseStaticThread<64>() {
@@ -46,9 +49,7 @@ int main(void) {
   usartPlatformInit();
 
   // Build and initialize the system
-  //platform::gyro.init();
-  //platform::accel.init();
-  platform::system.init();
+  platform::init();
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
