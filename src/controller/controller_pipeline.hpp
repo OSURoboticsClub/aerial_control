@@ -4,6 +4,10 @@
 #include <controller/controller.hpp>
 #include <controller/setpoint_types.hpp>
 
+/**
+ * Provides a simple interface to submitting setpoints to a series of
+ * controllers to be run sequentially. Produces a final setpoint of type `R`.
+ */
 template <typename R>
 class ControllerPipeline {
 public:

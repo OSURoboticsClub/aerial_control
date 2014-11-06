@@ -8,6 +8,9 @@
 // #include <communicator.hpp>
 #include <debugger.hpp>
 
+/**
+ * Blinks an LED to show that the software is still alive.
+ */
 class HeartbeatThread : public chibios_rt::BaseStaticThread<64> {
 public:
   HeartbeatThread() : chibios_rt::BaseStaticThread<64>() {
