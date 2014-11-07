@@ -1,7 +1,5 @@
 template <int num_rotors>
 void MultirotorVehicleSystem<num_rotors>::init() {
-  getGyroscope()->init();
-  getAccelerometer()->init();
 }
 
 template <int num_rotors>
