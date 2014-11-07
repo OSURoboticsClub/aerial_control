@@ -36,8 +36,8 @@ int main(void) {
   chibios_rt::System::init();
 
   // Start the background threads
-  heartbeatThread.start(NORMALPRIO + 10);
-  debugger.start(NORMALPRIO + 10);
+  heartbeatThread.start(LOWPRIO);
+  debugger.start(LOWPRIO);
 
   pwmInit();
   spiInit();
