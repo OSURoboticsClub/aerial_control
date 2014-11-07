@@ -27,7 +27,7 @@ protected:
   inline InputSource *getInputSource() override;
   inline MotorMapper *getMotorMapper() override;
 
-  inline actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) override;
+  inline actuator_setpoint_t runController(const attitude_estimate_t &estimate, const angular_position_setpoint_t& setpoint) override;
 
 private:
   Accelerometer *accelerometer;
