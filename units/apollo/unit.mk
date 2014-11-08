@@ -1,4 +1,3 @@
-CHIBIOS = ChibiOS-RT
 include platforms/stm32f3discovery/platform.mk
 include platforms/ch.mk
 
