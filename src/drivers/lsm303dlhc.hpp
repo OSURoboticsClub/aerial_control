@@ -40,7 +40,7 @@
 
 class LSM303DLHC : public Accelerometer {
 public:
-  LSM303DLHC(I2CDriver *i2c);
+  LSM303DLHC(I2CDriver *i2cd);
 
   void init() override;
   accelerometer_reading_t readAccel() override;
@@ -49,7 +49,7 @@ private:
   uint8_t readRegister(uint8_t reg);
   void writeRegister(uint8_t reg, uint8_t val);
 
-  I2CDriver *i2c;
+  I2CDriver *i2cd;
 };
 
 #endif
