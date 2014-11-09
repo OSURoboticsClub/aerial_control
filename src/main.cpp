@@ -8,27 +8,7 @@
 // #include <communicator.hpp>
 #include <debugger.hpp>
 
-/**
- * Blinks an LED to show that the software is still alive.
- */
-class HeartbeatThread : public chibios_rt::BaseStaticThread<64> {
-public:
-  HeartbeatThread() : chibios_rt::BaseStaticThread<64>() {
-  }
-
-  virtual msg_t main() {
-    while(true) {
-      //palSetPad(GPIOE, GPIOE_LED3_RED);
-      sleep(MS2ST(500));
-      //palClearPad(GPIOE, GPIOE_LED3_RED);
-      sleep(MS2ST(500));
-    }
-
-    return 0;
-  }
-};
-
-static HeartbeatThread heartbeatThread;
+static platform::HeartbeatThread heartbeatThread;
 static Debugger debugger;
 
 int main(void) {
