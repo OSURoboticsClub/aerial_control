@@ -12,9 +12,9 @@ void MPU6000::init() {
 
   // Start bus
   chMtxLock(&spi_mtx);
-  spiAcquireBus(spid);
-  spiStart(spid, spicfg);
-  spiSelect(spid);
+  spiAcquireBus(spid);      // Acquire bus ownership
+  spiStart(spid, spicfg);   // Set up transfer parameters
+  spiSelect(spid);          // Assert slave select
 
   // Reset device.
   txbuf[0] = MPU6000_PWR_MGMT_1;
@@ -54,8 +54,8 @@ void MPU6000::init() {
   spiExchange(spid, 2, txbuf, rxbuf);   // Exchange data.
 
   // Stop bus
-  spiUnselect(spid);
-  spiReleaseBus(spid);
+  spiUnselect(spid);     // Deassert slave select
+  spiReleaseBus(spid);   // Release bus ownership
   chMtxUnlock();
 
   // Read once to clear out bad data?
@@ -69,13 +69,13 @@ gyroscope_reading_t MPU6000::readGyro() {
 
   // Start bus
   chMtxLock(&spi_mtx);
-  spiAcquireBus(spid);
-  spiStart(spid, spicfg);
-  spiSelect(spid);
+  spiAcquireBus(spid);      // Acquire bus ownership
+  spiStart(spid, spicfg);   // Set up transfer parameters
+  spiSelect(spid);          // Assert slave select
 
   // Get data
   txbuf[0] = MPU6000_GYRO_XOUT_H | (1<<7);
-  spiExchange(spid, 7, txbuf, rxbuf);
+  spiExchange(spid, 7, txbuf, rxbuf);   // Atomic transfer operations
   reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 + GYR_X_OFFSET;
   reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 + GYR_Y_OFFSET;
   reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 + GYR_Z_OFFSET;
@@ -86,8 +86,8 @@ gyroscope_reading_t MPU6000::readGyro() {
   float temp = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 340 + 36.53;
 
   // Stop bus
-  spiUnselect(spid);
-  spiReleaseBus(spid);
+  spiUnselect(spid);     // Deassert slave select
+  spiReleaseBus(spid);   // Release bus ownership
   chMtxUnlock();
 
   return reading;
@@ -99,20 +99,20 @@ accelerometer_reading_t MPU6000::readAccel() {
 
   // Start bus
   chMtxLock(&spi_mtx);
-  spiAcquireBus(spid);
-  spiStart(spid, spicfg);
-  spiSelect(spid);
+  spiAcquireBus(spid);      // Acquire bus ownership
+  spiStart(spid, spicfg);   // Set up transfer parameters
+  spiSelect(spid);          // Assert slave select
 
   // Get data
   txbuf[0] = MPU6000_ACCEL_XOUT_H | (1<<7);
-  spiExchange(spid, 7, txbuf, rxbuf);
+  spiExchange(spid, 7, txbuf, rxbuf);   // Atomic transfer operations
   reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
   reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
   reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
 
   // Stop bus
-  spiUnselect(spid);
-  spiReleaseBus(spid);
+  spiUnselect(spid);     // Deassert slave select
+  spiReleaseBus(spid);   // Release bus ownership
   chMtxUnlock();
 
   return reading;
