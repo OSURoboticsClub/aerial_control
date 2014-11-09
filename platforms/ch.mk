@@ -68,7 +68,6 @@ endif
 PROJECT = osuar_control
 
 # Imported source files and paths
-CHIBIOS = ChibiOS-RT
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 include $(CHIBIOS)/test/test.mk
