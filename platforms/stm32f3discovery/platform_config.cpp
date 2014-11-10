@@ -6,7 +6,7 @@ namespace platform {
 
 L3GD20 gyro(&SPID1);
 LSM303DLHC accel(&I2CD1);
-DefaultMultirotorVehicleSystem system(&accel, &gyro);
+DefaultMultirotorVehicleSystem system(&gyro, &accel);
 
 void init() {
   // Initialize platform HAL

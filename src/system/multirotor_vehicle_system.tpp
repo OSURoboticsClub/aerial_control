@@ -4,12 +4,12 @@ void MultirotorVehicleSystem<num_rotors>::init() {
 
 template <int num_rotors>
 void MultirotorVehicleSystem<num_rotors>::update() {
-  // Poll the accelerometer and gyroscope
-  accelerometer_reading_t accel_reading = getAccelerometer()->readAccel();
+  // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyro_reading = getGyroscope()->readGyro();
+  accelerometer_reading_t accel_reading = getAccelerometer()->readAccel();
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = getAttitudeEstimator()->update(accel_reading, gyro_reading);
+  attitude_estimate_t estimate = getAttitudeEstimator()->update(gyro_reading, accel_reading);
 
   // Poll for controller input
   controller_input_t input = getInputSource()->read();

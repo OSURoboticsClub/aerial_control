@@ -1,6 +1,5 @@
-EsraRocketSystem::EsraRocketSystem(Accelerometer *accelerometer, Gyroscope *gyroscope)
-  : accelerometer(accelerometer),
-    gyroscope(gyroscope) {
+EsraRocketSystem::EsraRocketSystem(Gyroscope *gyroscope, Accelerometer *accelerometer)
+  : gyroscope(gyroscope), accelerometer(accelerometer) {
 }
 
 void EsraRocketSystem::init() {
@@ -13,12 +12,12 @@ void EsraRocketSystem::update() {
   RocketSystem::update();
 }
 
-Accelerometer *EsraRocketSystem::getAccelerometer() {
-  return accelerometer;
-}
-
 Gyroscope *EsraRocketSystem::getGyroscope() {
   return gyroscope;
+}
+
+Accelerometer *EsraRocketSystem::getAccelerometer() {
+  return accelerometer;
 }
 
 AttitudeEstimator *EsraRocketSystem::getAttitudeEstimator() {
