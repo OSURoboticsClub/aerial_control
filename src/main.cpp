@@ -19,11 +19,6 @@ int main(void) {
   heartbeatThread.start(LOWPRIO);
   debugger.start(LOWPRIO);
 
-  i2cPlatformInit();
-  pwmPlatformInit();
-  spiPlatformInit();
-  usartPlatformInit();
-
   // Build and initialize the system
   platform::init();
 

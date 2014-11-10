@@ -16,7 +16,7 @@ const PWMConfig motor_pwm_config = {
   0,0   // HW dependent
 };
 
-PWMDriver *pwmPlatformInit(void);
+void pwmPlatformInit(void);
 void pwmPlatformSet(uint8_t ch, float dc);
 
 #endif // PWM_CONFIG_HPP_

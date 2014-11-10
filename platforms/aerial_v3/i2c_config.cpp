@@ -4,5 +4,4 @@
 
 void i2cPlatformInit(void) {
   i2cInit();
-  // TODO(yoos)
 }

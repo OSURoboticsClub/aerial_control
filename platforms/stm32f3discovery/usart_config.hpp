@@ -11,6 +11,6 @@ const SerialConfig usart1_config = {
   0
 };
 
-SerialDriver *usartPlatformInit(void);
+void usartPlatformInit(void);
 
 #endif // USART_CONFIG_HPP_
