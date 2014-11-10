@@ -3,8 +3,8 @@
 
 #include <hal.h>
 
-#include <sensor/accelerometer.hpp>
 #include <sensor/gyroscope.hpp>
+#include <sensor/accelerometer.hpp>
 
 #define MPU6000_AUX_VDDIO          0x01   // R/W
 #define MPU6000_SMPLRT_DIV         0x19   // R/W
@@ -94,13 +94,13 @@
 #define MPU6000_FIFO_R_W           0x74   // R/W
 #define MPU6000_WHO_AM_I           0x75   // R
 
-class MPU6000 : public Accelerometer, public Gyroscope {
+class MPU6000 : public Gyroscope, public Accelerometer {
 public:
   MPU6000(SPIDriver *spid, const SPIConfig *spicfg);
 
   void init() override;
-  accelerometer_reading_t readAccel() override;
   gyroscope_reading_t readGyro() override;
+  accelerometer_reading_t readAccel() override;
 
 private:
   uint8_t readRegister(uint8_t reg);
