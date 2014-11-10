@@ -11,7 +11,7 @@ void MPU6000::init() {
   uint8_t txbuf[8], rxbuf[8];
 
   // Start bus
-  chMtxLock(&spi_mtx);
+  //chMtxLock(&spi_mtx);
   spiAcquireBus(spid);      // Acquire bus ownership
   spiStart(spid, spicfg);   // Set up transfer parameters
   spiSelect(spid);          // Assert slave select
@@ -56,7 +56,7 @@ void MPU6000::init() {
   // Stop bus
   spiUnselect(spid);     // Deassert slave select
   spiReleaseBus(spid);   // Release bus ownership
-  chMtxUnlock();
+  //chMtxUnlock();
 
   // Read once to clear out bad data?
   readGyro();
@@ -68,7 +68,7 @@ gyroscope_reading_t MPU6000::readGyro() {
   gyroscope_reading_t reading;
 
   // Start bus
-  chMtxLock(&spi_mtx);
+  //chMtxLock(&spi_mtx);
   spiAcquireBus(spid);      // Acquire bus ownership
   spiStart(spid, spicfg);   // Set up transfer parameters
   spiSelect(spid);          // Assert slave select
@@ -88,7 +88,7 @@ gyroscope_reading_t MPU6000::readGyro() {
   // Stop bus
   spiUnselect(spid);     // Deassert slave select
   spiReleaseBus(spid);   // Release bus ownership
-  chMtxUnlock();
+  //chMtxUnlock();
 
   return reading;
 }
@@ -98,7 +98,7 @@ accelerometer_reading_t MPU6000::readAccel() {
   accelerometer_reading_t reading;
 
   // Start bus
-  chMtxLock(&spi_mtx);
+  //chMtxLock(&spi_mtx);
   spiAcquireBus(spid);      // Acquire bus ownership
   spiStart(spid, spicfg);   // Set up transfer parameters
   spiSelect(spid);          // Assert slave select
@@ -113,7 +113,7 @@ accelerometer_reading_t MPU6000::readAccel() {
   // Stop bus
   spiUnselect(spid);     // Deassert slave select
   spiReleaseBus(spid);   // Release bus ownership
-  chMtxUnlock();
+  //chMtxUnlock();
 
   return reading;
 }
