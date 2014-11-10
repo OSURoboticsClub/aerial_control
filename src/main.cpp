@@ -19,10 +19,6 @@ int main(void) {
   heartbeatThread.start(LOWPRIO);
   debugger.start(LOWPRIO);
 
-  pwmInit();
-  spiInit();
-  i2cInit();
-
   i2cPlatformInit();
   pwmPlatformInit();
   spiPlatformInit();
