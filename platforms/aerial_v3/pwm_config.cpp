@@ -2,7 +2,7 @@
 
 #include <pwm_config.hpp>
 
-void *pwmPlatformInit(void) {
+void pwmPlatformInit(void) {
   pwmStart(&PWMD3, &motor_pwm_config);
   palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(4));
   palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(4));
