@@ -19,6 +19,7 @@ void init() {
   system.init();
 
   palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+  palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
 }
 
 msg_t HeartbeatThread::main(void) {
@@ -26,7 +27,10 @@ msg_t HeartbeatThread::main(void) {
     palSetPad(GPIOA, 6);
     sleep(MS2ST(50));
     palClearPad(GPIOA, 6);
-    sleep(MS2ST(950));
+    palSetPad(GPIOA, 7);
+    sleep(MS2ST(50));
+    palClearPad(GPIOA, 7);
+    sleep(MS2ST(900));
   }
 
   return 0;
