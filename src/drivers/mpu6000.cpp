@@ -37,24 +37,17 @@ void MPU6000::init() {
   // value so we can change what we need and leave everything else alone.
   txbuf[0] = MPU6000_GYRO_CONFIG | (1<<7);
   _spiExchange(spid, spicfg, 2, txbuf, rxbuf);   // Exchange data.
+  chThdSleepMicroseconds(0);   // TODO(yoos): Without this, the GYRO_CONFIG register does not get set. This was not the case in the old C firmware. Why?
   txbuf[0] = MPU6000_GYRO_CONFIG;
   txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
   _spiExchange(spid, spicfg, 2, txbuf, rxbuf);   // Exchange data.
 
-  // Set accelerometer full range to 2 g.
+  // Set accelerometer full range to 16 g.
   txbuf[0] = MPU6000_ACCEL_CONFIG | (1<<7);
   _spiExchange(spid, spicfg, 2, txbuf, rxbuf);   // Exchange data.
   txbuf[0] = MPU6000_ACCEL_CONFIG;
-  txbuf[1] = (rxbuf[1] & ~0x18) | 0x00;
+  txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
   _spiExchange(spid, spicfg, 2, txbuf, rxbuf);   // Exchange data.
-
-  // DEBUG
-  txbuf[0] = MPU6000_TEMP_OUT_H | (1<<7);
-  _spiExchange(spid, spicfg, 3, txbuf, rxbuf);   // Exchange data.
-
-  char dbg_buf[8];
-  chsnprintf(dbg_buf, 3, "%02x", rxbuf[2]);
-  chnWriteTimeout((BaseChannel*)&SD3, (uint8_t*)dbg_buf, 3, MS2ST(20));
 
   // Read once to clear out bad data?
   readGyro();
@@ -80,6 +73,14 @@ gyroscope_reading_t MPU6000::readGyro() {
 
   float temp = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 340 + 36.53;
 
+  // DEBUG
+  //char dbg_buf[16];
+  //for (int i=0; i<16; i++) {
+  //  dbg_buf[i] = 0;
+  //}
+  //chsnprintf(dbg_buf, 12, "%0.6f\r\n", reading.axes[2]);
+  //chnWriteTimeout((BaseChannel*)&SD3, (uint8_t*)dbg_buf, 12, MS2ST(20));
+
   return reading;
 }
 
@@ -96,29 +97,3 @@ accelerometer_reading_t MPU6000::readAccel() {
 
   return reading;
 }
-
-//uint8_t MPU6000::readRegister(uint8_t reg) {
-//  uint8_t txbuf[8];
-//  uint8_t rxbuf[8];
-//
-//  txbuf[0] = reg;
-//  txbuf[1] = 0xFF;
-//
-//  spiSelect(this->spid);
-//  spiExchange(this->spid, 2, txbuf, rxbuf);
-//  spiUnselect(this->spid);
-//
-//  return rxbuf[1];
-//}
-//
-//void MPU6000::writeRegister(uint8_t reg, uint8_t val) {
-//  uint8_t txbuf[8];
-//  uint8_t rxbuf[8];
-//
-//  txbuf[0] = reg;
-//  txbuf[1] = val;
-//
-//  spiSelect(this->spid);
-//  spiExchange(this->spid, 2, txbuf, rxbuf);
-//  spiUnselect(this->spid);
-//}
