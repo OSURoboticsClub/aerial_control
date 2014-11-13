@@ -3,7 +3,7 @@
 #include <spi_config.hpp>
 
 void spiPlatformInit(void) {
-  spiInit();
+  //spiInit();
   palSetPadMode(GPIOB, 3, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);   /* SPI1 SCK */
   palSetPadMode(GPIOB, 4, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);   /* SPI1 MISO */
   palSetPadMode(GPIOB, 5, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);   /* SPI1 MOSI */
