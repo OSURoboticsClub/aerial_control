@@ -12,3 +12,18 @@ void spiPlatformInit(void) {
 
   chMtxInit(&spi_mtx);
 }
+
+void _spiExchange(SPIDriver *spid, const SPIConfig *spicfg, uint16_t bufsize, uint8_t *txbuf, uint8_t *rxbuf) {
+  chMtxLock(&spi_mtx);
+
+  spiStart(spid, spicfg);                     // Set up transfer parameters.
+  spiAcquireBus(spid);                        // Acquire ownership of the bus.
+  spiSelect(spid);                            // Assert slave select.
+
+  spiExchange(spid, bufsize, txbuf, rxbuf);   // Atomic transfer operations.
+
+  spiUnselect(spid);                          // Deassert slave select.
+  spiReleaseBus(spid);                        // Release ownership.
+
+  chMtxUnlock();
+}
