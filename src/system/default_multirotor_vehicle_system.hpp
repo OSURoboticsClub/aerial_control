@@ -7,7 +7,7 @@
 #include <estimator/attitude_estimator.hpp>
 #include <estimator/dcm_attitude_estimator.hpp>
 #include <input/input_source.hpp>
-#include <input/pwm_receiver_input_source.hpp>
+#include <input/ppm_input_source.hpp>
 #include <motor/multirotor_quad_x_motor_mapper.hpp>
 #include <sensor/accelerometer.hpp>
 #include <sensor/gyroscope.hpp>
@@ -34,7 +34,7 @@ private:
   Gyroscope *gyroscope;
 
   DCMAttitudeEstimator estimator;
-  PWMReceiverInputSource inputSource;
+  PPMInputSource inputSource;
 
   AngularPositionController attPosController;
   AngularVelocityController attVelController;
