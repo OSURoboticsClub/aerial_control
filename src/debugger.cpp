@@ -34,11 +34,6 @@ msg_t Debugger::main() {
       chMtxUnlock();
     }
 
-    chsnprintf(currentMessage, 28, "test on usart1 %d\r\n", 1234567890);
-    chnWriteTimeout((BaseChannel*)&SD1, (const uint8_t*)&currentMessage, 28, MS2ST(20));
-    chsnprintf(currentMessage, 28, "test on usart3 %d\r\n", 1234567890);
-    chnWriteTimeout((BaseChannel*)&SD3, (const uint8_t*)&currentMessage, 28, MS2ST(20));
-
     sleep(MS2ST(100));
   }
 
