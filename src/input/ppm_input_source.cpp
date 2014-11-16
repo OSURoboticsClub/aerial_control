@@ -29,9 +29,11 @@ void PPMInputSource::trigger() {
 
         state = PPMState::SYNCED;
       } else if(lastFrameWidth > MIN_CHANNEL_WIDTH && lastFrameWidth < MAX_CHANNEL_WIDTH) {
-        // Channel frame.
-        channelTempBuffer[currentChannel] = lastFrameWidth;
-        currentChannel++;
+        // Channel frame. Only store if we have room.
+        if(currentChannel < MAX_CHANNELS) {
+          channelTempBuffer[currentChannel] = lastFrameWidth;
+          currentChannel++;
+        }
       } else {
         // Something went wrong. Reset to unsynced state.
         state = PPMState::UNSYNCED;
