@@ -4,7 +4,7 @@
 
 #include <hal_config.hpp>
 
-LSM303DLHC::LSM303DLHC(I2CDriver *i2c) : i2c(i2c) {
+LSM303DLHC::LSM303DLHC(I2CDriver *i2cd) : i2cd(i2cd) {
 }
 
 void LSM303DLHC::init() {
@@ -19,9 +19,9 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
 
   txbuf[0] = LSM303_I2C_AD_OUT_X_L_A | 0x80;
 
-  i2cAcquireBus(this->i2c);
-  i2cMasterTransmitTimeout(this->i2c, LSM303_I2C_ACC_ADDRESS, txbuf, 1, rxbuf, 6, TIME_INFINITE);
-  i2cReleaseBus(this->i2c);
+  i2cAcquireBus(this->i2cd);
+  i2cMasterTransmitTimeout(this->i2cd, LSM303_I2C_ACC_ADDRESS, txbuf, 1, rxbuf, 6, TIME_INFINITE);
+  i2cReleaseBus(this->i2cd);
 
   // Swapped for board orientation
   raw[0] = -((rxbuf[3] << 8) | rxbuf[2]);
@@ -44,9 +44,9 @@ uint8_t LSM303DLHC::readRegister(uint8_t reg) {
 
   txbuf[0] = reg;
 
-  i2cAcquireBus(this->i2c);
-  i2cMasterTransmitTimeout(this->i2c, LSM303_I2C_ACC_ADDRESS, txbuf, 1, rxbuf, 1, TIME_INFINITE);
-  i2cReleaseBus(this->i2c);
+  i2cAcquireBus(this->i2cd);
+  i2cMasterTransmitTimeout(this->i2cd, LSM303_I2C_ACC_ADDRESS, txbuf, 1, rxbuf, 1, TIME_INFINITE);
+  i2cReleaseBus(this->i2cd);
 
   return rxbuf[0];
 }
@@ -58,7 +58,7 @@ void LSM303DLHC::writeRegister(uint8_t reg, uint8_t val) {
   txbuf[0] = reg;
   txbuf[1] = val;
 
-  i2cAcquireBus(this->i2c);
-  i2cMasterTransmitTimeout(this->i2c, LSM303_I2C_ACC_ADDRESS, txbuf, 2, rxbuf, 0, TIME_INFINITE);
-  i2cReleaseBus(this->i2c);
+  i2cAcquireBus(this->i2cd);
+  i2cMasterTransmitTimeout(this->i2cd, LSM303_I2C_ACC_ADDRESS, txbuf, 2, rxbuf, 0, TIME_INFINITE);
+  i2cReleaseBus(this->i2cd);
 }

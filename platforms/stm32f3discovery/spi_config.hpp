@@ -1,6 +1,11 @@
 #ifndef SPI_CONFIG_HPP_
 #define SPI_CONFIG_HPP_
 
+// Mutex to lock output buffer
+// TODO(yoos): Currently unused for this platform. Necessary to make rocket
+// build using MPU-6000. Should rethink this.
+static Mutex spi_mtx;
+
 // L3GD20 SPI configuration
 const SPIConfig l3gd20_spi_config = {
   NULL,

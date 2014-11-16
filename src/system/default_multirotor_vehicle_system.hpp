@@ -9,20 +9,20 @@
 #include <input/input_source.hpp>
 #include <input/ppm_input_source.hpp>
 #include <motor/multirotor_quad_x_motor_mapper.hpp>
-#include <sensor/accelerometer.hpp>
 #include <sensor/gyroscope.hpp>
+#include <sensor/accelerometer.hpp>
 #include <system/multirotor_vehicle_system.hpp>
 
 class DefaultMultirotorVehicleSystem : public MultirotorVehicleSystem<4> {
 public:
-  inline DefaultMultirotorVehicleSystem(Accelerometer *accelerometer, Gyroscope *gyroscope);
+  inline DefaultMultirotorVehicleSystem(Gyroscope *gyroscope, Accelerometer *accelerometer);
 
   inline void init() override;
   inline void update() override;
 
 protected:
-  inline Accelerometer *getAccelerometer() override;
   inline Gyroscope *getGyroscope() override;
+  inline Accelerometer *getAccelerometer() override;
   inline AttitudeEstimator *getAttitudeEstimator() override;
   inline InputSource *getInputSource() override;
   inline MotorMapper *getMotorMapper() override;
@@ -30,8 +30,8 @@ protected:
   inline actuator_setpoint_t runController(const attitude_estimate_t &estimate, const angular_position_setpoint_t& setpoint) override;
 
 private:
-  Accelerometer *accelerometer;
   Gyroscope *gyroscope;
+  Accelerometer *accelerometer;
 
   DCMAttitudeEstimator estimator;
   PPMInputSource inputSource;

@@ -4,8 +4,8 @@
 #include <controller/setpoint_types.hpp>
 #include <estimator/attitude_estimator.hpp>
 #include <input/input_source.hpp>
-#include <sensor/accelerometer.hpp>
 #include <sensor/gyroscope.hpp>
+#include <sensor/accelerometer.hpp>
 #include <system/vehicle_system.hpp>
 
 template <int num_rotors>
@@ -15,8 +15,8 @@ public:
   void update() override;
 
 protected:
-  virtual Accelerometer *getAccelerometer() =0;
   virtual Gyroscope *getGyroscope() =0;
+  virtual Accelerometer *getAccelerometer() =0;
   virtual AttitudeEstimator *getAttitudeEstimator() =0;
   virtual InputSource *getInputSource() =0;
   virtual MotorMapper *getMotorMapper() =0;

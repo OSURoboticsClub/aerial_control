@@ -1,4 +1,4 @@
-include platforms/rocket_v0.1/platform.mk
+include platforms/aerial_v3/platform.mk
 include platforms/ch.mk
 
 # Include directory for unit_config.hpp
