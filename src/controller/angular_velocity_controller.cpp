@@ -5,9 +5,9 @@
 #include <algorithm>
 
 AngularVelocityController::AngularVelocityController()
-  : rollVelPid(10.0, 0.0, 0.0),
-    pitchVelPid(10.0, 0.0, 0.0),
-    yawVelPid(10.0, 0.0, 0.0) {
+  : rollVelPid(ANGVEL_X_KP, ANGVEL_X_KI, ANGVEL_X_KD),
+    pitchVelPid(ANGVEL_Y_KP, ANGVEL_Y_KI, ANGVEL_Z_KD),
+    yawVelPid(ANGVEL_Z_KP, ANGVEL_Z_KI, ANGVEL_Z_KD) {
 }
 
 actuator_setpoint_t AngularVelocityController::run(const attitude_estimate_t& estimate, const angular_velocity_setpoint_t& input) {
