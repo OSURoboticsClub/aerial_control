@@ -1,0 +1,7 @@
+BOARDSRC = ['../../ChibiOS-RT/boards/ST_STM32F3_DISCOVERY/board.c']
+BOARDINC = ['../../ChibiOS-RT/boards/ST_STM32F3_DISCOVERY']
+
+def configure(ctx):
+    ctx.env.append_value('INCLUDES', ['ChibiOS-RT/boards/ST_STM32F3_DISCOVERY'])
+    ctx.env.append_value('LDSCRIPT', ['ChibiOS-RT/os/ports/GCC/ARMCMx/STM32F3xx/ld/STM32F303xC.ld'])
+
