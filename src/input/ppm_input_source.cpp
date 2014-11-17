@@ -9,6 +9,8 @@ PPMInputSource::PPMInputSource()
 }
 
 void PPMInputSource::trigger() {
+  // TODO: This is in system ticks. Convert to _us_.
+  // TODO: `chTimeNow` can wrap around. Need to handle this case.
   systime_t frameStart = chTimeNow();
 
   systime_t lastFrameWidth = frameStart - lastFrameStart;
