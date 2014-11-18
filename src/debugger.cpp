@@ -34,7 +34,7 @@ msg_t Debugger::main() {
       chMtxUnlock();
     }
 
-    sleep(US2ST(100));
+    sleep(MS2ST(100));
   }
 
   return 0;

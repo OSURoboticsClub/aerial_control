@@ -1,5 +1,5 @@
-DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Accelerometer *accelerometer, Gyroscope *gyroscope)
-  : accelerometer(accelerometer), gyroscope(gyroscope) {
+DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope *gyroscope, Accelerometer *accelerometer)
+  : gyroscope(gyroscope), accelerometer(accelerometer) {
 }
 
 void DefaultMultirotorVehicleSystem::init() {
@@ -12,12 +12,12 @@ void DefaultMultirotorVehicleSystem::update() {
   MultirotorVehicleSystem::update();
 }
 
-Accelerometer *DefaultMultirotorVehicleSystem::getAccelerometer() {
-  return accelerometer;
-}
-
 Gyroscope *DefaultMultirotorVehicleSystem::getGyroscope() {
   return gyroscope;
+}
+
+Accelerometer *DefaultMultirotorVehicleSystem::getAccelerometer() {
+  return accelerometer;
 }
 
 AttitudeEstimator *DefaultMultirotorVehicleSystem::getAttitudeEstimator() {

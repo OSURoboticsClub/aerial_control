@@ -4,7 +4,7 @@
 
 #include <hal_config.hpp>
 
-L3GD20::L3GD20(SPIDriver *spi) : spi(spi) {
+L3GD20::L3GD20(SPIDriver *spid) : spid(spid) {
 }
 
 void L3GD20::init() {
@@ -24,9 +24,9 @@ gyroscope_reading_t L3GD20::readGyro() {
   txbuf[1] = 0xFF;
   txbuf[2] = 0xFF;
 
-  spiSelect(spi);
-  spiExchange(spi, 7, txbuf, rxbuf);
-  spiUnselect(spi);
+  spiSelect(spid);
+  spiExchange(spid, 7, txbuf, rxbuf);
+  spiUnselect(spid);
 
   // Swapped for board orientation
   raw[0] = (rxbuf[2] << 8) | rxbuf[1];
@@ -49,9 +49,9 @@ uint8_t L3GD20::readRegister(uint8_t reg) {
   txbuf[0] = L3GD20_SPI_RW | reg;
   txbuf[1] = 0xFF;
 
-  spiSelect(this->spi);
-  spiExchange(this->spi, 2, txbuf, rxbuf);
-  spiUnselect(this->spi);
+  spiSelect(this->spid);
+  spiExchange(this->spid, 2, txbuf, rxbuf);
+  spiUnselect(this->spid);
 
   return rxbuf[1];
 }
@@ -63,7 +63,7 @@ void L3GD20::writeRegister(uint8_t reg, uint8_t val) {
   txbuf[0] = reg;
   txbuf[1] = val;
 
-  spiSelect(this->spi);
-  spiExchange(this->spi, 2, txbuf, rxbuf);
-  spiUnselect(this->spi);
+  spiSelect(this->spid);
+  spiExchange(this->spid, 2, txbuf, rxbuf);
+  spiUnselect(this->spid);
 }

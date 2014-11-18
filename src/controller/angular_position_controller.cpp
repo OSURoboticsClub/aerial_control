@@ -5,9 +5,9 @@
 #include <algorithm>
 
 AngularPositionController::AngularPositionController()
-  : rollPosPid(10.0, 0.0, 0.0),
-    pitchPosPid(10.0, 0.0, 0.0),
-    yawPosPid(10.0, 0.0, 0.0) {
+  : rollPosPid(ANGPOS_X_KP, ANGPOS_X_KI, ANGPOS_X_KD),
+    pitchPosPid(ANGPOS_Y_KP, ANGPOS_Y_KI, ANGPOS_Z_KD),
+    yawPosPid(ANGPOS_Z_KP, ANGPOS_Z_KI, ANGPOS_Z_KD) {
 }
 
 angular_velocity_setpoint_t AngularPositionController::run(const attitude_estimate_t& estimate, const angular_position_setpoint_t& input) {

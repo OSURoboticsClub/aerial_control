@@ -6,13 +6,13 @@ PIDController::PIDController(float kp, float ki, float kd)
 }
 
 float PIDController::calculate(float sp, float pv, float dt) {
-  this->prevError = this->currError;
-  this->currError = sp - pv;
-  this->accumError += currError;
+  prevError = currError;
+  currError = sp - pv;
+  accumError += currError;
 
-  float p = this->kp * this->currError;
-  float i = this->ki * this->accumError;
-  float d = this->kd * (this->currError - this->prevError) / dt;
+  float p = kp * currError;
+  float i = ki * accumError;
+  float d = kd * (currError - prevError) / dt;
 
   return p + i + d;
 }

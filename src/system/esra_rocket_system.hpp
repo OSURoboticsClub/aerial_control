@@ -9,20 +9,20 @@
 #include <input/input_source.hpp>
 #include <input/pwm_receiver_input_source.hpp>
 #include <motor/esra_rocket_motor_mapper.hpp>   // TODO(yoos)
-#include <sensor/accelerometer.hpp>
 #include <sensor/gyroscope.hpp>
+#include <sensor/accelerometer.hpp>
 #include <system/rocket_system.hpp>
 
 class EsraRocketSystem : public RocketSystem<4> {
 public:
-  inline EsraRocketSystem(Accelerometer *accelerometer, Gyroscope *gyroscope);
+  inline EsraRocketSystem(Gyroscope *gyroscope, Accelerometer *accelerometer);
 
   inline void init() override;
   inline void update() override;
 
 protected:
-  inline Accelerometer *getAccelerometer() override;
   inline Gyroscope *getGyroscope() override;
+  inline Accelerometer *getAccelerometer() override;
   inline AttitudeEstimator *getAttitudeEstimator() override;
   inline InputSource *getInputSource() override;
   inline MotorMapper *getMotorMapper() override;
@@ -30,8 +30,8 @@ protected:
   inline actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) override;
 
 private:
-  Accelerometer *accelerometer;
   Gyroscope *gyroscope;
+  Accelerometer *accelerometer;
 
   DCMAttitudeEstimator estimator;
   PWMReceiverInputSource inputSource;
