@@ -4,7 +4,7 @@
 
 namespace platform {
 
-L3GD20 gyro(&SPID1);
+L3GD20 gyro(&SPID1, &l3gd20_spi_config);
 LSM303DLHC accel(&I2CD1);
 DefaultMultirotorVehicleSystem system(&gyro, &accel);
 

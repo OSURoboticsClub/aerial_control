@@ -12,6 +12,6 @@
 // Unit config
 #include <unit_config.hpp>
 
-const float DT = 0.001;
+const float DT = 0.1;
 
 #endif
