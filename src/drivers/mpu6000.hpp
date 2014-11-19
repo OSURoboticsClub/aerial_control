@@ -5,6 +5,7 @@
 
 #include <sensor/gyroscope.hpp>
 #include <sensor/accelerometer.hpp>
+#include <drivers/spi_device.hpp>
 
 #define MPU6000_AUX_VDDIO          0x01   // R/W
 #define MPU6000_SMPLRT_DIV         0x19   // R/W
@@ -94,9 +95,9 @@
 #define MPU6000_FIFO_R_W           0x74   // R/W
 #define MPU6000_WHO_AM_I           0x75   // R
 
-class MPU6000 : public Gyroscope, public Accelerometer {
+class MPU6000 : protected SPIDevice, public Gyroscope, public Accelerometer {
 public:
-  MPU6000(SPIDriver *spid, const SPIConfig *spicfg);
+  using SPIDevice::SPIDevice;
 
   void init() override;
   gyroscope_reading_t readGyro() override;
@@ -105,9 +106,6 @@ public:
 private:
   uint8_t readRegister(uint8_t reg);
   void writeRegister(uint8_t reg, uint8_t val);
-
-  SPIDriver *spid;
-  const SPIConfig *spicfg;
 };
 
 #endif
