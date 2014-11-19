@@ -49,26 +49,11 @@ HALSRC = [
     'ChibiOS-RT/os/hal/src/tm.c',
     'ChibiOS-RT/os/hal/src/uart.c',
 ]
-PLATFORMSRC = [
-    'ChibiOS-RT/os/hal/platforms/STM32F30x/stm32_dma.c',
-    'ChibiOS-RT/os/hal/platforms/STM32F30x/hal_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32F30x/adc_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32F30x/ext_lld_isr.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/can_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/ext_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/GPIOv2/pal_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/I2Cv2/i2c_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/RTCv2/rtc_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/SPIv2/spi_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/TIMv1/gpt_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/TIMv1/icu_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/TIMv1/pwm_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/USARTv2/serial_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/USARTv2/uart_lld.c',
-    'ChibiOS-RT/os/hal/platforms/STM32/USBv1/usb_lld.c'
+VARIOUSSRC = [
+    'ChibiOS-RT/os/various/chprintf.c',
+    'ChibiOS-RT/os/various/memstreams.c',
+    'ChibiOS-RT/os/various/cpp_wrappers/ch.cpp'
 ]
-CPPWRAPPERSRC = ['ChibiOS-RT/os/various/cpp_wrappers/ch.cpp']
-
 PORTINC = [
     'ChibiOS-RT/os/ports/common/ARMCMx/CMSIS/include',
     'ChibiOS-RT/os/ports/common/ARMCMx',
@@ -77,24 +62,13 @@ PORTINC = [
 ]
 KERNINC = ['ChibiOS-RT/os/kernel/include']
 HALINC = ['ChibiOS-RT/os/hal/include']
-PLATFORMINC = [
-    'ChibiOS-RT/os/hal/platforms/STM32F30x',
-    'ChibiOS-RT/os/hal/platforms/STM32',
-    'ChibiOS-RT/os/hal/platforms/STM32/GPIOv2',
-    'ChibiOS-RT/os/hal/platforms/STM32/I2Cv2',
-    'ChibiOS-RT/os/hal/platforms/STM32/RTCv2',
-    'ChibiOS-RT/os/hal/platforms/STM32/SPIv2',
-    'ChibiOS-RT/os/hal/platforms/STM32/TIMv1',
-    'ChibiOS-RT/os/hal/platforms/STM32/USARTv2',
-    'ChibiOS-RT/os/hal/platforms/STM32/USB'
+VARIOUSINC = [
+    'ChibiOS-RT/os/various',
+    'ChibiOS-RT/os/various/cpp_wrappers'
 ]
-CPPWRAPPERINC = ['ChibiOS-RT/os/various/cpp_wrappers']
 
-CHIBIOS_INC = PORTINC + KERNINC + HALINC + PLATFORMINC + CPPWRAPPERINC + ['include', 'platforms/stm32f3discovery', 'units/apollo']
-CHIBIOS_SRC = PORTSRC + KERNSRC + HALSRC + PLATFORMSRC + CPPWRAPPERSRC
-
-# PORTLD  = ${CHIBIOS}/os/ports/GCC/ARMCMx/STM32F3xx/ld
-# LDSCRIPT = $(PORTLD)/STM32F303xC.ld
+CHIBIOS_INC = PORTINC + KERNINC + HALINC + VARIOUSINC + ['include', 'platforms/stm32f3discovery', 'units/apollo']
+CHIBIOS_SRC = PORTSRC + KERNSRC + HALSRC + VARIOUSSRC
 
 top = '.'
 out = 'build'
@@ -147,26 +121,26 @@ def configure(ctx):
         '-lm',
     ])
     ctx.env.append_value('LINKFLAGS', [
-        '-Wl,-Map=../build/osuar_control.map,--cref,--no-warn-mismatch,--library-path=ChibiOS-RT/os/ports/GCC/ARMCMx,--script=${LDSCRIPT},--gc-sections'
+        '-Wl,-Map=../build/osuar_control.map,--cref,--no-warn-mismatch,--library-path=ChibiOS-RT/os/ports/GCC/ARMCMx,--script=%s,--gc-sections' % ctx.env.LDSCRIPT
     ])
 
 def build(ctx):
     # Build the ChibiOS library statically
     ctx.stlib(
-        source=CHIBIOS_SRC + \
-            ['ChibiOS-RT/os/various/chprintf.c',
-             'ChibiOS-RT/os/various/memstreams.c'],
+        source=CHIBIOS_SRC + ctx.env.PLATFORMSRC,
         target='chibios',
-        includes=CHIBIOS_INC + ['ChibiOS-RT/os/various/', 'src']
+        includes=CHIBIOS_INC + ctx.env.PLATFORMINC + ['src']
     )
+
+    print ctx.env.OSUAR_PLATFORMSRC
 
     # Build the program binary
     ctx.program(
         source=ctx.path.ant_glob('src/**/*.cpp') +
-               ctx.path.ant_glob('platforms/stm32f3discovery/*.cpp'),
+               ctx.path.ant_glob(ctx.env.OSUAR_PLATFORMSRC + '/' + '*.cpp'),
         target='osuar_control.elf',
         use='chibios',
-        includes=CHIBIOS_INC + ['ChibiOS-RT/os/various/', 'src']
+        includes=CHIBIOS_INC + ctx.env.PLATFORMINC + ['src']
     )
 
     # Create the final binary file
