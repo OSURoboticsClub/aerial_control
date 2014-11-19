@@ -11,6 +11,7 @@ protected:
   SPIDriver *spid;
   const SPIConfig *spicfg;
 
+  // TODO(yoos): Rename
   void _spiExchange(uint16_t bufsize, uint8_t *txbuf, uint8_t *rxbuf);
 };
 
