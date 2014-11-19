@@ -5,13 +5,13 @@
 
 class SPIDevice {
 public:
-  explicit SPIDevice(SPIDriver *spid, const SPIConfig *spicfg, Mutex *spimtx);
+  explicit SPIDevice(SPIDriver *spid, const SPIConfig *spicfg);
 
 protected:
   SPIDriver *spid;
   const SPIConfig *spicfg;
-  Mutex *spimtx;
 
+  // TODO(yoos): Rename
   void _spiExchange(uint16_t bufsize, uint8_t *txbuf, uint8_t *rxbuf);
 };
 

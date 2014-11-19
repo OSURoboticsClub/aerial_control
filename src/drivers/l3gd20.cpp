@@ -4,9 +4,6 @@
 
 #include <hal_config.hpp>
 
-L3GD20::L3GD20(SPIDriver *spid) : spid(spid) {
-}
-
 void L3GD20::init() {
   // Wake up device, enable X, Y, and Z outputs, and set 760Hz mode.
   writeRegister(L3GD20_SPI_AD_CTRL_REG1, 0x0F | (1 << 7) | (1 << 6));
@@ -24,9 +21,7 @@ gyroscope_reading_t L3GD20::readGyro() {
   txbuf[1] = 0xFF;
   txbuf[2] = 0xFF;
 
-  spiSelect(spid);
-  spiExchange(spid, 7, txbuf, rxbuf);
-  spiUnselect(spid);
+  _spiExchange(7, txbuf, rxbuf);
 
   // Swapped for board orientation
   raw[0] = (rxbuf[2] << 8) | rxbuf[1];
@@ -49,9 +44,7 @@ uint8_t L3GD20::readRegister(uint8_t reg) {
   txbuf[0] = L3GD20_SPI_RW | reg;
   txbuf[1] = 0xFF;
 
-  spiSelect(this->spid);
-  spiExchange(this->spid, 2, txbuf, rxbuf);
-  spiUnselect(this->spid);
+  _spiExchange(2, txbuf, rxbuf);
 
   return rxbuf[1];
 }
@@ -63,7 +56,5 @@ void L3GD20::writeRegister(uint8_t reg, uint8_t val) {
   txbuf[0] = reg;
   txbuf[1] = val;
 
-  spiSelect(this->spid);
-  spiExchange(this->spid, 2, txbuf, rxbuf);
-  spiUnselect(this->spid);
+  _spiExchange(2, txbuf, rxbuf);
 }

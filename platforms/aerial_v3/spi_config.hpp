@@ -1,9 +1,6 @@
 #ifndef SPI_CONFIG_HPP_
 #define SPI_CONFIG_HPP_
 
-// Mutex to lock output buffer
-static Mutex spimtx;
-
 // MPU6000 SPI configuration
 const SPIConfig mpu6000_spicfg = {
   NULL,

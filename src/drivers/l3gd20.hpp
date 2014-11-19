@@ -4,6 +4,7 @@
 #include <hal.h>
 
 #include <sensor/gyroscope.hpp>
+#include <drivers/spi_device.hpp>
 
 #define L3GD20_SENSITIVITY_250DPS   (0.00875F)
 #define L3GD20_SENSITIVITY_500DPS   (0.0175F)
@@ -58,9 +59,9 @@
 #define L3GD20_SPI_AD_INT1_TSH_ZL   0x37
 #define L3GD20_SPI_AD_INT1_DURATION 0x38
 
-class L3GD20 : public Gyroscope {
+class L3GD20 : protected SPIDevice, public Gyroscope {
 public:
-  L3GD20(SPIDriver *spid);
+  using SPIDevice::SPIDevice;
 
   void init() override;
   gyroscope_reading_t readGyro() override;
