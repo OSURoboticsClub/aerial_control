@@ -18,7 +18,7 @@ public:
   /**
    * Reads from the source and returns the setpoints.
    */
-  virtual controller_input_t read() =0;
+  virtual controller_input_t read() = 0;
 };
 
 #endif

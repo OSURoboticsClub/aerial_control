@@ -10,7 +10,7 @@
 template <typename I, typename O>
 class Controller {
 public:
-  virtual O run(const attitude_estimate_t& estimate, const I& input) =0;
+  virtual O run(const attitude_estimate_t& estimate, const I& input) = 0;
 };
 
 #endif

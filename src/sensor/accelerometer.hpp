@@ -7,8 +7,8 @@ struct accelerometer_reading_t {
 
 class Accelerometer {
 public:
-  virtual void init() =0;
-  virtual accelerometer_reading_t readAccel() =0;
+  virtual void init() = 0;
+  virtual accelerometer_reading_t readAccel() = 0;
 };
 
 #endif

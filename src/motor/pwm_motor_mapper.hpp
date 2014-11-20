@@ -11,7 +11,7 @@ template <int motor_count>
 class PWMMotorMapper : public MotorMapper {
 public:
   void init() override;
-  virtual void run(actuator_setpoint_t& input) =0;
+  virtual void run(actuator_setpoint_t& input) = 0;
 
 protected:
   PWMMotorMapper();

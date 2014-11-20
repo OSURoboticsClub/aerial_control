@@ -7,8 +7,8 @@ struct gyroscope_reading_t {
 
 class Gyroscope {
 public:
-  virtual void init() =0;
-  virtual gyroscope_reading_t readGyro() =0;
+  virtual void init() = 0;
+  virtual gyroscope_reading_t readGyro() = 0;
 };
 
 #endif
