@@ -22,7 +22,7 @@ void PWMMotorMapper<motor_count>::setMotorSpeeds(const std::array<float, motor_c
 }
 
 template <int motor_count>
-void PWMMotorMapper<motor_count>::mapToBounds(const std::array<float, motor_count>& percents, std::array<float, motor_count>* mapped) {
+void PWMMotorMapper<motor_count>::mapToBounds(const std::array<float, motor_count>& percents, std::array<float, motor_count> *mapped) {
   // TODO: Make these configurable
   float output_min = 0.0f, output_max = 0.7f;
 
@@ -33,8 +33,8 @@ void PWMMotorMapper<motor_count>::mapToBounds(const std::array<float, motor_coun
   // Limit the outputs to the maximum values
   float scale = (output_max - output_min) / (input_max - input_min);
   if(scale < 1.0f) {
-    for(float& percent : *mapped) {
-      percent = (percent - input_min) * scale + output_min;
+    for(int i = 0; i < mapped.size(); i++) {
+      mapped[i] = (percents[i] - input_min) * scale + output_min;
     }
   }
 }
