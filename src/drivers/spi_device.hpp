@@ -1,5 +1,5 @@
-#ifndef SPIDEVICE_HPP_
-#define SPIDEVICE_HPP_
+#ifndef SPI_DEVICE_HPP_
+#define SPI_DEVICE_HPP_
 
 #include <hal.h>
 
@@ -15,4 +15,4 @@ protected:
   void _spiExchange(uint16_t bufsize, uint8_t *txbuf, uint8_t *rxbuf);
 };
 
-#endif // SPIDEVICE_HPP_
+#endif // SPI_DEVICE_HPP_
