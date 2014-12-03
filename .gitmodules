@@ -1,4 +1,4 @@
 [submodule "ChibiOS-RT"]
 	path = ChibiOS-RT
-	url = https://github.com/ChibiOS/ChibiOS-RT
+	url = https://github.com/ChibiOS/ChibiOS-gitmain
 	branch = stable_2.6.x
