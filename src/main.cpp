@@ -5,7 +5,6 @@
 #include <platform_config.hpp>
 
 // Misc
-// #include <communicator.hpp>
 #include <debugger.hpp>
 
 static platform::HeartbeatThread heartbeatThread;
