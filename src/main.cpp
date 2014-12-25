@@ -2,10 +2,10 @@
 #include <hal.h>
 
 #include <array> // TODO(kyle):
-#include <protocol.hpp>
-#include <messages.hpp>
-#include <encoder.hpp>
-#include <decoder.hpp>
+#include <protocol/protocol.hpp>
+#include <protocol/messages.hpp>
+#include <protocol/encoder.hpp>
+#include <protocol/decoder.hpp>
 
 #include <hal_config.hpp>
 #include <platform_config.hpp>
@@ -18,14 +18,21 @@ static Debugger debugger;
 
 void communicate() {
   protocol::Encoder encoder;
-  protocol::message::heartbeat_message_t message {
-    .seq = 0x50
+  std::array<std::uint8_t, 255> buffer;
+
+  protocol::message::attitude_message_t message {
+    .roll = 0.0f,
+    .pitch = 0.0f,
+    .yaw = 0.0f,
   };
 
-  std::array<std::uint8_t, 3> buffer;
-  encoder.encode(message, &buffer);
+  // protocol::message::heartbeat_message_t message {
+  //   .seq = 0x00
+  // };
 
-  chnWrite((BaseSequentialStream *) &SD1, buffer.data(), 3);
+  std::uint16_t len = encoder.encode(message, &buffer);
+
+  sdWrite(&SD1, buffer.data(), len);
 }
 
 int main(void) {
