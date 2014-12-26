@@ -11,29 +11,12 @@
 #include <platform_config.hpp>
 
 // Misc
+#include <communication.hpp>
 #include <debugger.hpp>
 
 static platform::HeartbeatThread heartbeatThread;
+static CommunicationThread communicationThread(reinterpret_cast<BaseChannel *>(&SD1));
 static Debugger debugger;
-
-void communicate() {
-  protocol::Encoder encoder;
-  std::array<std::uint8_t, 255> buffer;
-
-  protocol::message::attitude_message_t message {
-    .roll = 0.0f,
-    .pitch = 0.0f,
-    .yaw = 0.0f,
-  };
-
-  // protocol::message::heartbeat_message_t message {
-  //   .seq = 0x00
-  // };
-
-  std::uint16_t len = encoder.encode(message, &buffer);
-
-  sdWrite(&SD1, buffer.data(), len);
-}
 
 int main(void) {
   halInit();
@@ -41,6 +24,7 @@ int main(void) {
 
   // Start the background threads
   heartbeatThread.start(LOWPRIO);
+  communicationThread.start(LOWPRIO);
   debugger.start(LOWPRIO);
 
   // Build and initialize the system
@@ -53,7 +37,6 @@ int main(void) {
     deadline += MS2ST(DT * 1000);
 
     platform::system.update();
-    communicate();
 
     chibios_rt::BaseThread::sleepUntil(deadline);
   }
