@@ -1,4 +1,4 @@
-CHIBIOS = ChibiOS-RT
+CHIBIOS = ChibiOS
 
 POSSIBLE_BOARD_NAME = $(addsuffix /unit.mk, $(addprefix units/, $(MAKECMDGOALS)))
 ifneq (,$(wildcard $(POSSIBLE_BOARD_NAME)))
