@@ -1,11 +1,6 @@
 #include <ch.hpp>
 #include <hal.h>
 
-#include <protocol/protocol.hpp>
-#include <protocol/messages.hpp>
-#include <protocol/encoder.hpp>
-#include <protocol/decoder.hpp>
-
 #include <hal_config.hpp>
 #include <platform_config.hpp>
 
