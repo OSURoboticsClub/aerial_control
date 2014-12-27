@@ -1,7 +1,6 @@
 #include <ch.hpp>
 #include <hal.h>
 
-#include <array> // TODO(kyle):
 #include <protocol/protocol.hpp>
 #include <protocol/messages.hpp>
 #include <protocol/encoder.hpp>
@@ -12,11 +11,9 @@
 
 // Misc
 #include <communication.hpp>
-#include <debugger.hpp>
 
 static platform::HeartbeatThread heartbeatThread;
 static CommunicationThread communicationThread(reinterpret_cast<BaseChannel *>(&SD1));
-static Debugger debugger;
 
 int main(void) {
   halInit();
@@ -25,7 +22,6 @@ int main(void) {
   // Start the background threads
   heartbeatThread.start(LOWPRIO);
   communicationThread.start(LOWPRIO);
-  debugger.start(LOWPRIO);
 
   // Build and initialize the system
   platform::init();
