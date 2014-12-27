@@ -6,14 +6,14 @@ BASEFLAGS = -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb \
             -falign-functions=16 -ffunction-sections \
             -fdata-sections -fno-common -fsingle-precision-constant \
             -O2 -lm \
-             -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=1 -DEIGEN_NO_DEBUG=1 -DTHUMB_PRESENT -DTHUMB
+            -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=1 -DEIGEN_NO_DEBUG=1 -DTHUMB_PRESENT -DTHUMB
 CFLAGS = $(BASEFLAGS)
 CXXFLAGS = $(BASEFLAGS) -std=c++11 -fno-rtti -fno-exceptions -Wall
 LDFLAGS = $(BASEFLAGS) -nostartfiles -Wl,--no-warn-mismatch,--library-path=ChibiOS-RT/os/ports/GCC/ARMCMx,--script=ChibiOS-RT/os/ports/GCC/ARMCMx/STM32F3xx/ld/STM32F303xC.ld,--gc-sections
 
-!cc = |> $(CC) -c $(CFLAGS) $(INCLUDES) %f -o %o |> tbuild/%B.o
-!cxx = |> $(CXX) -c $(CXXFLAGS) $(INCLUDES) %f -o %o |> tbuild/%B.o
-!ld = |> $(LD) %f $(LDFLAGS) -o %o |> tbuild/osuar_control.elf
+!cc = |> $(CC) -c $(CFLAGS) $(INCLUDES) %f -o %o |> build/%B.o
+!cxx = |> $(CXX) -c $(CXXFLAGS) $(INCLUDES) %f -o %o |> build/%B.o
+!ld = |> $(LD) %f $(LDFLAGS) -o %o |> build/%B.elf
 
 CSRCS += ChibiOS-RT/os/ports/GCC/ARMCMx/crt0.c
 CSRCS += ChibiOS-RT/os/ports/GCC/ARMCMx/STM32F3xx/vectors.c
@@ -70,35 +70,6 @@ INCLUDES += -IChibiOS-RT/os/hal/include
 INCLUDES += -IChibiOS-RT/os/various
 INCLUDES += -IChibiOS-RT/os/various/cpp_wrappers
 
-CSRCS += ChibiOS-RT/boards/ST_STM32F3_DISCOVERY/board.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/stm32_dma.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/hal_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/adc_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/ext_lld_isr.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/can_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/ext_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/GPIOv2/pal_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/I2Cv2/i2c_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/RTCv2/rtc_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/SPIv2/spi_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/TIMv1/gpt_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/TIMv1/icu_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/TIMv1/pwm_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/USARTv2/serial_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/USARTv2/uart_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/USBv1/usb_lld.c
-
-INCLUDES += -IChibiOS-RT/boards/ST_STM32F3_DISCOVERY
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32F30x
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/GPIOv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/I2Cv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/RTCv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/SPIv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/TIMv1
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/USARTv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/USB
-
 CPPSRCS += src/*.cpp
 CPPSRCS += src/controller/*.cpp
 CPPSRCS += src/drivers/*.cpp
@@ -107,8 +78,6 @@ CPPSRCS += src/input/*.cpp
 CPPSRCS += src/motor/*.cpp
 CPPSRCS += src/sensor/*.cpp
 CPPSRCS += src/system/*.cpp
-
-CPPSRCS += platforms/stm32f3discovery/*.cpp
 
 INCLUDES += -Isrc
 INCLUDES += -Isrc/controller
@@ -120,9 +89,18 @@ INCLUDES += -Isrc/sensor
 INCLUDES += -Isrc/system
 
 INCLUDES += -Iinclude
-INCLUDES += -Iplatforms/stm32f3discovery
 INCLUDES += -Iunits/apollo
+
+ifeq (@(CHIP_STM32F3_DISCOVERY),y)
+include variants/platforms/stm32f3discovery/Tupfile
+else
+ifeq (@(CHIP_STM32F4_DISCOVERY),y)
+include variants/platforms/stm32f4discovery/Tupfile
+else
+error No platform
+endif
+endif
 
 : foreach $(CSRCS) |> !cc |> {objs}
 : foreach $(CPPSRCS) |> !cxx |> {objs}
-: {objs} |> !ld |> tbuild/osuar_control.elf
+: {objs} |> !ld |> build/osuar_control.elf
