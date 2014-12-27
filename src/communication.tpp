@@ -31,10 +31,10 @@ void CommunicationThread::dispatch(const protocol::decoded_message_t<buffer_size
   }
 }
 
-template <typename T>
-void CommunicationThread::send(T m) {
+template <typename M>
+void CommunicationThread::send(const M& message) {
   std::array<std::uint8_t, 255> encodeBuffer;
-  std::uint16_t len = encoder.encode(m, &encodeBuffer);
+  std::uint16_t len = encoder.encode(message, &encodeBuffer);
 
   chnWrite(channel, encodeBuffer.data(), len);
 }

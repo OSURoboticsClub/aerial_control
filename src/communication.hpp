@@ -21,8 +21,8 @@ private:
   template <typename M>
   void on(const M& message);
 
-  template <typename T>
-  void send(T m);
+  template <typename M>
+  void send(const M& message);
 
   BaseChannel *channel;
 
