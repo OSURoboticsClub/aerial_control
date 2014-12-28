@@ -8,6 +8,7 @@
 #include <protocol/encoder.hpp>
 #include <protocol/decoder.hpp>
 
+template <std::size_t buffer_size>
 class CommunicationThread : public chibios_rt::BaseStaticThread<256> {
 public:
   CommunicationThread(BaseChannel *channel);
@@ -15,11 +16,14 @@ public:
   msg_t main() override;
 
 private:
-  template <std::size_t buffer_size>
   void dispatch(const protocol::decoded_message_t<buffer_size>& decoded);
 
   template <typename M>
   void on(const M& message);
+
+  // TODO: This is overridden for now because we can't specialize on M without
+  // specializing on buffer_size as well.
+  void on(const protocol::message::heartbeat_message_t& m);
 
   template <typename M>
   void send(const M& message);

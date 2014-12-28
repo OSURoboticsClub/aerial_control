@@ -1,10 +1,12 @@
 #include <array>
 
-CommunicationThread::CommunicationThread(BaseChannel *channel)
+template <std::size_t buffer_size>
+CommunicationThread<buffer_size>::CommunicationThread(BaseChannel *channel)
   : channel(channel) {
 }
 
-msg_t CommunicationThread::main() {
+template <std::size_t buffer_size>
+msg_t CommunicationThread<buffer_size>::main() {
   static std::array<std::uint8_t, 255> decodeBuffer;
 
   while(true) {
@@ -20,7 +22,7 @@ msg_t CommunicationThread::main() {
 }
 
 template <std::size_t buffer_size>
-void CommunicationThread::dispatch(const protocol::decoded_message_t<buffer_size>& decoded) {
+void CommunicationThread<buffer_size>::dispatch(const protocol::decoded_message_t<buffer_size>& decoded) {
   // TODO(kyle): Is there a way to do this without a giant switch?
   switch(decoded.id) {
     case protocol::message::heartbeat_message_t::ID: {
@@ -31,8 +33,8 @@ void CommunicationThread::dispatch(const protocol::decoded_message_t<buffer_size
   }
 }
 
-template <typename M>
-void CommunicationThread::send(const M& message) {
+template <std::size_t buffer_size> template <typename M>
+void CommunicationThread<buffer_size>::send(const M& message) {
   std::array<std::uint8_t, 255> encodeBuffer;
   std::uint16_t len = encoder.encode(message, &encodeBuffer);
 

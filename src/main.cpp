@@ -8,7 +8,7 @@
 #include <communication.hpp>
 
 static platform::HeartbeatThread heartbeatThread;
-static CommunicationThread communicationThread(reinterpret_cast<BaseChannel *>(&SD1));
+static CommunicationThread<255> communicationThread(reinterpret_cast<BaseChannel *>(&SD1));
 
 int main(void) {
   halInit();
