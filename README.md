@@ -5,7 +5,8 @@ _To control anything that flies, for now._
 Building
 --------
 
-    make <unit> # See units/ for unit definitions
+    tup variant variants/*.config # Generate variant build directories
+    tup build-apollo              # To build variant 'apollo'
 
 Conventions
 -----------
