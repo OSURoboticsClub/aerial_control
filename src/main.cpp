@@ -9,7 +9,7 @@
 
 static platform::HeartbeatThread heartbeatThread;
 static CommunicationThread<255> communicationThread(
-    reinterpret_cast<chibios_rt::BaseSequentialStreamInterface *>(&SD1));
+    reinterpret_cast<chibios_rt::BaseSequentialStreamInterface&>(SD1));
 
 int main(void) {
   halInit();
