@@ -1,83 +1,61 @@
-CC = arm-none-eabi-gcc
-CXX = arm-none-eabi-g++
-LD = arm-none-eabi-gcc
-BASEFLAGS = -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb \
-            -mno-thumb-interwork -mthumb -fomit-frame-pointer \
-            -falign-functions=16 -ffunction-sections \
-            -fdata-sections -fno-common -fsingle-precision-constant \
-            -O2 -lm \
-            -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=1 -DEIGEN_NO_DEBUG=1 -DTHUMB_PRESENT -DTHUMB
-CFLAGS = $(BASEFLAGS)
-CXXFLAGS = $(BASEFLAGS) -std=c++11 -fno-rtti -fno-exceptions -Wall
-LDFLAGS = $(BASEFLAGS) -nostartfiles -Wl,--no-warn-mismatch,--library-path=ChibiOS-RT/os/ports/GCC/ARMCMx,--script=ChibiOS-RT/os/ports/GCC/ARMCMx/STM32F3xx/ld/STM32F303xC.ld,--gc-sections
+include_rules
 
-!cc = |> $(CC) -c $(CFLAGS) $(INCLUDES) %f -o %o |> build/%B.o
-!cxx = |> $(CXX) -c $(CXXFLAGS) $(INCLUDES) %f -o %o |> build/%B.o
-!ld = |> $(LD) %f $(LDFLAGS) -o %o |> build/%B.elf
+# ChibiOS files
+CSRCS += ChibiOS/os/kernel/src/chsys.c
+CSRCS += ChibiOS/os/kernel/src/chdebug.c
+CSRCS += ChibiOS/os/kernel/src/chlists.c
+CSRCS += ChibiOS/os/kernel/src/chvt.c
+CSRCS += ChibiOS/os/kernel/src/chschd.c
+CSRCS += ChibiOS/os/kernel/src/chthreads.c
+CSRCS += ChibiOS/os/kernel/src/chdynamic.c
+CSRCS += ChibiOS/os/kernel/src/chregistry.c
+CSRCS += ChibiOS/os/kernel/src/chsem.c
+CSRCS += ChibiOS/os/kernel/src/chmtx.c
+CSRCS += ChibiOS/os/kernel/src/chcond.c
+CSRCS += ChibiOS/os/kernel/src/chevents.c
+CSRCS += ChibiOS/os/kernel/src/chmsg.c
+CSRCS += ChibiOS/os/kernel/src/chmboxes.c
+CSRCS += ChibiOS/os/kernel/src/chqueues.c
+CSRCS += ChibiOS/os/kernel/src/chmemcore.c
+CSRCS += ChibiOS/os/kernel/src/chheap.c
+CSRCS += ChibiOS/os/kernel/src/chmempools.c
+CSRCS += ChibiOS/os/hal/src/hal.c
+CSRCS += ChibiOS/os/hal/src/adc.c
+CSRCS += ChibiOS/os/hal/src/can.c
+CSRCS += ChibiOS/os/hal/src/ext.c
+CSRCS += ChibiOS/os/hal/src/gpt.c
+CSRCS += ChibiOS/os/hal/src/i2c.c
+CSRCS += ChibiOS/os/hal/src/icu.c
+CSRCS += ChibiOS/os/hal/src/mac.c
+CSRCS += ChibiOS/os/hal/src/mmc_spi.c
+CSRCS += ChibiOS/os/hal/src/mmcsd.c
+CSRCS += ChibiOS/os/hal/src/pal.c
+CSRCS += ChibiOS/os/hal/src/pwm.c
+CSRCS += ChibiOS/os/hal/src/rtc.c
+CSRCS += ChibiOS/os/hal/src/sdc.c
+CSRCS += ChibiOS/os/hal/src/serial.c
+CSRCS += ChibiOS/os/hal/src/serial_usb.c
+CSRCS += ChibiOS/os/hal/src/spi.c
+CSRCS += ChibiOS/os/hal/src/tm.c
+CSRCS += ChibiOS/os/hal/src/uart.c
+CSRCS += ChibiOS/os/various/chprintf.c
+CSRCS += ChibiOS/os/various/memstreams.c
+CXXSRCS += ChibiOS/os/various/cpp_wrappers/ch.cpp
 
-CSRCS += ChibiOS-RT/os/ports/GCC/ARMCMx/crt0.c
-CSRCS += ChibiOS-RT/os/ports/GCC/ARMCMx/STM32F3xx/vectors.c
-CSRCS += ChibiOS-RT/os/ports/GCC/ARMCMx/chcore.c
-CSRCS += ChibiOS-RT/os/ports/GCC/ARMCMx/chcore_v7m.c
-CSRCS += ChibiOS-RT/os/ports/common/ARMCMx/nvic.c
-CSRCS += ChibiOS-RT/os/kernel/src/chsys.c
-CSRCS += ChibiOS-RT/os/kernel/src/chdebug.c
-CSRCS += ChibiOS-RT/os/kernel/src/chlists.c
-CSRCS += ChibiOS-RT/os/kernel/src/chvt.c
-CSRCS += ChibiOS-RT/os/kernel/src/chschd.c
-CSRCS += ChibiOS-RT/os/kernel/src/chthreads.c
-CSRCS += ChibiOS-RT/os/kernel/src/chdynamic.c
-CSRCS += ChibiOS-RT/os/kernel/src/chregistry.c
-CSRCS += ChibiOS-RT/os/kernel/src/chsem.c
-CSRCS += ChibiOS-RT/os/kernel/src/chmtx.c
-CSRCS += ChibiOS-RT/os/kernel/src/chcond.c
-CSRCS += ChibiOS-RT/os/kernel/src/chevents.c
-CSRCS += ChibiOS-RT/os/kernel/src/chmsg.c
-CSRCS += ChibiOS-RT/os/kernel/src/chmboxes.c
-CSRCS += ChibiOS-RT/os/kernel/src/chqueues.c
-CSRCS += ChibiOS-RT/os/kernel/src/chmemcore.c
-CSRCS += ChibiOS-RT/os/kernel/src/chheap.c
-CSRCS += ChibiOS-RT/os/kernel/src/chmempools.c
-CSRCS += ChibiOS-RT/os/hal/src/hal.c
-CSRCS += ChibiOS-RT/os/hal/src/adc.c
-CSRCS += ChibiOS-RT/os/hal/src/can.c
-CSRCS += ChibiOS-RT/os/hal/src/ext.c
-CSRCS += ChibiOS-RT/os/hal/src/gpt.c
-CSRCS += ChibiOS-RT/os/hal/src/i2c.c
-CSRCS += ChibiOS-RT/os/hal/src/icu.c
-CSRCS += ChibiOS-RT/os/hal/src/mac.c
-CSRCS += ChibiOS-RT/os/hal/src/mmc_spi.c
-CSRCS += ChibiOS-RT/os/hal/src/mmcsd.c
-CSRCS += ChibiOS-RT/os/hal/src/pal.c
-CSRCS += ChibiOS-RT/os/hal/src/pwm.c
-CSRCS += ChibiOS-RT/os/hal/src/rtc.c
-CSRCS += ChibiOS-RT/os/hal/src/sdc.c
-CSRCS += ChibiOS-RT/os/hal/src/serial.c
-CSRCS += ChibiOS-RT/os/hal/src/serial_usb.c
-CSRCS += ChibiOS-RT/os/hal/src/spi.c
-CSRCS += ChibiOS-RT/os/hal/src/tm.c
-CSRCS += ChibiOS-RT/os/hal/src/uart.c
-CSRCS += ChibiOS-RT/os/various/chprintf.c
-CSRCS += ChibiOS-RT/os/various/memstreams.c
-CPPSRCS += ChibiOS-RT/os/various/cpp_wrappers/ch.cpp
+INCLUDES += -IChibiOS/os/kernel/include
+INCLUDES += -IChibiOS/os/hal/include
+INCLUDES += -IChibiOS/os/various
+INCLUDES += -IChibiOS/os/various/cpp_wrappers
 
-INCLUDES += -IChibiOS-RT/os/ports/common/ARMCMx/CMSIS/include
-INCLUDES += -IChibiOS-RT/os/ports/common/ARMCMx
-INCLUDES += -IChibiOS-RT/os/ports/GCC/ARMCMx
-INCLUDES += -IChibiOS-RT/os/ports/GCC/ARMCMx/STM32F3xx
-INCLUDES += -IChibiOS-RT/os/kernel/include
-INCLUDES += -IChibiOS-RT/os/hal/include
-INCLUDES += -IChibiOS-RT/os/various
-INCLUDES += -IChibiOS-RT/os/various/cpp_wrappers
-
-CPPSRCS += src/*.cpp
-CPPSRCS += src/controller/*.cpp
-CPPSRCS += src/drivers/*.cpp
-CPPSRCS += src/estimator/*.cpp
-CPPSRCS += src/input/*.cpp
-CPPSRCS += src/motor/*.cpp
-CPPSRCS += src/sensor/*.cpp
-CPPSRCS += src/system/*.cpp
+# Control files
+CXXSRCS += src/*.cpp
+CXXSRCS += src/controller/*.cpp
+CXXSRCS += src/drivers/*.cpp
+CXXSRCS += src/estimator/*.cpp
+CXXSRCS += src/input/*.cpp
+CXXSRCS += src/motor/*.cpp
+CXXSRCS += src/sensor/*.cpp
+CXXSRCS += src/system/*.cpp
 
 INCLUDES += -Isrc
 INCLUDES += -Isrc/controller
@@ -89,18 +67,22 @@ INCLUDES += -Isrc/sensor
 INCLUDES += -Isrc/system
 
 INCLUDES += -Iinclude
-INCLUDES += -Iunits/apollo
+INCLUDES += -Iinclude/protocol/include
 
-ifeq (@(CHIP_STM32F3_DISCOVERY),y)
+# Platforms
 include variants/platforms/stm32f3discovery/Tupfile
-else
-ifeq (@(CHIP_STM32F4_DISCOVERY),y)
 include variants/platforms/stm32f4discovery/Tupfile
-else
-error No platform
-endif
-endif
 
-: foreach $(CSRCS) |> !cc |> {objs}
-: foreach $(CPPSRCS) |> !cxx |> {objs}
-: {objs} |> !ld |> build/osuar_control.elf
+# Units
+include variants/units/apollo/Tupfile
+include variants/units/hera/Tupfile
+
+# Rules
+: foreach $(CSRCS) |> !cc |>
+: foreach $(CSRCS-y) |> !cc |>
+: foreach $(CXXSRCS) |> !cxx |>
+: foreach $(CXXSRCS-y) |> !cxx |>
+: *.o |> !ld |> osuar_control.elf
+
+: osuar_control.elf |> !hex |>
+: osuar_control.elf |> !bin |>

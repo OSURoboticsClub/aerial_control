@@ -1,31 +1,47 @@
-CSRCS += ChibiOS-RT/boards/ST_STM32F3_DISCOVERY/board.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/stm32_dma.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/hal_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/adc_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32F30x/ext_lld_isr.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/can_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/ext_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/GPIOv2/pal_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/I2Cv2/i2c_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/RTCv2/rtc_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/SPIv2/spi_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/TIMv1/gpt_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/TIMv1/icu_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/TIMv1/pwm_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/USARTv2/serial_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/USARTv2/uart_lld.c
-CSRCS += ChibiOS-RT/os/hal/platforms/STM32/USBv1/usb_lld.c
+# Board
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/boards/ST_STM32F3_DISCOVERY/board.c
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/boards/ST_STM32F3_DISCOVERY
 
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32F30x
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/GPIOv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/I2Cv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/RTCv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/SPIv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/TIMv1
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/USARTv2
-INCLUDES += -IChibiOS-RT/os/hal/platforms/STM32/USB
-INCLUDES += -IChibiOS-RT/boards/ST_STM32F3_DISCOVERY
+# Platform
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32F30x/stm32_dma.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32F30x/hal_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32F30x/adc_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32F30x/ext_lld_isr.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/can_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/ext_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/GPIOv2/pal_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/I2Cv2/i2c_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/RTCv2/rtc_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/SPIv2/spi_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/TIMv1/gpt_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/TIMv1/icu_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/TIMv1/pwm_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/USARTv2/serial_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/USARTv2/uart_lld.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/hal/platforms/STM32/USBv1/usb_lld.c
 
-CPPSRCS += platforms/stm32f3discovery/*.cpp
-INCLUDES += -Iplatforms/stm32f3discovery
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32F30x
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/GPIOv2
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/I2Cv2
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/RTCv2
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/SPIv2
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/TIMv1
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/USARTv2
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/hal/platforms/STM32/USBv1
+
+# Port
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/ports/GCC/ARMCMx/crt0.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/ports/GCC/ARMCMx/STM32F3xx/vectors.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/ports/GCC/ARMCMx/chcore.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/ports/GCC/ARMCMx/chcore_v7m.c
+CSRCS-@(PLATFORM_STM32F3DISCOVERY) += ChibiOS/os/ports/common/ARMCMx/nvic.c
+
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/ports/common/ARMCMx/CMSIS/include
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/ports/common/ARMCMx
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/ports/GCC/ARMCMx
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -IChibiOS/os/ports/GCC/ARMCMx/STM32F3xx
+
+# Control platform
+CXXSRCS-@(PLATFORM_STM32F3DISCOVERY) += platforms/stm32f3discovery/*.cpp
+INCLUDES-@(PLATFORM_STM32F3DISCOVERY) += -Iplatforms/stm32f3discovery
