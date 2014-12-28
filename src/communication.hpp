@@ -11,7 +11,7 @@
 template <std::size_t buffer_size>
 class CommunicationThread : public chibios_rt::BaseStaticThread<256> {
 public:
-  CommunicationThread(BaseChannel *channel);
+  CommunicationThread(chibios_rt::BaseSequentialStreamInterface *channel);
 
   msg_t main() override;
 
@@ -28,7 +28,7 @@ private:
   template <typename M>
   void send(const M& message);
 
-  BaseChannel *channel;
+  chibios_rt::BaseSequentialStreamInterface *channel;
 
   protocol::Encoder encoder;
   protocol::Decoder decoder;
