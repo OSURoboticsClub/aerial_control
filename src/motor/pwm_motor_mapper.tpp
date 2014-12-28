@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <limits>
 
-#include <hal_config.hpp>
+#include "hal_config.hpp"
 
 template <int motor_count>
 PWMMotorMapper<motor_count>::PWMMotorMapper() {

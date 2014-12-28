@@ -1,8 +1,8 @@
 #ifndef ATTITUDE_ESTIMATOR_HPP_
 #define ATTITUDE_ESTIMATOR_HPP_
 
-#include <sensor/gyroscope.hpp>
-#include <sensor/accelerometer.hpp>
+#include "sensor/gyroscope.hpp"
+#include "sensor/accelerometer.hpp"
 
 struct attitude_estimate_t {
   float roll;

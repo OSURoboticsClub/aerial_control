@@ -1,10 +1,10 @@
 #ifndef L3GD20_HPP_
 #define L3GD20_HPP_
 
-#include <hal.h>
+#include "hal.h"
 
-#include <sensor/gyroscope.hpp>
-#include <drivers/spi_device.hpp>
+#include "sensor/gyroscope.hpp"
+#include "drivers/spi_device.hpp"
 
 #define L3GD20_SENSITIVITY_250DPS   (0.00875F)
 #define L3GD20_SENSITIVITY_500DPS   (0.0175F)

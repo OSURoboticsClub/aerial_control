@@ -1,4 +1,4 @@
-#include <motor/multirotor_quad_x_motor_mapper.hpp>
+#include "motor/multirotor_quad_x_motor_mapper.hpp"
 
 #include <array>
 

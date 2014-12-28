@@ -1,8 +1,8 @@
-#include <controller/angular_position_controller.hpp>
-
-#include <hal_config.hpp>
+#include "controller/angular_position_controller.hpp"
 
 #include <algorithm>
+
+#include "hal_config.hpp"
 
 AngularPositionController::AngularPositionController()
   : rollPosPid(ANGPOS_X_KP, ANGPOS_X_KI, ANGPOS_X_KD),

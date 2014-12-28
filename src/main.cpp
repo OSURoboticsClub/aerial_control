@@ -1,11 +1,11 @@
-#include <ch.hpp>
-#include <hal.h>
+#include "ch.hpp"
+#include "hal.h"
 
-#include <hal_config.hpp>
-#include <platform_config.hpp>
+#include "hal_config.hpp"
+#include "platform_config.hpp"
 
 // Misc
-#include <communication.hpp>
+#include "communication.hpp"
 
 static platform::HeartbeatThread heartbeatThread;
 static CommunicationThread<255> communicationThread(reinterpret_cast<BaseChannel *>(&SD1));

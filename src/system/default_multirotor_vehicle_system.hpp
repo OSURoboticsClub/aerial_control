@@ -1,17 +1,17 @@
 #ifndef DEFAULT_MULTIROTOR_VEHICLE_SYSTEM_HPP_
 #define DEFAULT_MULTIROTOR_VEHICLE_SYSTEM_HPP_
 
-#include <controller/angular_position_controller.hpp>
-#include <controller/angular_velocity_controller.hpp>
-#include <controller/controller_pipeline.hpp>
-#include <estimator/attitude_estimator.hpp>
-#include <estimator/dcm_attitude_estimator.hpp>
-#include <input/input_source.hpp>
-#include <input/pwm_receiver_input_source.hpp>
-#include <motor/multirotor_quad_x_motor_mapper.hpp>
-#include <sensor/gyroscope.hpp>
-#include <sensor/accelerometer.hpp>
-#include <system/multirotor_vehicle_system.hpp>
+#include "controller/angular_position_controller.hpp"
+#include "controller/angular_velocity_controller.hpp"
+#include "controller/controller_pipeline.hpp"
+#include "estimator/attitude_estimator.hpp"
+#include "estimator/dcm_attitude_estimator.hpp"
+#include "input/input_source.hpp"
+#include "input/pwm_receiver_input_source.hpp"
+#include "motor/multirotor_quad_x_motor_mapper.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/accelerometer.hpp"
+#include "system/multirotor_vehicle_system.hpp"
 
 class DefaultMultirotorVehicleSystem : public MultirotorVehicleSystem<4> {
 public:
@@ -43,6 +43,6 @@ private:
   MultirotorQuadXMotorMapper motorMapper;
 };
 
-#include <system/default_multirotor_vehicle_system.tpp>
+#include "system/default_multirotor_vehicle_system.tpp"
 
 #endif

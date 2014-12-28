@@ -1,12 +1,12 @@
 #ifndef COMMUNICATION_HPP_
 #define COMMUNICATION_HPP_
 
-#include <hal.h>
+#include "hal.h"
 
-#include <protocol/protocol.hpp>
-#include <protocol/messages.hpp>
-#include <protocol/encoder.hpp>
-#include <protocol/decoder.hpp>
+#include "protocol/protocol.hpp"
+#include "protocol/messages.hpp"
+#include "protocol/encoder.hpp"
+#include "protocol/decoder.hpp"
 
 template <std::size_t buffer_size>
 class CommunicationThread : public chibios_rt::BaseStaticThread<256> {

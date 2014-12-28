@@ -1,7 +1,7 @@
 #ifndef MOTOR_MAPPER_HPP_
 #define MOTOR_MAPPER_HPP_
 
-#include <controller/setpoint_types.hpp>
+#include "controller/setpoint_types.hpp"
 
 class MotorMapper {
 public:

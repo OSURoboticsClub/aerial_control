@@ -1,8 +1,8 @@
 #ifndef CONTROLLER_PIPELINE_HPP_
 #define CONTROLLER_PIPELINE_HPP_
 
-#include <controller/controller.hpp>
-#include <controller/setpoint_types.hpp>
+#include "controller/controller.hpp"
+#include "controller/setpoint_types.hpp"
 
 /**
  * Provides a simple interface to submitting setpoints to a series of
@@ -18,6 +18,6 @@ public:
   R run(const attitude_estimate_t& estimate, const SP& input, C& head, Cs&... controllers);
 };
 
-#include <controller/controller_pipeline.tpp>
+#include "controller/controller_pipeline.tpp"
 
 #endif

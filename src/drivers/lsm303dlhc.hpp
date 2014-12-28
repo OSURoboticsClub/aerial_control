@@ -1,9 +1,9 @@
 #ifndef LSM303DLHC_HPP_
 #define LSM303DLHC_HPP_
 
-#include <hal.h>
+#include "hal.h"
 
-#include <sensor/accelerometer.hpp>
+#include "sensor/accelerometer.hpp"
 
 #define LSM303_I2C_ACC_ADDRESS        0x19
 

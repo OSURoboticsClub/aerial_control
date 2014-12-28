@@ -3,9 +3,10 @@
 
 #include <array>
 
-#include <hal.h>
-#include <controller/setpoint_types.hpp>
-#include <motor/motor_mapper.hpp>
+#include "hal.h"
+
+#include "controller/setpoint_types.hpp"
+#include "motor/motor_mapper.hpp"
 
 template <int motor_count>
 class PWMMotorMapper : public MotorMapper {
@@ -22,6 +23,6 @@ private:
   static void mapToBounds(const std::array<float, motor_count>& percents, std::array<float, motor_count> *mapped);
 };
 
-#include <motor/pwm_motor_mapper.tpp>
+#include "motor/pwm_motor_mapper.tpp"
 
 #endif

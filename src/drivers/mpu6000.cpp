@@ -1,9 +1,6 @@
-#include <drivers/mpu6000.hpp>
+#include "drivers/mpu6000.hpp"
 
-#include <hal.h>
-#include <chprintf.h>
-
-#include <hal_config.hpp>
+#include "hal_config.hpp"
 
 void MPU6000::init() {
   uint8_t txbuf[8], rxbuf[8];

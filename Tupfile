@@ -56,13 +56,6 @@ CXXSRCS += src/sensor/*.cpp
 CXXSRCS += src/system/*.cpp
 
 INCLUDES += -Isrc
-INCLUDES += -Isrc/controller
-INCLUDES += -Isrc/drivers
-INCLUDES += -Isrc/estimator
-INCLUDES += -Isrc/input
-INCLUDES += -Isrc/motor
-INCLUDES += -Isrc/sensor
-INCLUDES += -Isrc/system
 
 INCLUDES += -Iinclude
 INCLUDES += -Iinclude/protocol/include

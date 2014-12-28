@@ -1,6 +1,6 @@
-#include <estimator/dcm_attitude_estimator.hpp>
+#include "estimator/dcm_attitude_estimator.hpp"
 
-#include <hal_config.hpp>
+#include "hal_config.hpp"
 
 DCMAttitudeEstimator::DCMAttitudeEstimator() {
   dcm.setIdentity();

@@ -1,9 +1,9 @@
 #ifndef DCM_ATTITUDE_ESTIMATOR_HPP_
 #define DCM_ATTITUDE_ESTIMATOR_HPP_
 
-#include <Eigen/Dense>
+#include "Eigen/Dense"
 
-#include <estimator/attitude_estimator.hpp>
+#include "estimator/attitude_estimator.hpp"
 
 class DCMAttitudeEstimator : public AttitudeEstimator {
 public:

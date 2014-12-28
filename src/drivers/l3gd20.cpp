@@ -1,8 +1,6 @@
-#include <drivers/l3gd20.hpp>
+#include "drivers/l3gd20.hpp"
 
-#include <hal.h>
-
-#include <hal_config.hpp>
+#include "hal_config.hpp"
 
 void L3GD20::init() {
   // Wake up device, enable X, Y, and Z outputs, and set 760Hz mode.

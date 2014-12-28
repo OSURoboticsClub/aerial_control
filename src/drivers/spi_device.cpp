@@ -1,4 +1,4 @@
-#include <drivers/spi_device.hpp>
+#include "drivers/spi_device.hpp"
 
 SPIDevice::SPIDevice(SPIDriver *spid, const SPIConfig *spicfg) : spid(spid), spicfg(spicfg) {
 }

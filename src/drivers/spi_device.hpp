@@ -1,7 +1,7 @@
 #ifndef SPI_DEVICE_HPP_
 #define SPI_DEVICE_HPP_
 
-#include <hal.h>
+#include "hal.h"
 
 class SPIDevice {
 public:

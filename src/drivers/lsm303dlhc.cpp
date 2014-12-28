@@ -1,8 +1,6 @@
-#include <drivers/lsm303dlhc.hpp>
+#include "drivers/lsm303dlhc.hpp"
 
-#include <hal.h>
-
-#include <hal_config.hpp>
+#include "hal_config.hpp"
 
 LSM303DLHC::LSM303DLHC(I2CDriver *i2cd) : i2cd(i2cd) {
 }
