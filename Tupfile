@@ -1,14 +1,16 @@
-# ChibiOS files
-CSRCS += ChibiOS/os/kernel/src/*.c
-CSRCS += ChibiOS/os/hal/src/*.c
-CSRCS += ChibiOS/os/various/chprintf.c
-CSRCS += ChibiOS/os/various/memstreams.c
-CXXSRCS += ChibiOS/os/various/cpp_wrappers/ch.cpp
+CHIBIOS = ChibiOS
 
-INCLUDES += -IChibiOS/os/kernel/include
-INCLUDES += -IChibiOS/os/hal/include
-INCLUDES += -IChibiOS/os/various
-INCLUDES += -IChibiOS/os/various/cpp_wrappers
+# ChibiOS files
+CSRCS += $(CHIBIOS)/os/kernel/src/*.c
+CSRCS += $(CHIBIOS)/os/hal/src/*.c
+CSRCS += $(CHIBIOS)/os/various/chprintf.c
+CSRCS += $(CHIBIOS)/os/various/memstreams.c
+CXXSRCS += $(CHIBIOS)/os/various/cpp_wrappers/ch.cpp
+
+INCLUDES += -I$(CHIBIOS)/os/kernel/include
+INCLUDES += -I$(CHIBIOS)/os/hal/include
+INCLUDES += -I$(CHIBIOS)/os/various
+INCLUDES += -I$(CHIBIOS)/os/various/cpp_wrappers
 
 # Control files
 CXXSRCS += src/*.cpp
