@@ -1,5 +1,7 @@
 #include "drivers/l3gd20.hpp"
 
+#include <cstddef>
+
 #include "hal_config.hpp"
 
 void L3GD20::init() {
@@ -28,7 +30,7 @@ gyroscope_reading_t L3GD20::readGyro() {
 
   gyroscope_reading_t reading;
 
-  for(int i = 0; i < 3; i++) {
+  for(std::size_t i = 0; i < 3; i++) {
     reading.axes[i] = (float) raw[i] * L3GD20_SENSITIVITY_2000DPS * L3GD20_DPS_TO_RADS;
   }
 

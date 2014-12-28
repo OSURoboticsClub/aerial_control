@@ -1,6 +1,7 @@
 #include "motor/multirotor_quad_x_motor_mapper.hpp"
 
 #include <array>
+#include <cstddef>
 
 MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper() {
 }
@@ -22,7 +23,7 @@ void MultirotorQuadXMotorMapper::run(actuator_setpoint_t& input) {
 
   // Add throttle to shifts to get absolute output value
   std::array<float, 4> outputs = { 0 };
-  for(int i = 0; i < 4; i++) {
+  for(std::size_t i = 0; i < 4; i++) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }
 

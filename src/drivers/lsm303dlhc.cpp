@@ -1,5 +1,7 @@
 #include "drivers/lsm303dlhc.hpp"
 
+#include <cstddef>
+
 #include "hal_config.hpp"
 
 LSM303DLHC::LSM303DLHC(I2CDriver *i2cd) : i2cd(i2cd) {
@@ -28,7 +30,7 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
 
   accelerometer_reading_t reading;
 
-  for(int i = 0; i < 3; i++) {
+  for(std::size_t i = 0; i < 3; i++) {
     // TODO: Scale to m/s^2
     reading.axes[i] = (float) raw[i];
   }
