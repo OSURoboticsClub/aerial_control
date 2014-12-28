@@ -78,10 +78,8 @@ include variants/units/apollo/Tupfile
 include variants/units/hera/Tupfile
 
 # Rules
-: foreach $(CSRCS) |> !cc |>
-: foreach $(CSRCS-y) |> !cc |>
-: foreach $(CXXSRCS) |> !cxx |>
-: foreach $(CXXSRCS-y) |> !cxx |>
+: foreach $(CSRCS) $(CSRCS-y) |> !cc |>
+: foreach $(CXXSRCS) $(CXXSRCS-y) |> !cxx |>
 : *.o |> !ld |> osuar_control.elf
 
 : osuar_control.elf |> !hex |>
