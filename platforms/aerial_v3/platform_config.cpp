@@ -5,7 +5,7 @@
 namespace platform {
 
 MPU6000 imu(&SPID1, &mpu6000_spicfg);
-DefaultMultirotorVehicleSystem system(&imu, &imu);
+DefaultMultirotorVehicleSystem system(imu, imu);
 
 void init() {
   // Initialize platform HAL

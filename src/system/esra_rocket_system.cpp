@@ -1,6 +1,6 @@
 #include "system/esra_rocket_system.hpp"
 
-EsraRocketSystem::EsraRocketSystem(Gyroscope *gyroscope, Accelerometer *accelerometer)
+EsraRocketSystem::EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer)
   : gyroscope(gyroscope), accelerometer(accelerometer) {
 }
 
@@ -14,24 +14,24 @@ void EsraRocketSystem::update() {
   RocketSystem::update();
 }
 
-Gyroscope *EsraRocketSystem::getGyroscope() {
+Gyroscope& EsraRocketSystem::getGyroscope() {
   return gyroscope;
 }
 
-Accelerometer *EsraRocketSystem::getAccelerometer() {
+Accelerometer& EsraRocketSystem::getAccelerometer() {
   return accelerometer;
 }
 
-AttitudeEstimator *EsraRocketSystem::getAttitudeEstimator() {
-  return &estimator;
+AttitudeEstimator& EsraRocketSystem::getAttitudeEstimator() {
+  return estimator;
 }
 
-InputSource *EsraRocketSystem::getInputSource() {
-  return &inputSource;
+InputSource& EsraRocketSystem::getInputSource() {
+  return inputSource;
 }
 
-MotorMapper *EsraRocketSystem::getMotorMapper() {
-  return &motorMapper;
+MotorMapper& EsraRocketSystem::getMotorMapper() {
+  return motorMapper;
 }
 
 actuator_setpoint_t EsraRocketSystem::runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) {

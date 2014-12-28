@@ -1,6 +1,6 @@
 #include "system/default_multirotor_vehicle_system.hpp"
 
-DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope *gyroscope, Accelerometer *accelerometer)
+DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer)
   : gyroscope(gyroscope), accelerometer(accelerometer) {
 }
 
@@ -14,24 +14,24 @@ void DefaultMultirotorVehicleSystem::update() {
   MultirotorVehicleSystem::update();
 }
 
-Gyroscope *DefaultMultirotorVehicleSystem::getGyroscope() {
+Gyroscope& DefaultMultirotorVehicleSystem::getGyroscope() {
   return gyroscope;
 }
 
-Accelerometer *DefaultMultirotorVehicleSystem::getAccelerometer() {
+Accelerometer& DefaultMultirotorVehicleSystem::getAccelerometer() {
   return accelerometer;
 }
 
-AttitudeEstimator *DefaultMultirotorVehicleSystem::getAttitudeEstimator() {
-  return &estimator;
+AttitudeEstimator& DefaultMultirotorVehicleSystem::getAttitudeEstimator() {
+  return estimator;
 }
 
-InputSource *DefaultMultirotorVehicleSystem::getInputSource() {
-  return &inputSource;
+InputSource& DefaultMultirotorVehicleSystem::getInputSource() {
+  return inputSource;
 }
 
-MotorMapper *DefaultMultirotorVehicleSystem::getMotorMapper() {
-  return &motorMapper;
+MotorMapper& DefaultMultirotorVehicleSystem::getMotorMapper() {
+  return motorMapper;
 }
 
 actuator_setpoint_t DefaultMultirotorVehicleSystem::runController(const attitude_estimate_t& estimate, const angular_position_setpoint_t& setpoint) {
