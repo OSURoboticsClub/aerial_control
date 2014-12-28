@@ -1,6 +1,6 @@
 CC = arm-none-eabi-gcc
 CXX = arm-none-eabi-g++
-LD = arm-none-eabi-gcc
+LD = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
 
 BASEFLAGS =  -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb
