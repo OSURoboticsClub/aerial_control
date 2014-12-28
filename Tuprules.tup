@@ -8,11 +8,12 @@ BASEFLAGS += -mno-thumb-interwork -mthumb -fomit-frame-pointer
 BASEFLAGS += -falign-functions=16 -ffunction-sections
 BASEFLAGS += -fdata-sections -fno-common -fsingle-precision-constant
 BASEFLAGS += -O2 -lm
-BASEFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=1 -DEIGEN_NO_DEBUG=1 -DTHUMB_PRESENT -DTHUMB
+BASEFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=1 -DTHUMB_PRESENT -DTHUMB
+BASEFLAGS += -DEIGEN_NO_DEBUG=1
 
 CFLAGS = $(BASEFLAGS)
 CXXFLAGS = $(BASEFLAGS) -std=c++11 -fno-rtti -fno-exceptions -Wall
-LDFLAGS = $(BASEFLAGS) -nostartfiles -Wl,--no-warn-mismatch,--library-path=ChibiOS/os/ports/GCC/ARMCMx,--script=ChibiOS/os/ports/GCC/ARMCMx/STM32F3xx/ld/STM32F303xC.ld,--gc-sections
+LDFLAGS = $(BASEFLAGS) -nostartfiles -Wl,--no-warn-mismatch,--library-path=ChibiOS/os/ports/GCC/ARMCMx,--script=$(LINKSCRIPT-y),--gc-sections
 
 !cc = |> $(CC) -c $(CFLAGS) $(INCLUDES) $(INCLUDES-y) %f -o %o |> %B.o
 !cxx = |> $(CXX) -c $(CXXFLAGS) $(INCLUDES) $(INCLUDES-y) %f -o %o |> %B.o
