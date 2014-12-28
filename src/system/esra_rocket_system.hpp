@@ -15,19 +15,19 @@
 
 class EsraRocketSystem : public RocketSystem<4> {
 public:
-  inline EsraRocketSystem(Gyroscope *gyroscope, Accelerometer *accelerometer);
+  EsraRocketSystem(Gyroscope *gyroscope, Accelerometer *accelerometer);
 
-  inline void init() override;
-  inline void update() override;
+  void init() override;
+  void update() override;
 
 protected:
-  inline Gyroscope *getGyroscope() override;
-  inline Accelerometer *getAccelerometer() override;
-  inline AttitudeEstimator *getAttitudeEstimator() override;
-  inline InputSource *getInputSource() override;
-  inline MotorMapper *getMotorMapper() override;
+  Gyroscope *getGyroscope() override;
+  Accelerometer *getAccelerometer() override;
+  AttitudeEstimator *getAttitudeEstimator() override;
+  InputSource *getInputSource() override;
+  MotorMapper *getMotorMapper() override;
 
-  inline actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) override;
+  actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) override;
 
 private:
   Gyroscope *gyroscope;
@@ -42,7 +42,5 @@ private:
 
   EsraRocketMotorMapper motorMapper;
 };
-
-#include "system/esra_rocket_system.tpp"
 
 #endif

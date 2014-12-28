@@ -1,3 +1,5 @@
+#include "system/esra_rocket_system.hpp"
+
 EsraRocketSystem::EsraRocketSystem(Gyroscope *gyroscope, Accelerometer *accelerometer)
   : gyroscope(gyroscope), accelerometer(accelerometer) {
 }

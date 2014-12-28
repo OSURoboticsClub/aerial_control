@@ -1,3 +1,5 @@
+#include "system/default_multirotor_vehicle_system.hpp"
+
 DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope *gyroscope, Accelerometer *accelerometer)
   : gyroscope(gyroscope), accelerometer(accelerometer) {
 }
