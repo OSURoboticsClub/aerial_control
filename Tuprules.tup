@@ -1,22 +1,35 @@
-CC = arm-none-eabi-gcc
-CXX = arm-none-eabi-g++
-LD = arm-none-eabi-g++
-OBJCOPY = arm-none-eabi-objcopy
+PREFIX = arm-none-eabi
 
-BASEFLAGS =  -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb
-BASEFLAGS += -mno-thumb-interwork -mthumb -fomit-frame-pointer
-BASEFLAGS += -falign-functions=16 -ffunction-sections
-BASEFLAGS += -fdata-sections -fno-common -fsingle-precision-constant
-BASEFLAGS += -O2 -lm
-BASEFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=1 -DTHUMB_PRESENT -DTHUMB
-BASEFLAGS += -DEIGEN_NO_DEBUG=1
+CC = $(PREFIX)-gcc
+CXX = $(PREFIX)-g++
+LD = $(PREFIX)-g++
+AR = $(PREFIX)-ar
+AS = $(PREFIX)-as
+OBJCOPY = $(PREFIX)-objcopy
+OBJDUMP = $(PREFIX)-objdump
+GDB = $(PREFIX)-gdb
+SIZE = $(PREFIX)-size
 
-CFLAGS = $(BASEFLAGS)
-CXXFLAGS = $(BASEFLAGS) -std=c++11 -fno-rtti -fno-exceptions -Wall
-LDFLAGS = $(BASEFLAGS) -nostartfiles -Wl,--no-warn-mismatch,--library-path=ChibiOS/os/ports/GCC/ARMCMx,--script=$(LINKSCRIPT-y),--gc-sections
+FPFLAGS = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+
+CFLAGS += -O2 -g
+CFLAGS += -Wall -Wextra
+CFLAGS += -mcpu=cortex-m4 -mthumb $(FPFLAGS) -mno-thumb-interwork
+CFLAGS += -fomit-frame-pointer -falign-functions=16 -ffunction-sections
+CFLAGS += -fdata-sections -fno-common -fsingle-precision-constant
+CFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=TRUE -DTHUMB_PRESENT -DTHUMB
+CFLAGS += -DEIGEN_NO_DEBUG=1
+
+CXXFLAGS += $(CFLAGS)
+CXXFLAGS += -std=c++11 -fno-rtti -fno-exceptions
+
+LDFLAGS += -lm -nostartfiles
+LDFLAGS += -T$(LINKSCRIPT-y)
+LDFLAGS += -Wl,--no-warn-mismatch,--gc-sections
 
 !cc = |> $(CC) -c $(CFLAGS) $(INCLUDES) $(INCLUDES-y) %f -o %o |> %B.o
 !cxx = |> $(CXX) -c $(CXXFLAGS) $(INCLUDES) $(INCLUDES-y) %f -o %o |> %B.o
 !ld = |> $(LD) %f $(LDFLAGS) -o %o |>
 !hex = |> $(OBJCOPY) -O ihex %f %o |> %B.hex
 !bin = |> $(OBJCOPY) -O binary %f %o |> %B.bin
+!size = |> $(SIZE) %f |>
