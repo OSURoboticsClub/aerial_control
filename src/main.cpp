@@ -5,10 +5,10 @@
 #include <platform_config.hpp>
 
 // Misc
-#include <debugger.hpp>
+#include <communication.hpp>
 
 static platform::HeartbeatThread heartbeatThread;
-static Debugger debugger;
+static CommunicationThread<255> communicationThread(reinterpret_cast<BaseChannel *>(&SD1));
 
 int main(void) {
   halInit();
@@ -16,7 +16,7 @@ int main(void) {
 
   // Start the background threads
   heartbeatThread.start(LOWPRIO);
-  debugger.start(LOWPRIO);
+  communicationThread.start(LOWPRIO);
 
   // Build and initialize the system
   platform::init();
