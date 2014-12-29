@@ -5,8 +5,26 @@ _To control anything that flies, for now._
 Building
 --------
 
+    git submodule update --init
     tup variant variants/*.config # Generate variant build directories
     tup build-apollo              # To build variant 'apollo'
+
+Adding another platform
+-----------------------
+To add another unit `UUU` of platform type `PPP` as variant `VVV`, add the following:
+
+  * `variants/units/UUU/Tupfile`
+  * `variants/platforms/PPP/Tupfile`
+  * `variants/VVV.config`
+  * `platforms/PPP`
+
+As necessary, further add the following:
+
+  * `units/UUU`
+  * Appropriate system code in `src/system`
+
+By convention, we name variants after units, so `UUU` and `VVV` are currently
+the same in all cases.
 
 Conventions
 -----------
