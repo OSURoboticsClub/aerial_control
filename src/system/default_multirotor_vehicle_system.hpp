@@ -4,6 +4,7 @@
 #include "controller/angular_position_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
 #include "controller/controller_pipeline.hpp"
+#include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "input/input_source.hpp"

@@ -22,8 +22,25 @@ void MultirotorVehicleSystem<num_rotors>::update() {
     .throttle_sp = input.throttle_sp
   };
 
-  actuator_setpoint_t actuator_setpoint = runController(estimate, angular_setpoint);
+  actuator_setpoint_t actuator_setpoint;
+  if(armed) {
+    // Run the controller pipeline as determined by the subclass
+    actuator_setpoint = runController(estimate, angular_setpoint);
+  } else {
+    // Run the zero controller
+    actuator_setpoint = zeroController.run(estimate, angular_setpoint);
+  }
 
   // Update motor outputs
   getMotorMapper().run(actuator_setpoint);
+}
+
+template <int num_rotors>
+void MultirotorVehicleSystem<num_rotors>::setArmed(bool arm) {
+  armed = arm;
+}
+
+template <int num_rotors>
+bool MultirotorVehicleSystem<num_rotors>::isArmed() {
+  return armed;
 }
