@@ -27,7 +27,7 @@ protected:
   InputSource& getInputSource() override;
   MotorMapper& getMotorMapper() override;
 
-  actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) override;
+  actuator_setpoint_t runController(const attitude_estimate_t &estimate, const angular_position_setpoint_t& setpoint) override;
 
 private:
   Gyroscope& gyroscope;
