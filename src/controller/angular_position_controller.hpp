@@ -1,7 +1,6 @@
 #ifndef ANGULAR_POSITION_CONTROLLER_HPP_
 #define ANGULAR_POSITION_CONTROLLER_HPP_
 
-#include "hal_config.hpp"
 #include "controller/controller.hpp"
 #include "controller/pid_controller.hpp"
 #include "controller/setpoint_types.hpp"

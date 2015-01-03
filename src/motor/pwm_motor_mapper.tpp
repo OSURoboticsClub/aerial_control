@@ -2,10 +2,9 @@
 #include <cstddef>
 #include <limits>
 
-#include "hal_config.hpp"
-
 template <int motor_count>
-PWMMotorMapper<motor_count>::PWMMotorMapper() {
+PWMMotorMapper<motor_count>::PWMMotorMapper(PWMPlatform& pwmPlatform)
+  : pwmPlatform(pwmPlatform) {
 }
 
 template <int motor_count>
@@ -18,7 +17,7 @@ void PWMMotorMapper<motor_count>::setMotorSpeeds(const std::array<float, motor_c
   mapToBounds(percents, &mappedPercents);
 
   for(std::size_t i = 0; i < motor_count; i++) {
-    pwmPlatformSet(i, mappedPercents[i]);
+    pwmPlatform.set(i, mappedPercents[i]);
   }
 }
 

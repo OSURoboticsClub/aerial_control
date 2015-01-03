@@ -6,7 +6,7 @@
 
 class EsraRocketMotorMapper : public PWMMotorMapper<4> {
 public:
-  EsraRocketMotorMapper();
+  EsraRocketMotorMapper(PWMPlatform& pwmPlatform);
 
   void init() override;
   void run(actuator_setpoint_t& input) override;

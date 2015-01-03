@@ -2,8 +2,6 @@
 
 #include <cstddef>
 
-#include "hal_config.hpp"
-
 void L3GD20::init() {
   // Wake up device, enable X, Y, and Z outputs, and set 760Hz mode.
   writeRegister(L3GD20_SPI_AD_CTRL_REG1, 0x0F | (1 << 7) | (1 << 6));

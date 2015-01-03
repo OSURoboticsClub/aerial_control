@@ -1,7 +1,7 @@
 #include "system/esra_rocket_system.hpp"
 
-EsraRocketSystem::EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer)
-  : gyroscope(gyroscope), accelerometer(accelerometer) {
+EsraRocketSystem::EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform)
+  : gyroscope(gyroscope), accelerometer(accelerometer), motorMapper(pwmPlatform) {
 }
 
 void EsraRocketSystem::init() {

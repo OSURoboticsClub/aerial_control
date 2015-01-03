@@ -1,3 +1,5 @@
+const float DT = 0.001;
+
 // Maximum angular position in the roll and pitch axes (deg)
 static const float MAX_PITCH_ROLL_POS = 30.0;
 

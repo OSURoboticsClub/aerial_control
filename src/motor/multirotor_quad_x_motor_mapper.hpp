@@ -3,10 +3,11 @@
 
 #include "controller/setpoint_types.hpp"
 #include "motor/pwm_motor_mapper.hpp"
+#include "variant/pwm_platform.hpp"
 
 class MultirotorQuadXMotorMapper : public PWMMotorMapper<4> {
 public:
-  MultirotorQuadXMotorMapper();
+  MultirotorQuadXMotorMapper(PWMPlatform& pwmPlatform);
 
   void init() override;
   void run(actuator_setpoint_t& input) override;

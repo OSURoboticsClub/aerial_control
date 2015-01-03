@@ -1,7 +1,7 @@
 #include "system/default_multirotor_vehicle_system.hpp"
 
-DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer)
-  : gyroscope(gyroscope), accelerometer(accelerometer) {
+DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform)
+  : gyroscope(gyroscope), accelerometer(accelerometer), motorMapper(pwmPlatform) {
 }
 
 void DefaultMultirotorVehicleSystem::init() {

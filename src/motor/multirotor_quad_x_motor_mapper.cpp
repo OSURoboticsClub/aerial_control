@@ -3,7 +3,8 @@
 #include <array>
 #include <cstddef>
 
-MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper() {
+MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper(PWMPlatform& pwmPlatform)
+  : PWMMotorMapper(pwmPlatform) {
 }
 
 void MultirotorQuadXMotorMapper::init() {

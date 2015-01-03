@@ -15,7 +15,7 @@
 
 class EsraRocketSystem : public RocketSystem<4> {
 public:
-  EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer);
+  EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform);
 
   void init() override;
   void update() override;

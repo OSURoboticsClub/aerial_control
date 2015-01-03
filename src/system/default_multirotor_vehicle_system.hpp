@@ -16,7 +16,8 @@
 
 class DefaultMultirotorVehicleSystem : public MultirotorVehicleSystem<4> {
 public:
-  DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer);
+  DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
+      PWMPlatform& pwmPlatform);
 
   void init() override;
   void update() override;

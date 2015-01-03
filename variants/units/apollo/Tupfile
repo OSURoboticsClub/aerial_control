@@ -1,1 +1,2 @@
+CXXSRCS-@(UNIT_APOLLO) += units/apollo/*.cpp
 INCLUDES-@(UNIT_APOLLO) += -Iunits/apollo

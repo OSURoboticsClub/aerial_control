@@ -3,7 +3,8 @@
 #include <array>
 #include <cstddef>
 
-EsraRocketMotorMapper::EsraRocketMotorMapper() {
+EsraRocketMotorMapper::EsraRocketMotorMapper(PWMPlatform& pwmPlatform)
+  : PWMMotorMapper(pwmPlatform) {
 }
 
 void EsraRocketMotorMapper::init() {

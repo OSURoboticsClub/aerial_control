@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "hal_config.hpp"
+#include "unit_config.hpp"
 
 AngularVelocityController::AngularVelocityController()
   : rollVelPid(ANGVEL_X_KP, ANGVEL_X_KI, ANGVEL_X_KD),
