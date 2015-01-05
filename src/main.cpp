@@ -27,7 +27,7 @@ int main(void) {
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
-  systime_t deadline = chTimeNow();
+  systime_t deadline = chibios_rt::System::getTime();
   while(true) {
     deadline += MS2ST(DT * 1000);
 
