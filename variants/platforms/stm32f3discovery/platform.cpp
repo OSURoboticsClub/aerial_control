@@ -18,20 +18,10 @@ static const SPIConfig l3gd20_spi_config = {
   SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0
 };
 
-static I2CPlatform i2cPlatform;
-static PWMPlatform pwmPlatform;
-static SPIPlatform spiPlatform;
-static USARTPlatform usartPlatform;
-
 static L3GD20 gyro(&SPID1, &l3gd20_spi_config);
 static LSM303DLHC accel(&I2CD1);
 
 Platform::Platform() {
-}
-
-void Platform::init() {
-  gyro.init();
-  accel.init();
 }
 
 template <>
@@ -45,6 +35,35 @@ Accelerometer& Platform::get() {
 }
 
 template <>
+I2CPlatform& Platform::get() {
+  static I2CPlatform i2cPlatform;
+  return i2cPlatform;
+}
+
+template <>
 PWMPlatform& Platform::get() {
+  static PWMPlatform pwmPlatform;
   return pwmPlatform;
+}
+
+template <>
+SPIPlatform& Platform::get() {
+  static SPIPlatform spiPlatform;
+  return spiPlatform;
+}
+
+template <>
+USARTPlatform& Platform::get() {
+  static USARTPlatform usartPlatform;
+  return usartPlatform;
+}
+
+void Platform::init() {
+  get<I2CPlatform>();
+  get<PWMPlatform>();
+  get<SPIPlatform>();
+  get<USARTPlatform>();
+
+  gyro.init();
+  accel.init();
 }

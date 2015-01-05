@@ -1,2 +1,2 @@
-CXXSRCS-@(UNIT_APOLLO) += units/apollo/*.cpp
-INCLUDES-@(UNIT_APOLLO) += -Iunits/apollo
+CXXSRCS-@(UNIT_APOLLO) += $(TUP_CWD)/*.cpp
+INCLUDES-@(UNIT_APOLLO) += -I$(TUP_CWD)

@@ -11,7 +11,6 @@ static const SerialConfig usart1_config = {
 };
 
 USARTPlatform::USARTPlatform() {
-  sdInit();
   sdStart(&SD1, &usart1_config);
   palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(7));
   palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(7));

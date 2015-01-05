@@ -16,7 +16,6 @@ static const PWMConfig motor_pwm_config = {
 };
 
 PWMPlatform::PWMPlatform() {
-  pwmInit();
   pwmStart(&PWMD8, &motor_pwm_config);
   palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(4));
   palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(4));
