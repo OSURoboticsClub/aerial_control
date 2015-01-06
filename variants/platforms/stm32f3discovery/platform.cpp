@@ -1,5 +1,7 @@
 #include "variant/platform.hpp"
 
+#include "hal.h"
+
 #include "drivers/l3gd20.hpp"
 #include "drivers/lsm303dlhc.hpp"
 #include "sensor/accelerometer.hpp"
@@ -18,19 +20,27 @@ static const SPIConfig l3gd20_spi_config = {
   SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0
 };
 
-static L3GD20 gyro(&SPID1, &l3gd20_spi_config);
-static LSM303DLHC accel(&I2CD1);
+// LSM303DHLC I2C configuration
+static const I2CConfig lsm303dlhc_i2c_config = {
+  0x00902025, // voodoo magic
+  0,
+  0
+};
+
+const i2caddr_t LSM303_I2C_ACC_ADDRESS = 0x19;
 
 Platform::Platform() {
 }
 
 template <>
 Gyroscope& Platform::get() {
+  static L3GD20 gyro(&SPID1, &l3gd20_spi_config);
   return gyro;
 }
 
 template <>
 Accelerometer& Platform::get() {
+  static LSM303DLHC accel(&I2CD1, &lsm303dlhc_i2c_config, LSM303_I2C_ACC_ADDRESS);
   return accel;
 }
 

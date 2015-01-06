@@ -3,9 +3,9 @@
 
 #include "hal.h"
 
+#include "drivers/spi_device.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
-#include "drivers/spi_device.hpp"
 
 #define MPU6000_AUX_VDDIO          0x01   // R/W
 #define MPU6000_SMPLRT_DIV         0x19   // R/W

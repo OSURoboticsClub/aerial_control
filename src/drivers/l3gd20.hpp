@@ -69,8 +69,6 @@ public:
 private:
   uint8_t readRegister(uint8_t reg);
   void writeRegister(uint8_t reg, uint8_t val);
-
-  SPIDriver *spid;
 };
 
 #endif

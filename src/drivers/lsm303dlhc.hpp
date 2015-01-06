@@ -3,9 +3,8 @@
 
 #include "hal.h"
 
+#include "drivers/i2c_device.hpp"
 #include "sensor/accelerometer.hpp"
-
-#define LSM303_I2C_ACC_ADDRESS        0x19
 
 #define LSM303_I2C_AD_CTRL_REG1_A     0x20
 #define LSM303_I2C_AD_CTRL_REG2_A     0x21
@@ -38,9 +37,9 @@
 #define LSM303_I2C_AD_TIME_LATENCY_A  0x3C
 #define LSM303_I2C_AD_TIME_WINDOW_A   0x3D
 
-class LSM303DLHC : public Accelerometer {
+class LSM303DLHC : protected I2CDevice<8, 8>, public Accelerometer {
 public:
-  LSM303DLHC(I2CDriver *i2cd);
+  using I2CDevice::I2CDevice;
 
   void init() override;
   accelerometer_reading_t readAccel() override;
@@ -48,8 +47,6 @@ public:
 private:
   uint8_t readRegister(uint8_t reg);
   void writeRegister(uint8_t reg, uint8_t val);
-
-  I2CDriver *i2cd;
 };
 
 #endif
