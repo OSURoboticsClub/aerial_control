@@ -5,6 +5,7 @@
 #include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
 #include "input/input_source.hpp"
+#include "motor/motor_mapper.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/vehicle_system.hpp"
