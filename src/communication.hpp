@@ -1,6 +1,8 @@
 #ifndef COMMUNICATION_HPP_
 #define COMMUNICATION_HPP_
 
+#include <array>
+
 #include "hal.h"
 #include "protocol/protocol.hpp"
 #include "protocol/messages.hpp"

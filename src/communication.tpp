@@ -1,5 +1,3 @@
-#include <array>
-
 CommunicationThread::CommunicationThread(Unit& unit, chibios_rt::BaseSequentialStreamInterface& stream)
   : unit(unit), stream(stream) {
 }
