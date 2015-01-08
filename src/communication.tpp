@@ -31,8 +31,8 @@ void CommunicationThread::dispatch(const protocol::decoded_message_t<buffer_size
     case protocol::message::attitude_message_t::ID:
       on(deduce<protocol::message::attitude_message_t>(decoded));
       break;
-    case protocol::message::set_control_mode_t::ID:
-      on(deduce<protocol::message::set_control_mode_t>(decoded));
+    case protocol::message::set_control_mode_message_t::ID:
+      on(deduce<protocol::message::set_control_mode_message_t>(decoded));
       break;
   }
 }

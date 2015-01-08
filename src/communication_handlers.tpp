@@ -23,8 +23,8 @@ void CommunicationThread::on(const msg::heartbeat_message_t& m) {
 }
 
 template <>
-void CommunicationThread::on(const msg::set_control_mode_t& m) {
-  if(m.mode == msg::set_control_mode_t::ControlMode::MANUAL) {
-  } else if(m.mode == msg::set_control_mode_t::ControlMode::OFFBOARD) {
+void CommunicationThread::on(const msg::set_control_mode_message_t& m) {
+  if(m.mode == msg::set_control_mode_message_t::ControlMode::MANUAL) {
+  } else if(m.mode == msg::set_control_mode_message_t::ControlMode::OFFBOARD) {
   }
 }
