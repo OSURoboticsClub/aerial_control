@@ -57,9 +57,9 @@ gyroscope_reading_t MPU6000::readGyro() {
   _spiExchange(7, txbuf, rxbuf);   // Atomic transfer operations
 
   // TODO(yoos): correct for thermal bias.
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 + GYR_X_OFFSET;
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 + GYR_Y_OFFSET;
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 + GYR_Z_OFFSET;
+  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_X_OFFSET;
+  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Y_OFFSET;
+  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Z_OFFSET;
 
   // Poll temp
   txbuf[0] = MPU6000_TEMP_OUT_H | (1<<7);
@@ -85,9 +85,9 @@ accelerometer_reading_t MPU6000::readAccel() {
   // Get data
   txbuf[0] = MPU6000_ACCEL_XOUT_H | (1<<7);
   _spiExchange(7, txbuf, rxbuf);   // Atomic transfer operations
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16384.0 + ACC_X_OFFSET;
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16384.0 + ACC_Y_OFFSET;
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16384.0 + ACC_Z_OFFSET;
+  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16384.0 + unit_config::ACC_X_OFFSET;
+  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16384.0 + unit_config::ACC_Y_OFFSET;
+  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16384.0 + unit_config::ACC_Z_OFFSET;
 
   return reading;
 }

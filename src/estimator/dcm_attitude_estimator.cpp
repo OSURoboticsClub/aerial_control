@@ -13,7 +13,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyro_readi
   accel.normalize();
 
   Eigen::Vector3f corr(0.0f, 0.0f, 0.0f);
-  corr += gyro * DT;
+  corr -= gyro * unit_config::DT;
   corr -= dcm.col(2).cross(accel);
 
   Eigen::Matrix3f dcmStep;
