@@ -12,14 +12,14 @@ public:
   I2CDevice(I2CDriver *i2cd, const I2CConfig *i2ccfg, const i2caddr_t addr);
 
 protected:
-  void exchange();
+  void exchange(std::size_t tx, std::size_t rx);
 
   I2CDriver *i2cd;
   const I2CConfig *i2ccfg;
   const i2caddr_t addr;
 
-  std::array<std::uint8_t, 8> txbuf;
-  std::array<std::uint8_t, 8> rxbuf;
+  std::array<std::uint8_t, tx_size> txbuf;
+  std::array<std::uint8_t, rx_size> rxbuf;
 };
 
 #include "drivers/i2c_device.tpp"

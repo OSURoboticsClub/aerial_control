@@ -13,7 +13,7 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
   std::fill(std::begin(txbuf), std::end(txbuf), 0);
   txbuf[0] = LSM303_I2C_AD_OUT_X_L_A | 0x80;
 
-  exchange();
+  exchange(1, 6);
 
   // Swapped for board orientation
   std::array<std::int16_t, 3> raw;
@@ -35,7 +35,7 @@ uint8_t LSM303DLHC::readRegister(uint8_t reg) {
   std::fill(std::begin(txbuf), std::end(txbuf), 0);
   txbuf[0] = reg;
 
-  exchange();
+  exchange(1, 1);
 
   return rxbuf[0];
 }
@@ -45,5 +45,5 @@ void LSM303DLHC::writeRegister(uint8_t reg, uint8_t val) {
   txbuf[0] = reg;
   txbuf[1] = val;
 
-  exchange();
+  exchange(2, 0);
 }
