@@ -1,42 +1,47 @@
 #include <array>
 
-template <std::size_t buffer_size>
-CommunicationThread<buffer_size>::CommunicationThread(chibios_rt::BaseSequentialStreamInterface& channel)
-  : channel(channel) {
+CommunicationThread::CommunicationThread(Unit& unit, chibios_rt::BaseSequentialStreamInterface& stream)
+  : unit(unit), stream(stream) {
 }
 
-template <std::size_t buffer_size>
-msg_t CommunicationThread<buffer_size>::main() {
-  static std::array<std::uint8_t, 255> decodeBuffer;
-
+msg_t CommunicationThread::main() {
   while(true) {
-    std::size_t len = channel.read(decodeBuffer.data(), decodeBuffer.size());
+    std::uint8_t b = stream.get();
 
-    for(std::size_t i = 0; i < len; i++) {
-      protocol::decoded_message_t<255> decoded;
-      if(decoder.process(decodeBuffer[i], &decoded)) {
-        dispatch(decoded);
-      }
+    protocol::decoded_message_t<255> decoded;
+    if(decoder.process(b, &decoded)) {
+      dispatch(decoded);
     }
   }
 }
 
+template <typename M, std::size_t buffer_size>
+static M deduce(const protocol::decoded_message_t<buffer_size>& decoded) {
+  return reinterpret_cast<const M&>(decoded.payload);
+}
+
 template <std::size_t buffer_size>
-void CommunicationThread<buffer_size>::dispatch(const protocol::decoded_message_t<buffer_size>& decoded) {
+void CommunicationThread::dispatch(const protocol::decoded_message_t<buffer_size>& decoded) {
   // TODO(kyle): Is there a way to do this without a giant switch?
   switch(decoded.id) {
-    case protocol::message::heartbeat_message_t::ID: {
-      auto message = reinterpret_cast<const protocol::message::heartbeat_message_t *>(&decoded.payload);
-      on(message);
+    case protocol::message::heartbeat_message_t::ID:
+      on(deduce<protocol::message::heartbeat_message_t>(decoded));
       break;
-    }
+    case protocol::message::log_message_t::ID:
+      on(deduce<protocol::message::log_message_t>(decoded));
+      break;
+    case protocol::message::attitude_message_t::ID:
+      on(deduce<protocol::message::attitude_message_t>(decoded));
+      break;
+    case protocol::message::set_control_mode_t::ID:
+      on(deduce<protocol::message::set_control_mode_t>(decoded));
+      break;
   }
 }
 
-template <std::size_t buffer_size> template <typename M>
-void CommunicationThread<buffer_size>::send(const M& message) {
-  std::array<std::uint8_t, 255> encodeBuffer;
+template <typename M>
+void CommunicationThread::send(const M& message) {
   std::uint16_t len = encoder.encode(message, &encodeBuffer);
 
-  channel.write(encodeBuffer.data(), len);
+  stream.write(encodeBuffer.data(), len);
 }
