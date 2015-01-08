@@ -1,1 +1,2 @@
-INCLUDES-@(UNIT_ZEUS) += -Iunits/zeus
+CXXSRCS-@(UNIT_ZEUS) += $(TUP_CWD)/*.cpp
+INCLUDES-@(UNIT_ZEUS) += -I$(TUP_CWD)
