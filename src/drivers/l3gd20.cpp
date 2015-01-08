@@ -22,8 +22,8 @@ gyroscope_reading_t L3GD20::readGyro() {
   _spiExchange(7, txbuf, rxbuf);
 
   // Swapped for board orientation
-  raw[0] = (rxbuf[2] << 8) | rxbuf[1];
-  raw[1] = (rxbuf[4] << 8) | rxbuf[3];
+  raw[0] = -((rxbuf[4] << 8) | rxbuf[3]);
+  raw[1] = (rxbuf[2] << 8) | rxbuf[1];
   raw[2] = (rxbuf[6] << 8) | rxbuf[5];
 
   gyroscope_reading_t reading;
