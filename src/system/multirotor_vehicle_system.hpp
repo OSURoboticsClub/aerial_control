@@ -16,10 +16,7 @@ public:
   void init() override;
   void update() override;
 
-  void setArmed(bool arm);
-  bool isArmed();
-
-protected:
+public:
   virtual Gyroscope& getGyroscope() = 0;
   virtual Accelerometer& getAccelerometer() = 0;
   virtual AttitudeEstimator& getAttitudeEstimator() = 0;
@@ -30,7 +27,6 @@ protected:
 
 private:
   ZeroController<angular_position_setpoint_t> zeroController;
-  bool armed;
 };
 
 #include "system/multirotor_vehicle_system.tpp"

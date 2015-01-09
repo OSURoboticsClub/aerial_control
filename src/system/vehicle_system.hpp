@@ -17,6 +17,12 @@ public:
    * Periodic update function. Called at a fixed interval.
    */
   virtual void update() = 0;
+
+  bool isArmed();
+  void setArmed(bool armed_);
+
+private:
+  bool armed;
 };
 
 #endif
