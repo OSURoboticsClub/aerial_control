@@ -1,16 +1,14 @@
 #include "drivers/lsm303dlhc.hpp"
 
-#include <algorithm>
 #include <array>
-#include <cstddef>
 
 void LSM303DLHC::init() {
   // Wake up device and enable X, Y, and Z outputs.
-  writeRegister(LSM303_I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
+  writeRegister(lsm303dlhc::I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
 }
 
 accelerometer_reading_t LSM303DLHC::readAccel() {
-  txbuf[0] = LSM303_I2C_AD_OUT_X_L_A | 0x80;
+  txbuf[0] = lsm303dlhc::I2C_AD_OUT_X_L_A | 0x80;
 
   exchange(1, 6);
 
