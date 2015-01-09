@@ -95,7 +95,7 @@
 #define MPU6000_FIFO_R_W           0x74   // R/W
 #define MPU6000_WHO_AM_I           0x75   // R
 
-class MPU6000 : protected SPIDevice, public Gyroscope, public Accelerometer {
+class MPU6000 : protected SPIDevice<8, 8>, public Gyroscope, public Accelerometer {
 public:
   using SPIDevice::SPIDevice;
 

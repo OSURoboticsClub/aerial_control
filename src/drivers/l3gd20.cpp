@@ -1,5 +1,6 @@
 #include "drivers/l3gd20.hpp"
 
+#include <array>
 #include <cstddef>
 
 void L3GD20::init() {
@@ -11,17 +12,14 @@ void L3GD20::init() {
 }
 
 gyroscope_reading_t L3GD20::readGyro() {
-  uint8_t txbuf[8];
-  uint8_t rxbuf[8];
-  int16_t raw[3];
-
   txbuf[0] = L3GD20_SPI_RW | L3GD20_SPI_MS | L3GD20_SPI_AD_OUT_X_L;
   txbuf[1] = 0xFF;
   txbuf[2] = 0xFF;
 
-  _spiExchange(7, txbuf, rxbuf);
+  exchange(7);
 
   // Swapped for board orientation
+  std::array<int16_t, 3> raw;
   raw[0] = -((rxbuf[4] << 8) | rxbuf[3]);
   raw[1] = (rxbuf[2] << 8) | rxbuf[1];
   raw[2] = (rxbuf[6] << 8) | rxbuf[5];
@@ -36,23 +34,17 @@ gyroscope_reading_t L3GD20::readGyro() {
 }
 
 uint8_t L3GD20::readRegister(uint8_t reg) {
-  uint8_t txbuf[8];
-  uint8_t rxbuf[8];
-
   txbuf[0] = L3GD20_SPI_RW | reg;
   txbuf[1] = 0xFF;
 
-  _spiExchange(2, txbuf, rxbuf);
+  exchange(2);
 
   return rxbuf[1];
 }
 
 void L3GD20::writeRegister(uint8_t reg, uint8_t val) {
-  uint8_t txbuf[8];
-  uint8_t rxbuf[8];
-
   txbuf[0] = reg;
   txbuf[1] = val;
 
-  _spiExchange(2, txbuf, rxbuf);
+  exchange(2);
 }

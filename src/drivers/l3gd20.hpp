@@ -59,7 +59,7 @@
 #define L3GD20_SPI_AD_INT1_TSH_ZL   0x37
 #define L3GD20_SPI_AD_INT1_DURATION 0x38
 
-class L3GD20 : protected SPIDevice, public Gyroscope {
+class L3GD20 : protected SPIDevice<8, 8>, public Gyroscope {
 public:
   using SPIDevice::SPIDevice;
 
