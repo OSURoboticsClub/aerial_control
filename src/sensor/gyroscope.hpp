@@ -1,8 +1,10 @@
 #ifndef GYROSCOPE_HPP_
 #define GYROSCOPE_HPP_
 
+#include <array>
+
 struct gyroscope_reading_t {
-  float axes[3];
+  std::array<float, 3> axes;
 };
 
 class Gyroscope {

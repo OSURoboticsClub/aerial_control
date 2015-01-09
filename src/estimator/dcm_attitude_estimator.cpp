@@ -1,14 +1,18 @@
 #include "estimator/dcm_attitude_estimator.hpp"
 
+#include <functional>
+
 #include "unit_config.hpp"
+
+static attitude_estimate_t estimate;
 
 DCMAttitudeEstimator::DCMAttitudeEstimator() {
   dcm.setIdentity();
 }
 
 attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyro_reading, accelerometer_reading_t& accel_reading) {
-  Eigen::Vector3f gyro(gyro_reading.axes);
-  Eigen::Vector3f accel(accel_reading.axes);
+  Eigen::Vector3f gyro(gyro_reading.axes.data());
+  Eigen::Vector3f accel(accel_reading.axes.data());
 
   accel.normalize();
 
