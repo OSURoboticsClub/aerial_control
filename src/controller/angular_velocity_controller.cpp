@@ -19,7 +19,7 @@ actuator_setpoint_t AngularVelocityController::run(const attitude_estimate_t& es
   rollActuatorSp = std::max(-unit_config::MAX_PITCH_ROLL_VEL, std::min(unit_config::MAX_PITCH_ROLL_VEL, rollActuatorSp));
   pitchActuatorSp = std::max(-unit_config::MAX_PITCH_ROLL_VEL, std::min(unit_config::MAX_PITCH_ROLL_VEL, pitchActuatorSp));
 
-  actuator_setpoint_t setpoint = {
+  actuator_setpoint_t setpoint {
     .roll_sp = rollActuatorSp,
     .pitch_sp = pitchActuatorSp,
     .yaw_sp = yawActuatorSp,

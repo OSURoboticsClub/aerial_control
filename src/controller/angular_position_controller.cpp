@@ -19,7 +19,7 @@ angular_velocity_setpoint_t AngularPositionController::run(const attitude_estima
   float pitchVelSp = pitchPosPid.calculate(pitchPosSp, estimate.pitch, unit_config::DT);
   float yawVelSp = yawPosPid.calculate(input.yaw_pos_sp, estimate.yaw, unit_config::DT);
 
-  angular_velocity_setpoint_t setpoint = {
+  angular_velocity_setpoint_t setpoint {
     .roll_vel_sp = rollVelSp,
     .pitch_vel_sp = pitchVelSp,
     .yaw_vel_sp = yawVelSp,

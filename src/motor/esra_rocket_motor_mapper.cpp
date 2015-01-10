@@ -13,7 +13,7 @@ void EsraRocketMotorMapper::init() {
 
 void EsraRocketMotorMapper::run(actuator_setpoint_t& input) {
   // Calculate output shifts
-  std::array<float, 4> output_shifts = {
+  std::array<float, 4> output_shifts {
      1.0f * input.pitch_sp + 1.0f * input.roll_sp + 1.0f * input.yaw_sp, // front left
     -1.0f * input.pitch_sp + 1.0f * input.roll_sp - 1.0f * input.yaw_sp, // front right
     -1.0f * input.pitch_sp - 1.0f * input.roll_sp + 1.0f * input.yaw_sp, // back right
@@ -21,7 +21,7 @@ void EsraRocketMotorMapper::run(actuator_setpoint_t& input) {
   };
 
   // Add throttle to shifts to get absolute output value
-  std::array<float, 4> outputs = { 0 };
+  std::array<float, 4> outputs;
   for(std::size_t i = 0; i < 4; i++) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }

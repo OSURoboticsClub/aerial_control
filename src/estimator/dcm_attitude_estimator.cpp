@@ -29,7 +29,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyro_readi
 
   orthonormalize();
 
-  attitude_estimate_t estimate = {
+  attitude_estimate_t estimate {
     // TODO: Are these trig functions safe at extreme angles?
     .roll = atan2f(dcm(2, 1), dcm(2, 2)),
     .pitch = -asinf(dcm(2, 0)),

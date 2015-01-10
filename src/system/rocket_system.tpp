@@ -15,7 +15,7 @@ void RocketSystem<num_rotors>::update() {
   controller_input_t input = getInputSource().read();
 
   // Run the controllers
-  angular_position_setpoint_t angular_setpoint = {
+  angular_position_setpoint_t angular_setpoint {
     .roll_pos_sp = input.roll_sp,
     .pitch_pos_sp = input.pitch_sp,
     .yaw_pos_sp = input.yaw_sp,

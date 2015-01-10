@@ -23,7 +23,7 @@ void MultirotorQuadXMotorMapper::run(actuator_setpoint_t& input) {
   };
 
   // Add throttle to shifts to get absolute output value
-  std::array<float, 4> outputs = { 0 };
+  std::array<float, 4> outputs;
   for(std::size_t i = 0; i < 4; i++) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }
