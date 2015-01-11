@@ -15,13 +15,14 @@ ARCHFLAGS += -mcpu=cortex-m4 -mthumb -mno-thumb-interwork
 ARCHFLAGS += $(FPFLAGS)
 
 CFLAGS += -O2 -g
-CFLAGS += -Werror -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
+CFLAGS += -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
 CFLAGS += -fomit-frame-pointer -falign-functions=16 -ffunction-sections
 CFLAGS += -fdata-sections -fno-common -fsingle-precision-constant
 CFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=TRUE -DTHUMB_PRESENT -DTHUMB
 CFLAGS += -DEIGEN_NO_DEBUG=1
 
 CXXFLAGS += $(CFLAGS)
+CXXFLAGS += -Wreorder
 CXXFLAGS += -std=c++11 -fno-rtti -fno-exceptions
 
 LDLIBS += -lm
