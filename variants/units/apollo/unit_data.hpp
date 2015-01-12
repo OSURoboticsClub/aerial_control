@@ -1,6 +1,7 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
+#include "communication/communicator.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/default_multirotor_vehicle_system.hpp"
@@ -9,8 +10,8 @@
 struct unit_data_t {
   DefaultMultirotorVehicleSystem system;
 
-  unit_data_t(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform)
-    : system(gyro, accel, pwmPlatform) {
+  unit_data_t(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform, Communicator& communicator)
+    : system(gyro, accel, pwmPlatform, communicator) {
   }
 };
 

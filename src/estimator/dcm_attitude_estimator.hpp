@@ -3,18 +3,21 @@
 
 #include "Eigen/Dense"
 
+#include "communication/communicator.hpp"
+#include "communication/rate_limited_stream.hpp"
 #include "estimator/attitude_estimator.hpp"
 
 class DCMAttitudeEstimator : public AttitudeEstimator {
 public:
-  DCMAttitudeEstimator();
+  DCMAttitudeEstimator(Communicator& communicator);
 
   attitude_estimate_t update(gyroscope_reading_t& gyro_reading, accelerometer_reading_t& accel_reading) override;
 
 private:
-  Eigen::Matrix3f dcm;
-
   void orthonormalize();
+
+  Eigen::Matrix3f dcm;
+  RateLimitedStream attitudeMessageStream;
 };
 
 #endif

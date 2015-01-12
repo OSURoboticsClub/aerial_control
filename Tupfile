@@ -14,6 +14,7 @@ INCLUDES += -I$(CHIBIOS)/os/various/cpp_wrappers
 
 # Control files
 CXXSRCS += src/*.cpp
+CXXSRCS += src/communication/*.cpp
 CXXSRCS += src/controller/*.cpp
 CXXSRCS += src/drivers/*.cpp
 CXXSRCS += src/estimator/*.cpp

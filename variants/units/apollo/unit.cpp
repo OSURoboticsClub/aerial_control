@@ -3,8 +3,9 @@
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
 
-Unit::Unit(Platform& platform)
-  : data(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<PWMPlatform>()) {
+Unit::Unit(Platform& platform, Communicator& communicator)
+  : data(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
+    platform.get<PWMPlatform>(), communicator) {
 }
 
 void Unit::init() {

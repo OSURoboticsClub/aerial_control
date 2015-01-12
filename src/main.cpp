@@ -1,7 +1,9 @@
 #include "ch.hpp"
 #include "hal.h"
 
-#include "communication.hpp"
+#include "communication/communicator.hpp"
+#include "communication/communication_thread.hpp"
+
 #include "unit_config.hpp"
 #include "variant/platform.hpp"
 #include "variant/unit.hpp"
@@ -31,13 +33,15 @@ int main(void) {
   Platform platform;
   platform.init();
 
-  Unit unit(platform);
+  static Communicator communicator(
+    reinterpret_cast<chibios_rt::BaseSequentialStreamInterface&>(SD1));
+
+  Unit unit(platform, communicator);
   unit.init();
 
   // Start the background threads
   static HeartbeatThread heartbeatThread;
-  static CommunicationThread communicationThread(unit,
-      reinterpret_cast<chibios_rt::BaseSequentialStreamInterface&>(SD1));
+  static CommunicationThread communicationThread(communicator);
 
   heartbeatThread.start(LOWPRIO);
   communicationThread.start(LOWPRIO);

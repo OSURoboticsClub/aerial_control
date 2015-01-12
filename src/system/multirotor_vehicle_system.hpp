@@ -1,6 +1,7 @@
 #ifndef MULTIROTOR_SYSTEM_HPP_
 #define MULTIROTOR_SYSTEM_HPP_
 
+#include "communication/communicator.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
@@ -13,6 +14,8 @@
 template <int num_rotors>
 class MultirotorVehicleSystem : public VehicleSystem {
 public:
+  MultirotorVehicleSystem(Communicator& communicator);
+
   void init() override;
   void update() override;
 

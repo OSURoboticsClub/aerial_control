@@ -1,4 +1,9 @@
 template <int num_rotors>
+MultirotorVehicleSystem<num_rotors>::MultirotorVehicleSystem(Communicator& communicator)
+  : VehicleSystem(communicator) {
+}
+
+template <int num_rotors>
 void MultirotorVehicleSystem<num_rotors>::init() {
   // TODO: For now, arm the vehicle on initialization. In the future, this
   // should be removed and arming should be designated by a control input or

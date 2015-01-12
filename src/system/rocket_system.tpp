@@ -1,4 +1,9 @@
 template <int num_rotors>
+RocketSystem<num_rotors>::RocketSystem(Communicator& communicator)
+  : VehicleSystem(communicator) {
+}
+
+template <int num_rotors>
 void RocketSystem<num_rotors>::init() {
 }
 

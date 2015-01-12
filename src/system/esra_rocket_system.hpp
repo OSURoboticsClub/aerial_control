@@ -1,6 +1,7 @@
 #ifndef ESRA_ROCKET_SYSTEM_HPP_
 #define ESRA_ROCKET_SYSTEM_HPP_
 
+#include "communication/communicator.hpp"
 #include "controller/angular_position_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
 #include "controller/controller_pipeline.hpp"
@@ -15,7 +16,7 @@
 
 class EsraRocketSystem : public RocketSystem<4> {
 public:
-  EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform);
+  EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform, Communicator& communicator);
 
   void init() override;
   void update() override;

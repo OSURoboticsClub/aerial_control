@@ -1,12 +1,11 @@
 #include "estimator/dcm_attitude_estimator.hpp"
 
-#include <functional>
+#include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
 
-static attitude_estimate_t estimate;
-
-DCMAttitudeEstimator::DCMAttitudeEstimator() {
+DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
+  : attitudeMessageStream(communicator, 100) {
   dcm.setIdentity();
 }
 
@@ -38,6 +37,16 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyro_readi
     .pitch_vel = gyro.y(),
     .yaw_vel = gyro.z()
   };
+
+  if(attitudeMessageStream.ready()) {
+    protocol::message::attitude_message_t m {
+      .roll = estimate.roll,
+      .pitch = estimate.pitch,
+      .yaw = estimate.yaw
+    };
+
+    attitudeMessageStream.publish(m);
+  }
 
   return estimate;
 }

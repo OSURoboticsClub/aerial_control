@@ -1,6 +1,7 @@
 #ifndef ROCKET_SYSTEM_HPP_
 #define ROCKET_SYSTEM_HPP_
 
+#include "communication/communicator.hpp"
 #include "controller/setpoint_types.hpp"
 #include "estimator/attitude_estimator.hpp"
 #include "input/input_source.hpp"
@@ -11,6 +12,8 @@
 template <int num_rotors>
 class RocketSystem : public VehicleSystem {
 public:
+  RocketSystem(Communicator& communicator);
+
   void init() override;
   void update() override;
 

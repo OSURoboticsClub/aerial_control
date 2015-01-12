@@ -1,25 +1,20 @@
-#ifndef COMMUNICATION_HPP_
-#define COMMUNICATION_HPP_
+#ifndef COMMUNICATOR_HPP_
+#define COMMUNICATOR_HPP_
 
 #include <array>
 
+#include "ch.hpp"
 #include "hal.h"
 #include "protocol/protocol.hpp"
 #include "protocol/messages.hpp"
 #include "protocol/encoder.hpp"
 #include "protocol/decoder.hpp"
 
-#include "variant/unit.hpp"
-
-class CommunicationThread : public chibios_rt::BaseStaticThread<256> {
+class Communicator {
 public:
-  CommunicationThread(Unit& unit, chibios_rt::BaseSequentialStreamInterface& stream);
+  Communicator(chibios_rt::BaseSequentialStreamInterface& stream);
 
-  msg_t main() override;
-
-private:
-  template <std::size_t buffer_size>
-  void dispatch(const protocol::decoded_message_t<buffer_size>& decoded);
+  void submit(std::uint8_t b);
 
   template <typename M>
   void on(const M& m);
@@ -27,7 +22,12 @@ private:
   template <typename M>
   void send(const M& message);
 
-  Unit& unit;
+  chibios_rt::BaseSequentialStreamInterface& getStream();
+
+private:
+  template <std::size_t buffer_size>
+  void dispatch(const protocol::decoded_message_t<buffer_size>& decoded);
+
   chibios_rt::BaseSequentialStreamInterface& stream;
 
   protocol::Encoder encoder;
@@ -38,8 +38,8 @@ private:
 
 // Handlers included before main implementation to avoid template use before
 // explicit specialization (C++ n3376 14.7.3/6).
-#include "communication_handlers.tpp"
+#include "communicator_handlers.tpp"
 
-#include "communication.tpp"
+#include "communicator.tpp"
 
 #endif
