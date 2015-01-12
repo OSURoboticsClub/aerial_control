@@ -36,10 +36,7 @@ private:
   std::array<std::uint8_t, 255> encodeBuffer;
 };
 
-// Handlers included before main implementation to avoid template use before
-// explicit specialization (C++ n3376 14.7.3/6).
-#include "communicator_handlers.tpp"
-
 #include "communicator.tpp"
+#include "communicator_handlers.tpp"
 
 #endif

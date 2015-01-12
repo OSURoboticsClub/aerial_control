@@ -24,6 +24,7 @@ void Communicator::dispatch(const protocol::decoded_message_t<buffer_size>& deco
 
 template <typename M>
 void Communicator::send(const M& message) {
+  static std::array<std::uint8_t, 255> encodeBuffer;
   std::uint16_t len = encoder.encode(message, &encodeBuffer);
 
   stream.write(encodeBuffer.data(), len);
