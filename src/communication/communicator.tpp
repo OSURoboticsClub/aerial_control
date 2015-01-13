@@ -16,6 +16,8 @@ void Communicator::dispatch(const protocol::decoded_message_t<buffer_size>& deco
     case protocol::message::attitude_message_t::ID:
       on(packet_cast<protocol::message::attitude_message_t>(decoded));
       break;
+    case protocol::message::set_arm_state_message_t::ID:
+      on(packet_cast<protocol::message::set_arm_state_message_t>(decoded));
     case protocol::message::set_control_mode_message_t::ID:
       on(packet_cast<protocol::message::set_control_mode_message_t>(decoded));
       break;

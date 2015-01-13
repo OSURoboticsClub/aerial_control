@@ -43,3 +43,8 @@ void MultirotorVehicleSystem<num_rotors>::update() {
   // Update motor outputs
   getMotorMapper().run(actuator_setpoint);
 }
+
+template <int num_rotors>
+void MultirotorVehicleSystem<num_rotors>::on(const protocol::message::set_arm_state_message_t& m) {
+  setArmed(m.armed);
+}

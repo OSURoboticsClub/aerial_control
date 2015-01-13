@@ -2,6 +2,7 @@
 #define MULTIROTOR_SYSTEM_HPP_
 
 #include "communication/communicator.hpp"
+#include "communication/message_listener.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
@@ -12,7 +13,7 @@
 #include "system/vehicle_system.hpp"
 
 template <int num_rotors>
-class MultirotorVehicleSystem : public VehicleSystem {
+class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(Communicator& communicator);
 
@@ -27,6 +28,8 @@ public:
   virtual MotorMapper& getMotorMapper() = 0;
 
   virtual actuator_setpoint_t runController(const attitude_estimate_t& estimate, const angular_position_setpoint_t& setpoint) = 0;
+
+  void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
   ZeroController<angular_position_setpoint_t> zeroController;
