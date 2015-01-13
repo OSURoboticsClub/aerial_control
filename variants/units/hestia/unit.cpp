@@ -1,6 +1,7 @@
 #include "variant/unit.hpp"
 
-Unit::Unit(Platform& platform) {
+Unit::Unit(Platform& platform, Communicator& communicator)
+  : data(communicator) {
 }
 
 void Unit::init() {

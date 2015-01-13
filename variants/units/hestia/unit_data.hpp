@@ -6,7 +6,8 @@
 struct unit_data_t {
   DummyVehicleSystem system;
 
-  unit_data_t() {
+  unit_data_t(Communicator& communicator)
+    : system(communicator) {
   }
 };
 

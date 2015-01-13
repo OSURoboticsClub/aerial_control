@@ -9,8 +9,8 @@
 struct unit_data_t {
   DefaultMultirotorVehicleSystem system;
 
-  unit_data_t(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform)
-    : system(gyro, accel, pwmPlatform) {
+  unit_data_t(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform, Communicator& communicator)
+    : system(gyro, accel, pwmPlatform, communicator) {
   }
 };
 
