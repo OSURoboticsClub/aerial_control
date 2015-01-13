@@ -2,7 +2,8 @@
 
 DefaultMultirotorVehicleSystem::DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform, Communicator& communicator)
   : MultirotorVehicleSystem(communicator), gyroscope(gyroscope),
-    accelerometer(accelerometer), estimator(communicator), motorMapper(pwmPlatform) {
+    accelerometer(accelerometer), estimator(communicator),
+    inputSource(communicator), motorMapper(pwmPlatform) {
 }
 
 void DefaultMultirotorVehicleSystem::init() {

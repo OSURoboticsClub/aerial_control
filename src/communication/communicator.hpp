@@ -10,6 +10,8 @@
 #include "protocol/encoder.hpp"
 #include "protocol/decoder.hpp"
 
+#include "message_listener.hpp"
+
 class Communicator {
 public:
   Communicator(chibios_rt::BaseSequentialStreamInterface& stream);
@@ -22,6 +24,8 @@ public:
   template <typename M>
   void send(const M& message);
 
+  void registerListener(MessageListener *listener);
+
   chibios_rt::BaseSequentialStreamInterface& getStream();
 
 private:
@@ -33,7 +37,9 @@ private:
   protocol::Encoder encoder;
   protocol::Decoder decoder;
 
-  std::array<std::uint8_t, 255> encodeBuffer;
+  // TODO(kyle): Fixed size array probably isn't good.
+  std::array<MessageListener *, 10> listeners;
+  std::size_t listenersPos;
 };
 
 #include "communicator.tpp"

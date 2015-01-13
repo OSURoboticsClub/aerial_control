@@ -12,6 +12,10 @@ void Communicator::submit(std::uint8_t b) {
   }
 }
 
+void Communicator::registerListener(MessageListener *listener) {
+  listeners[listenersPos++] = listener;
+}
+
 chibios_rt::BaseSequentialStreamInterface& Communicator::getStream() {
   return stream;
 }
