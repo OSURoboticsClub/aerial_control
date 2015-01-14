@@ -4,6 +4,7 @@
 #include "communication/communicator.hpp"
 #include "controller/angular_position_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
+#include "controller/position_controller.hpp"
 #include "controller/controller_pipeline.hpp"
 #include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
@@ -15,7 +16,7 @@
 #include "sensor/accelerometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 
-class DefaultMultirotorVehicleSystem : public MultirotorVehicleSystem<4> {
+class DefaultMultirotorVehicleSystem : public MultirotorVehicleSystem {
 public:
   DefaultMultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
       PWMPlatform& pwmPlatform, Communicator& communicator);
@@ -30,8 +31,6 @@ protected:
   InputSource& getInputSource() override;
   MotorMapper& getMotorMapper() override;
 
-  actuator_setpoint_t runController(const attitude_estimate_t& estimate, const angular_position_setpoint_t& setpoint) override;
-
 private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
@@ -39,10 +38,6 @@ private:
   DCMAttitudeEstimator estimator;
 
   OffboardInputSource inputSource;
-
-  AngularPositionController attPosController;
-  AngularVelocityController attVelController;
-  ControllerPipeline<actuator_setpoint_t> pipeline;
 
   MultirotorQuadXMotorMapper motorMapper;
 };

@@ -35,7 +35,3 @@ InputSource& DefaultMultirotorVehicleSystem::getInputSource() {
 MotorMapper& DefaultMultirotorVehicleSystem::getMotorMapper() {
   return motorMapper;
 }
-
-actuator_setpoint_t DefaultMultirotorVehicleSystem::runController(const attitude_estimate_t& estimate, const angular_position_setpoint_t& setpoint) {
-  return pipeline.run(estimate, setpoint, attPosController, attVelController);
-}
