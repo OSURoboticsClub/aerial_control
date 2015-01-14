@@ -1,6 +1,7 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
+#include "communication/communicator.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/esra_rocket_system.hpp"
