@@ -13,6 +13,7 @@ INCLUDES += -I$(CHIBIOS)/os/various
 INCLUDES += -I$(CHIBIOS)/os/various/cpp_wrappers
 
 # Control files
+CSRCS += src/stubs.c
 CXXSRCS += src/*.cpp
 CXXSRCS += src/communication/*.cpp
 CXXSRCS += src/controller/*.cpp
