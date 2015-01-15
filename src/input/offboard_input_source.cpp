@@ -1,7 +1,7 @@
 #include "input/offboard_input_source.hpp"
 
-OffboardInputSource::OffboardInputSource(Communicator& communicator) {
-  communicator.registerListener(this);
+OffboardInputSource::OffboardInputSource(Communicator& communicator)
+  : MessageListener(communicator) {
 }
 
 controller_input_t OffboardInputSource::read() {

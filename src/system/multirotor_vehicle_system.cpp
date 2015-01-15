@@ -1,7 +1,8 @@
 #include "system/multirotor_vehicle_system.hpp"
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(Communicator& communicator)
-  : VehicleSystem(communicator), mode(MultirotorControlMode::ANGULAR_POS) {
+  : VehicleSystem(communicator), MessageListener(communicator),
+    mode(MultirotorControlMode::ANGULAR_POS) {
 }
 
 void MultirotorVehicleSystem::init() {

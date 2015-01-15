@@ -3,6 +3,7 @@
 
 #include "protocol/messages.hpp"
 
+// Forward declaration
 class Communicator;
 
 class MessageListener {
@@ -16,9 +17,8 @@ public:
   virtual void on(const protocol::message::set_control_mode_message_t& m) {}
   virtual void on(const protocol::message::offboard_attitude_control_message_t& m) {}
 
-  // TODO(kyle): This causes linker errors
-  // protected:
-  //   MessageListener();
+protected:
+  MessageListener(Communicator& communicator);
 };
 
 #endif
