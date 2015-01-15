@@ -9,9 +9,9 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
   dcm.setIdentity();
 }
 
-attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyro_reading, accelerometer_reading_t& accel_reading) {
-  Eigen::Vector3f gyro(gyro_reading.axes.data());
-  Eigen::Vector3f accel(accel_reading.axes.data());
+attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) {
+  Eigen::Vector3f gyro(gyroReading.axes.data());
+  Eigen::Vector3f accel(accelReading.axes.data());
 
   accel.normalize();
 

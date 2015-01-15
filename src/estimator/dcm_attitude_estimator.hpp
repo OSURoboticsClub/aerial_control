@@ -11,7 +11,7 @@ class DCMAttitudeEstimator : public AttitudeEstimator {
 public:
   DCMAttitudeEstimator(Communicator& communicator);
 
-  attitude_estimate_t update(gyroscope_reading_t& gyro_reading, accelerometer_reading_t& accel_reading) override;
+  attitude_estimate_t update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) override;
 
 private:
   void orthonormalize();

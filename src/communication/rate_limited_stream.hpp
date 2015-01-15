@@ -27,12 +27,12 @@ private:
   /**
    * Time between each message in milliseconds.
    */
-  int period;
+  systime_t period;
 
   /**
    * The time in system ticks of the last published message.
    */
-  int lastPublish;
+  systime_t lastPublish;
 };
 
 #include "rate_limited_stream.tpp"

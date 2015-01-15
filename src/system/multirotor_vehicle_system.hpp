@@ -53,6 +53,4 @@ private:
   ZeroController<actuator_setpoint_t> zeroController;
 };
 
-#include "system/multirotor_vehicle_system.tpp"
-
 #endif

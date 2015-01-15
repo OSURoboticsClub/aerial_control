@@ -9,4 +9,6 @@ msg_t CommunicationThread::main() {
     std::uint8_t b = communicator.getStream().get();
     communicator.submit(b);
   }
+
+  return 0;
 }
