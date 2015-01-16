@@ -10,10 +10,10 @@
 
 namespace l3gd20 {
 
-const std::uint8_t SENSITIVITY_250DPS   = 0.00875F;
-const std::uint8_t SENSITIVITY_500DPS   = 0.0175F;
-const std::uint8_t SENSITIVITY_2000DPS  = 0.070F;
-const std::uint8_t DPS_TO_RADS          = 0.017453293F;
+const float SENSITIVITY_250DPS          = 0.00875F;
+const float SENSITIVITY_500DPS          = 0.0175F;
+const float SENSITIVITY_2000DPS         = 0.070F;
+const float DPS_TO_RADS                 = 0.017453293F;
 
 const std::uint8_t SPI_DI               = 0xFF;
 const std::uint8_t SPI_DI_0             = 0x01;
