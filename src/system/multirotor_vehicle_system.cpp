@@ -3,12 +3,12 @@
 MultirotorVehicleSystem::MultirotorVehicleSystem(Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
     mode(MultirotorControlMode::ANGULAR_POS) {
+  // Disarm by default. A set_arm_state_message_t message is required to enable
+  // the control pipeline.
+  setArmed(false);
 }
 
 void MultirotorVehicleSystem::init() {
-  // TODO: For now, arm the vehicle on initialization. In the future, this
-  // should be removed and arming should be designated by a control input or
-  // from a communication link.
 }
 
 void MultirotorVehicleSystem::update() {
