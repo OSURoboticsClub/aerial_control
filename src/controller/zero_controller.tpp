@@ -1,5 +1,3 @@
-#include <algorithm>
-
 template <typename S>
 ZeroController<S>::ZeroController() {
 }
