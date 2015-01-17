@@ -15,9 +15,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
   Eigen::Vector3f accel(accelReading.axes.data());
 
   float accWeight = 0.02f;
-  palClearPad(GPIOE, GPIOE_LED4_BLUE);
   if(accel.norm() > 1.05 * 9.8 || accel.norm() < 0.95 * 9.8) {
-    palSetPad(GPIOE, GPIOE_LED4_BLUE);
     accWeight = 0.0f;
   }
 
