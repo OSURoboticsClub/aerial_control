@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "unit_config.hpp"
+
 void LSM303DLHC::init() {
   // Wake up device and enable X, Y, and Z outputs.
   writeRegister(lsm303dlhc::I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
@@ -24,6 +26,10 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
     // TODO: Scale to m/s^2
     reading.axes[i] = (float) raw[i] * 9.8 / 32768 * 2;
   }
+
+  reading.axes[0] += unit_config::ACC_X_OFFSET;
+  reading.axes[1] += unit_config::ACC_Y_OFFSET;
+  reading.axes[2] += unit_config::ACC_Z_OFFSET;
 
   return reading;
 }

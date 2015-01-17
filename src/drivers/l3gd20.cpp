@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "unit_config.hpp"
+
 void L3GD20::init() {
   // Wake up device, enable X, Y, and Z outputs, and set 760Hz mode.
   writeRegister(l3gd20::SPI_AD_CTRL_REG1, 0x0F | (1 << 7) | (1 << 6));
@@ -28,6 +30,10 @@ gyroscope_reading_t L3GD20::readGyro() {
   for(std::size_t i = 0; i < 3; i++) {
     reading.axes[i] = (float) raw[i] * l3gd20::SENSITIVITY_2000DPS * l3gd20::DPS_TO_RADS;
   }
+
+  reading.axes[0] += unit_config::GYR_X_OFFSET;
+  reading.axes[1] += unit_config::GYR_Y_OFFSET;
+  reading.axes[2] += unit_config::GYR_Z_OFFSET;
 
   return reading;
 }
