@@ -6,7 +6,7 @@
 
 AngularVelocityController::AngularVelocityController()
   : rollVelPid(unit_config::ANGVEL_X_KP, unit_config::ANGVEL_X_KI, unit_config::ANGVEL_X_KD),
-    pitchVelPid(unit_config::ANGVEL_Y_KP, unit_config::ANGVEL_Y_KI, unit_config::ANGVEL_Z_KD),
+    pitchVelPid(unit_config::ANGVEL_Y_KP, unit_config::ANGVEL_Y_KI, unit_config::ANGVEL_Y_KD),
     yawVelPid(unit_config::ANGVEL_Z_KP, unit_config::ANGVEL_Z_KI, unit_config::ANGVEL_Z_KD) {
 }
 

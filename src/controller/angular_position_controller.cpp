@@ -6,7 +6,7 @@
 
 AngularPositionController::AngularPositionController()
   : rollPosPid(unit_config::ANGPOS_X_KP, unit_config::ANGPOS_X_KI, unit_config::ANGPOS_X_KD),
-    pitchPosPid(unit_config::ANGPOS_Y_KP, unit_config::ANGPOS_Y_KI, unit_config::ANGPOS_Z_KD),
+    pitchPosPid(unit_config::ANGPOS_Y_KP, unit_config::ANGPOS_Y_KI, unit_config::ANGPOS_Y_KD),
     yawPosPid(unit_config::ANGPOS_Z_KP, unit_config::ANGPOS_Z_KI, unit_config::ANGPOS_Z_KD) {
 }
 
