@@ -30,19 +30,16 @@ public:
   void init() override;
   void update() override;
 
-public:
+  void on(const protocol::message::set_arm_state_message_t& m) override;
+
+protected:
   virtual Gyroscope& getGyroscope() = 0;
   virtual Accelerometer& getAccelerometer() = 0;
   virtual AttitudeEstimator& getAttitudeEstimator() = 0;
   virtual InputSource& getInputSource() = 0;
   virtual MotorMapper& getMotorMapper() = 0;
 
-  void on(const protocol::message::set_arm_state_message_t& m) override;
-
 private:
-  template <typename SP>
-  actuator_setpoint_t runPipeline(const attitude_estimate_t& estimate, const SP& sp);
-
   MultirotorControlMode mode;
 
   PositionController posController;

@@ -9,22 +9,6 @@ void MultirotorVehicleSystem::init() {
   // TODO: For now, arm the vehicle on initialization. In the future, this
   // should be removed and arming should be designated by a control input or
   // from a communication link.
-  setArmed(true);
-}
-
-template <>
-actuator_setpoint_t MultirotorVehicleSystem::runPipeline(const attitude_estimate_t& estimate, const angular_velocity_setpoint_t& sp) {
-  return attVelController.run(estimate, sp);
-}
-
-template <>
-actuator_setpoint_t MultirotorVehicleSystem::runPipeline(const attitude_estimate_t& estimate, const angular_position_setpoint_t& sp) {
-  return runPipeline(estimate, attPosController.run(estimate, sp));
-}
-
-template <>
-actuator_setpoint_t MultirotorVehicleSystem::runPipeline(const attitude_estimate_t& estimate, const position_setpoint_t& sp) {
-  return runPipeline(estimate, posController.run(estimate, sp));
 }
 
 void MultirotorVehicleSystem::update() {
@@ -50,12 +34,12 @@ void MultirotorVehicleSystem::update() {
           .yaw_pos_sp = input.yaw_sp,
           .altitude_sp = input.throttle_sp
         };
-        actuatorSp = runPipeline(estimate, sp);
+        actuatorSp = pipeline.run(estimate, sp, posController, attPosController, attVelController);
         break;
       }
       case MultirotorControlMode::VELOCITY: {
         // TODO: implement
-        // actuatorSp = runPipeline(estimate, sp);
+        // actuatorSp = pipeline.run(estimate, sp, velController, attPosController, attVelController);
         break;
       }
       case MultirotorControlMode::ANGULAR_POS: {
@@ -65,7 +49,7 @@ void MultirotorVehicleSystem::update() {
           .yaw_pos_sp = input.yaw_sp,
           .throttle_sp = input.throttle_sp
         };
-        actuatorSp = runPipeline(estimate, sp);
+        actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController);
         break;
       }
       case MultirotorControlMode::ANGULAR_RATE: {
@@ -75,7 +59,7 @@ void MultirotorVehicleSystem::update() {
           .yaw_vel_sp = input.yaw_sp,
           .throttle_sp = input.throttle_sp
         };
-        actuatorSp = runPipeline(estimate, sp);
+        actuatorSp = pipeline.run(estimate, sp, attVelController);
         break;
       }
     }
