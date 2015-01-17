@@ -25,14 +25,14 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
 
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
   corr += gyro * unit_config::DT * (1.0f - accWeight);
-  corr += dcm.col(2).cross(accel) * accWeight;
+  corr -= dcm.col(2).cross(-accel) * accWeight;
 
   Eigen::Matrix3f dcmStep;
   dcmStep <<      1.0f,  corr.z(), -corr.y(),
              -corr.z(),      1.0f,  corr.x(),
               corr.y(), -corr.x(),      1.0f;
 
-  dcm *= dcmStep;
+  dcm = dcmStep * dcm;
 
   orthonormalize();
 
