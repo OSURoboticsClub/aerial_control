@@ -17,7 +17,7 @@ void PWMMotorMapper<motor_count>::init() {
 
 static float map(float inputRangeMin, float inputRangeMax, float outputRangeMin, float outputRangeMax, float a) {
   float scale = (outputRangeMax - outputRangeMin) / (inputRangeMax - inputRangeMin);
-  return (a - inputRangeMax) * scale + outputRangeMax;
+  return (a - inputRangeMin) * scale + outputRangeMin;
 }
 
 template <int motor_count>
