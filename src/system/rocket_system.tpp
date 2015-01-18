@@ -30,5 +30,5 @@ void RocketSystem<num_rotors>::update() {
   actuator_setpoint_t actuator_setpoint = runController(estimate, angular_setpoint);
 
   // Update motor outputs
-  getMotorMapper().run(actuator_setpoint);
+  getMotorMapper().run(isArmed(), actuator_setpoint);
 }

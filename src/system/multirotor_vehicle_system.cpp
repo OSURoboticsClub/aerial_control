@@ -69,7 +69,7 @@ void MultirotorVehicleSystem::update() {
   }
 
   // Update motor outputs
-  getMotorMapper().run(actuatorSp);
+  getMotorMapper().run(isArmed(), actuatorSp);
 }
 
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {

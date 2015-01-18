@@ -10,7 +10,7 @@ public:
   /**
    * Maps roll/pitch/yaw setpoints to motor output values.
    */
-  virtual void run(actuator_setpoint_t& input) = 0;
+  virtual void run(bool armed, actuator_setpoint_t& input) = 0;
 };
 
 #endif

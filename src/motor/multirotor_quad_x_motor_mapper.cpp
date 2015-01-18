@@ -2,16 +2,18 @@
 
 #include <array>
 #include <cstddef>
+#include "protocol/messages.hpp"
 
-MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper(PWMPlatform& pwmPlatform)
-  : PWMMotorMapper(pwmPlatform) {
+MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper(PWMPlatform& pwmPlatform, Communicator& communicator)
+  : PWMMotorMapper(pwmPlatform),
+    throttleStream(communicator, 10) {
 }
 
 void MultirotorQuadXMotorMapper::init() {
   PWMMotorMapper::init();
 }
 
-void MultirotorQuadXMotorMapper::run(actuator_setpoint_t& input) {
+void MultirotorQuadXMotorMapper::run(bool armed, actuator_setpoint_t& input) {
   // Calculate output shifts
   // TODO(yoos): comment on motor indexing convention starting from positive
   // X in counterclockwise order.
@@ -28,5 +30,5 @@ void MultirotorQuadXMotorMapper::run(actuator_setpoint_t& input) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }
 
-  setMotorSpeeds(outputs);
+  setMotorSpeeds(armed, outputs);
 }

@@ -9,7 +9,7 @@ public:
   EsraRocketMotorMapper(PWMPlatform& pwmPlatform);
 
   void init() override;
-  void run(actuator_setpoint_t& input) override;
+  void run(bool armed, actuator_setpoint_t& input) override;
 };
 
 #endif

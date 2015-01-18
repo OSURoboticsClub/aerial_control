@@ -11,7 +11,7 @@ void EsraRocketMotorMapper::init() {
   PWMMotorMapper::init();
 }
 
-void EsraRocketMotorMapper::run(actuator_setpoint_t& input) {
+void EsraRocketMotorMapper::run(bool armed, actuator_setpoint_t& input) {
   // Calculate output shifts
   std::array<float, 4> output_shifts {
      1.0f * input.pitch_sp + 1.0f * input.roll_sp + 1.0f * input.yaw_sp, // front left
@@ -26,5 +26,5 @@ void EsraRocketMotorMapper::run(actuator_setpoint_t& input) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }
 
-  setMotorSpeeds(outputs);
+  setMotorSpeeds(armed, outputs);
 }
