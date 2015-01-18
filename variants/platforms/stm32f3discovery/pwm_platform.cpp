@@ -4,7 +4,7 @@
 
 static const PWMConfig motor_pwm_config = {
   500000,    // 500 kHz PWM clock frequency.
-  1000,      // PWM period 2.0 ms.
+  2000,      // PWM period 2.0 ms.
   NULL,      // No callback.
   {
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
