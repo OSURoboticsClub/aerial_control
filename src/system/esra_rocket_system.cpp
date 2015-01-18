@@ -2,7 +2,7 @@
 
 EsraRocketSystem::EsraRocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer, PWMPlatform& pwmPlatform, Communicator& communicator)
   : RocketSystem(communicator), gyroscope(gyroscope), accelerometer(accelerometer),
-    estimator(communicator), motorMapper(pwmPlatform) {
+    estimator(communicator), motorMapper(pwmPlatform, communicator) {
 }
 
 void EsraRocketSystem::init() {

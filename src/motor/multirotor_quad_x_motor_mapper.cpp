@@ -31,4 +31,14 @@ void MultirotorQuadXMotorMapper::run(bool armed, actuator_setpoint_t& input) {
   }
 
   setMotorSpeeds(armed, outputs);
+
+  if(throttleStream.ready()) {
+    protocol::message::motor_throttle_message_t msg;
+
+    for(std::size_t i = 0; i < 4; i++) {
+      msg.throttles[i] = outputs[i];
+    }
+
+    throttleStream.publish(msg);
+  }
 }
