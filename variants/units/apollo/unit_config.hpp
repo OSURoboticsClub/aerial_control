@@ -43,7 +43,7 @@ const float ANGPOS_Z_KD = 0.0;
 
 // A low throttle that will not spin the motors. Used when the propellers are
 // not spinning, but we do not want to send an invalid PWM signal.
-const float THROTTLE_SAFE = 0.20;
+const float THROTTLE_SAFE = 0.30;
 
 // Minimum throttle to make the propellers spin.
 const float THROTTLE_MIN = 0.53;

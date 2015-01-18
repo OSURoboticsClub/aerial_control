@@ -21,8 +21,6 @@ protected:
   void setMotorSpeeds(bool armed, const std::array<float, motor_count>& percents);
 
 private:
-  static void mapToBounds(const std::array<float, motor_count>& percents, std::array<float, motor_count> *mapped);
-
   PWMPlatform& pwmPlatform;
 };
 

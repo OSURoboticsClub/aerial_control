@@ -2,6 +2,10 @@
 #include <cstddef>
 #include <limits>
 
+#include "protocol/messages.hpp"
+
+#include "unit_config.hpp"
+
 template <int motor_count>
 PWMMotorMapper<motor_count>::PWMMotorMapper(PWMPlatform& pwmPlatform)
   : pwmPlatform(pwmPlatform) {
@@ -11,30 +15,26 @@ template <int motor_count>
 void PWMMotorMapper<motor_count>::init() {
 }
 
-template <int motor_count>
-void PWMMotorMapper<motor_count>::setMotorSpeeds(const std::array<float, motor_count>& percents) {
-  std::array<float, motor_count> mappedPercents;
-  mapToBounds(percents, &mappedPercents);
-
-  for(std::size_t i = 0; i < motor_count; i++) {
-    pwmPlatform.set(i, mappedPercents[i]);
-  }
+static float map(float inputRangeMin, float inputRangeMax, float outputRangeMin, float outputRangeMax, float a) {
+  float scale = (outputRangeMax - outputRangeMin) / (inputRangeMax - inputRangeMin);
+  return (a - inputRangeMax) * scale + outputRangeMax;
 }
 
 template <int motor_count>
-void PWMMotorMapper<motor_count>::mapToBounds(const std::array<float, motor_count>& percents, std::array<float, motor_count> *mapped) {
-  // TODO: Make these configurable
-  float output_min = 0.0f, output_max = 0.7f;
+void PWMMotorMapper<motor_count>::setMotorSpeeds(bool armed, const std::array<float, motor_count>& percents) {
+  if(armed) {
+    float smin = std::min(0.0f, *std::min_element(percents.begin(), percents.end()));
+    float smax = std::max(1.0f, *std::max_element(percents.begin(), percents.end()));
 
-  // Find the minimum and maximum inputs
-  float input_min = *std::min_element(percents.begin(), percents.end());
-  float input_max = *std::max_element(percents.begin(), percents.end());
-
-  // Limit the outputs to the maximum values
-  float scale = (output_max - output_min) / (input_max - input_min);
-  if(scale < 1.0f) {
     for(std::size_t i = 0; i < motor_count; i++) {
-      (*mapped)[i] = (percents[i] - input_min) * scale + output_min;
+      float zo = map(smin, smax, 0.0f, 1.0f, percents[i]);
+      float pwm = map(0.0f, 1.0f, unit_config::THROTTLE_MIN, unit_config::THROTTLE_MAX, zo);
+
+      pwmPlatform.set(i, pwm);
+    }
+  } else {
+    for(std::size_t i = 0; i < motor_count; i++) {
+      pwmPlatform.set(i, unit_config::THROTTLE_SAFE);
     }
   }
 }
