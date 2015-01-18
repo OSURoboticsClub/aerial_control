@@ -18,7 +18,8 @@ public:
 protected:
   PWMMotorMapper(PWMPlatform& pwmPlatform);
 
-  void setMotorSpeeds(bool armed, const std::array<float, motor_count>& percents);
+  void setMotorSpeeds(bool armed, int chanOff, const std::array<float, motor_count>& percents,
+      float rangeMin = 0.0f, float rangeMax = 1.0f);
 
 private:
   PWMPlatform& pwmPlatform;

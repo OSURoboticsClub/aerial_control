@@ -21,20 +21,20 @@ static float map(float inputRangeMin, float inputRangeMax, float outputRangeMin,
 }
 
 template <int motor_count>
-void PWMMotorMapper<motor_count>::setMotorSpeeds(bool armed, const std::array<float, motor_count>& percents) {
+void PWMMotorMapper<motor_count>::setMotorSpeeds(bool armed, int chanOff, const std::array<float, motor_count>& percents, float rangeMin, float rangeMax) {
   if(armed) {
-    float smin = std::min(0.0f, *std::min_element(percents.begin(), percents.end()));
-    float smax = std::max(1.0f, *std::max_element(percents.begin(), percents.end()));
+    float smin = std::min(rangeMin, *std::min_element(percents.begin(), percents.end()));
+    float smax = std::max(rangeMax, *std::max_element(percents.begin(), percents.end()));
 
     for(std::size_t i = 0; i < motor_count; i++) {
-      float zo = map(smin, smax, 0.0f, 1.0f, percents[i]);
-      float pwm = map(0.0f, 1.0f, unit_config::THROTTLE_MIN, unit_config::THROTTLE_MAX, zo);
+      float zo = map(smin, smax, rangeMin, rangeMax, percents[i]);
+      float pwm = map(rangeMin, rangeMax, unit_config::THROTTLE_MIN, unit_config::THROTTLE_MAX, zo);
 
-      pwmPlatform.set(i, pwm);
+      pwmPlatform.set(i + chanOff, pwm);
     }
   } else {
     for(std::size_t i = 0; i < motor_count; i++) {
-      pwmPlatform.set(i, unit_config::THROTTLE_SAFE);
+      pwmPlatform.set(i + chanOff, unit_config::THROTTLE_SAFE);
     }
   }
 }

@@ -39,6 +39,7 @@ include variants/platforms/rocket_v0.1/Tupfile
 include variants/units/apollo/Tupfile
 include variants/units/hera/Tupfile
 include variants/units/hestia/Tupfile
+include variants/units/speed/Tupfile
 include variants/units/zeus/Tupfile
 
 include_rules

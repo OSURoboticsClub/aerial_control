@@ -30,7 +30,7 @@ void MultirotorQuadXMotorMapper::run(bool armed, actuator_setpoint_t& input) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }
 
-  setMotorSpeeds(armed, outputs);
+  setMotorSpeeds(armed, 0, outputs);
 
   if(throttleStream.ready()) {
     protocol::message::motor_throttle_message_t msg;
