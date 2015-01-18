@@ -6,6 +6,7 @@
 
 #include "unit_config.hpp"
 #include "variant/platform.hpp"
+#include "variant/usart_platform.hpp"
 #include "variant/unit.hpp"
 
 class HeartbeatThread : public chibios_rt::BaseStaticThread<64> {
@@ -33,8 +34,8 @@ int main(void) {
   Platform platform;
   platform.init();
 
-  static Communicator communicator(
-    reinterpret_cast<chibios_rt::BaseSequentialStreamInterface&>(SD1));
+  auto& primaryStream = platform.get<USARTPlatform>().getPrimaryStream();
+  static Communicator communicator(primaryStream);
 
   Unit unit(platform, communicator);
   unit.init();
