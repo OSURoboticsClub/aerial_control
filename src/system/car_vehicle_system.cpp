@@ -2,11 +2,12 @@
 
 #include "hal.h"
 
-CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer&
-    accelerometer, PWMPlatform& pwmPlatform, Communicator& communicator)
+CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
+    PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
+    Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer), estimator(communicator),
-    inputSource(communicator), motorMapper(pwmPlatform, communicator) {
+    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
