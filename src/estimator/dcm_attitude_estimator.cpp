@@ -7,7 +7,7 @@
 
 DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
   : dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 100) {
+    attitudeMessageStream(communicator, 20) {
 }
 
 attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) {

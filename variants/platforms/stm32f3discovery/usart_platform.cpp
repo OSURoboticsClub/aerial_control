@@ -4,7 +4,7 @@
 
 // USART1 configuration
 static const SerialConfig usart1_config = {
-  115200,
+  38400,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
