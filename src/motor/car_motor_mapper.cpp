@@ -22,7 +22,7 @@ void CarMotorMapper::run(bool armed, actuator_setpoint_t& input) {
     input.throttle_sp    // front right
   };
 
-  motorDevices.set(armed, motorOutputs);
+  motorDevices.set(armed, motors);
 
   // Servos control yaw angle of the vehicle
   std::array<float, 4> servos {
@@ -33,13 +33,13 @@ void CarMotorMapper::run(bool armed, actuator_setpoint_t& input) {
     -input.yaw_sp / 2    // front right
   };
 
-  servoDevices.set(armed, servoOutputs);
+  servoDevices.set(armed, servos);
 
   if(throttleStream.ready()) {
     protocol::message::motor_throttle_message_t msg;
 
     for(std::size_t i = 0; i < 4; i++) {
-      msg.throttles[i] = motorOutputs[i];
+      msg.throttles[i] = motors[i];
     }
 
     throttleStream.publish(msg);
