@@ -27,6 +27,7 @@ void MPU6000::init() {
 
   // Set gyro full range to 2000 dps. We first read in the current register
   // value so we can change what we need and leave everything else alone.
+  // See DS p. 12.
   txbuf[0] = mpu6000::GYRO_CONFIG | (1<<7);
   exchange(2);
   chThdSleepMicroseconds(0);   // TODO(yoos): Without this, the GYRO_CONFIG register does not get set. This was not the case in the old C firmware. Why?
@@ -34,7 +35,7 @@ void MPU6000::init() {
   txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
   exchange(2);
 
-  // Set accelerometer full range to 16 g.
+  // Set accelerometer full range to 16 g. See DS p. 13.
   txbuf[0] = mpu6000::ACCEL_CONFIG | (1<<7);
   exchange(2);
   txbuf[0] = mpu6000::ACCEL_CONFIG;
