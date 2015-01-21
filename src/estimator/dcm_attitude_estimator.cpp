@@ -14,8 +14,8 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
   Eigen::Vector3f gyro(gyroReading.axes.data());
   Eigen::Vector3f accel(accelReading.axes.data());
 
-  float accWeight = 0.02f;
-  if(accel.norm() > 1.05 * 9.8 || accel.norm() < 0.95 * 9.8) {
+  float accWeight = 0.002f;
+  if(abs(accel.norm()) > 1.5 || abs(accel.norm()) < 0.5) {
     accWeight = 0.0f;
   }
 
