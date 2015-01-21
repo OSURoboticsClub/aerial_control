@@ -23,8 +23,7 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
   accelerometer_reading_t reading;
 
   for(std::size_t i = 0; i < 3; i++) {
-    // TODO: Scale to m/s^2
-    reading.axes[i] = (float) raw[i] * 9.8 / 32768 * 2;
+    reading.axes[i] = (float) raw[i] / 32768.0 * 2.0;
   }
 
   reading.axes[0] += unit_config::ACC_X_OFFSET;
