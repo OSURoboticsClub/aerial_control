@@ -24,7 +24,7 @@ void MultirotorVehicleSystem::update() {
 
   // Run the controllers
   actuator_setpoint_t actuatorSp;
-  if(isArmed()) {
+  if(isArmed() && input.valid) {
     // Run the controller pipeline as determined by the subclass
     switch(mode) {
       case MultirotorControlMode::POSITION: {

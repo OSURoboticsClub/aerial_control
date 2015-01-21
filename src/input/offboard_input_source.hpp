@@ -17,7 +17,7 @@ public:
 
 private:
   controller_input_t lastInput;
-  // TODO: systime_t lastInputTimestamp;
+  systime_t lastInputTimestamp;
 };
 
 #endif
