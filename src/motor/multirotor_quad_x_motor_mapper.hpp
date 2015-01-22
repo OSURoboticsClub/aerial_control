@@ -4,17 +4,18 @@
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
 #include "controller/setpoint_types.hpp"
-#include "motor/pwm_motor_mapper.hpp"
-#include "variant/pwm_platform.hpp"
+#include "motor/motor_mapper.hpp"
+#include "motor/pwm_device_group.hpp"
 
-class MultirotorQuadXMotorMapper : public PWMMotorMapper<4> {
+class MultirotorQuadXMotorMapper : public MotorMapper {
 public:
-  MultirotorQuadXMotorMapper(PWMPlatform& pwmPlatform, Communicator& communicator);
+  MultirotorQuadXMotorMapper(PWMDeviceGroup<4>& motors, Communicator& communicator);
 
   void init() override;
   void run(bool armed, actuator_setpoint_t& input) override;
 
 private:
+  PWMDeviceGroup<4> motors;
   RateLimitedStream throttleStream;
 };
 

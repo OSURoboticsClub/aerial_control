@@ -4,13 +4,12 @@
 #include <cstddef>
 #include "protocol/messages.hpp"
 
-MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper(PWMPlatform& pwmPlatform, Communicator& communicator)
-  : PWMMotorMapper(pwmPlatform),
+MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper(PWMDeviceGroup<4>& motors, Communicator& communicator)
+  : motors(motors),
     throttleStream(communicator, 10) {
 }
 
 void MultirotorQuadXMotorMapper::init() {
-  PWMMotorMapper::init();
 }
 
 void MultirotorQuadXMotorMapper::run(bool armed, actuator_setpoint_t& input) {
@@ -30,7 +29,7 @@ void MultirotorQuadXMotorMapper::run(bool armed, actuator_setpoint_t& input) {
     outputs[i] = input.throttle_sp + output_shifts[i];
   }
 
-  setMotorSpeeds(armed, 0, outputs);
+  motors.set(armed, outputs);
 
   if(throttleStream.ready()) {
     protocol::message::motor_throttle_message_t msg;
