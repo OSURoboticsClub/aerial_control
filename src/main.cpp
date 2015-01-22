@@ -30,6 +30,10 @@ int main(void) {
   halInit();
   chibios_rt::System::init();
 
+  // TODO: This seems? to fix crashing issues on OSUAR rev. 3. Is this actually
+  // the case?
+  chibios_rt::BaseThread::sleep(MS2ST(100));
+
   // Build and initialize the system
   Platform platform;
   platform.init();
