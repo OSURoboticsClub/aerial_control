@@ -3,7 +3,7 @@
 #include "hal.h"
 
 // USART1 configuration
-static const SerialConfig usart1_config = {
+static const SerialConfig USART1_CONFIG {
   38400,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
@@ -11,7 +11,7 @@ static const SerialConfig usart1_config = {
 };
 
 // USART3 configuration
-static const SerialConfig usart3_config = {
+static const SerialConfig USART3_CONFIG {
   38400,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
@@ -19,8 +19,8 @@ static const SerialConfig usart3_config = {
 };
 
 USARTPlatform::USARTPlatform() {
-  sdStart(&SD1, &usart1_config);
-  sdStart(&SD3, &usart3_config);
+  sdStart(&SD1, &USART1_CONFIG);
+  sdStart(&SD3, &USART3_CONFIG);
   palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(7)); // USART1 TX
   palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(7)); // USART1 RX
   palSetPadMode(GPIOB, 10, PAL_MODE_ALTERNATE(7)); // USART3 TX

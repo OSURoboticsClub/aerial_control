@@ -11,7 +11,7 @@
 #include "variant/usart_platform.hpp"
 
 // MPU6000 SPI configuration
-static const SPIConfig mpu6000_spicfg = {
+static const SPIConfig MPU6000_CONFIG {
   NULL,
   GPIOB,
   2,
@@ -23,7 +23,7 @@ Platform::Platform() {
 
 template <>
 MPU6000& Platform::get() {
-  static MPU6000 imu(&SPID1, &mpu6000_spicfg);
+  static MPU6000 imu(&SPID1, &MPU6000_CONFIG);
   return imu;
 }
 
@@ -67,6 +67,5 @@ void Platform::init() {
   get<SPIPlatform>();
   get<USARTPlatform>();
 
-  // Initialize IMU
   get<MPU6000>().init();
 }

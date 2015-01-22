@@ -2,7 +2,7 @@
 
 #include "hal.h"
 
-static const PWMConfig motor_pwm_config = {
+static const PWMConfig MOTOR_PWM_CONFIG {
   500000,    // 500 kHz PWM clock frequency.
   1000,      // PWM period 2.0 ms.
   NULL,      // No callback.
@@ -16,7 +16,7 @@ static const PWMConfig motor_pwm_config = {
 };
 
 PWMPlatform::PWMPlatform() {
-  pwmStart(&PWMD8, &motor_pwm_config);
+  pwmStart(&PWMD8, &MOTOR_PWM_CONFIG);
   palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(3));
   palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(3));
   palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(3));

@@ -12,7 +12,7 @@
 #include "variant/usart_platform.hpp"
 
 // L3GD20 SPI configuration
-static const SPIConfig l3gd20_spi_config = {
+static const SPIConfig L3GD20_CONFIG {
   NULL,
   GPIOE,
   GPIOE_SPI1_CS,
@@ -21,7 +21,7 @@ static const SPIConfig l3gd20_spi_config = {
 };
 
 // LSM303DHLC I2C configuration
-static const I2CConfig lsm303dlhc_i2c_config = {
+static const I2CConfig LSM303_CONFIG {
   0x00902025, // voodoo magic
   0,
   0
@@ -34,13 +34,13 @@ Platform::Platform() {
 
 template <>
 Gyroscope& Platform::get() {
-  static L3GD20 gyro(&SPID1, &l3gd20_spi_config);
+  static L3GD20 gyro(&SPID1, &L3GD20_CONFIG);
   return gyro;
 }
 
 template <>
 Accelerometer& Platform::get() {
-  static LSM303DLHC accel(&I2CD1, &lsm303dlhc_i2c_config, LSM303_I2C_ACC_ADDRESS);
+  static LSM303DLHC accel(&I2CD1, &LSM303_CONFIG, LSM303_I2C_ACC_ADDRESS);
   return accel;
 }
 
