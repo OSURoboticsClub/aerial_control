@@ -26,7 +26,7 @@ const float ANGVEL_X_KD = 0.0;
 const float ANGVEL_Y_KP = 0.0;
 const float ANGVEL_Y_KI = 0.0;
 const float ANGVEL_Y_KD = 0.0;
-const float ANGVEL_Z_KP = 0.2;
+const float ANGVEL_Z_KP = 0.1;
 const float ANGVEL_Z_KI = 0.0;
 const float ANGVEL_Z_KD = 0.0;
 
