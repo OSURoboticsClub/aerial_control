@@ -74,7 +74,6 @@ void Platform::init() {
   get<SPIPlatform>();
   get<USARTPlatform>();
 
-  // TODO: What if these two are the same? inited twice?
   get<Gyroscope>().init();
   get<Accelerometer>().init();
 }
