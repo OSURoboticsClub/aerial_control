@@ -1,4 +1,4 @@
-#include "communication/communication_thread.hpp"
+#include "communication_thread.hpp"
 
 CommunicationThread::CommunicationThread(Communicator& communicator)
   : communicator(communicator) {
