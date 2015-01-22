@@ -6,7 +6,6 @@
 #include "controller/setpoint_types.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "variant/pwm_platform.hpp"
 
 class CarMotorMapper : public MotorMapper {
 public:

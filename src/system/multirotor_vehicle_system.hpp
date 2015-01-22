@@ -12,6 +12,7 @@
 #include "estimator/attitude_estimator.hpp"
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
+#include "motor/pwm_device_group.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/vehicle_system.hpp"
@@ -25,22 +26,21 @@ enum class MultirotorControlMode {
 
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
-  MultirotorVehicleSystem(Communicator& communicator);
+  MultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
+      AttitudeEstimator& estimator, InputSource& inputSource,
+      MotorMapper& motorMapper, Communicator& communicator);
 
   void init() override;
   void update() override;
 
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
-protected:
-  virtual Gyroscope& getGyroscope() = 0;
-  virtual Accelerometer& getAccelerometer() = 0;
-  virtual AttitudeEstimator& getAttitudeEstimator() = 0;
-  virtual InputSource& getInputSource() = 0;
-  virtual MotorMapper& getMotorMapper() = 0;
-
 private:
-  MultirotorControlMode mode;
+  Gyroscope& gyroscope;
+  Accelerometer& accelerometer;
+
+  AttitudeEstimator& estimator;
+  InputSource& inputSource;
 
   PositionController posController;
   AngularPositionController attPosController;
@@ -48,6 +48,10 @@ private:
   ControllerPipeline<actuator_setpoint_t> pipeline;
 
   ZeroController<actuator_setpoint_t> zeroController;
+
+  MotorMapper& motorMapper;
+
+  MultirotorControlMode mode;
 };
 
 #endif

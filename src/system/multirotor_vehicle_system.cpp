@@ -1,8 +1,13 @@
 #include "system/multirotor_vehicle_system.hpp"
 
-MultirotorVehicleSystem::MultirotorVehicleSystem(Communicator& communicator)
+MultirotorVehicleSystem::MultirotorVehicleSystem(
+    Gyroscope& gyroscope, Accelerometer& accelerometer,
+    AttitudeEstimator& estimator, InputSource& inputSource,
+    MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    mode(MultirotorControlMode::ANGULAR_POS) {
+    gyroscope(gyroscope), accelerometer(accelerometer),
+    estimator(estimator), inputSource(inputSource),
+    motorMapper(motorMapper), mode(MultirotorControlMode::ANGULAR_POS) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -13,14 +18,14 @@ void MultirotorVehicleSystem::init() {
 
 void MultirotorVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
-  gyroscope_reading_t gyroReading = getGyroscope().readGyro();
-  accelerometer_reading_t accelReading = getAccelerometer().readAccel();
+  gyroscope_reading_t gyroReading = gyroscope.readGyro();
+  accelerometer_reading_t accelReading = accelerometer.readAccel();
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = getAttitudeEstimator().update(gyroReading, accelReading);
+  attitude_estimate_t estimate = estimator.update(gyroReading, accelReading);
 
   // Poll for controller input
-  controller_input_t input = getInputSource().read();
+  controller_input_t input = inputSource.read();
 
   // Run the controllers
   actuator_setpoint_t actuatorSp;
@@ -69,7 +74,7 @@ void MultirotorVehicleSystem::update() {
   }
 
   // Update motor outputs
-  getMotorMapper().run(isArmed(), actuatorSp);
+  motorMapper.run(isArmed(), actuatorSp);
 }
 
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {
