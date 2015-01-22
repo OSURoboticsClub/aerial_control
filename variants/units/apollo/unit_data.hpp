@@ -8,7 +8,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
-#include "variant/pwm_platform.hpp"
+#include "variant/platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.53f;
 static const float MOTOR_PWM_MAX = 0.93f;
@@ -23,8 +23,8 @@ struct unit_data_t {
 
   MultirotorVehicleSystem system;
 
-  unit_data_t(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform, Communicator& communicator)
-    : motors(pwmPlatform,
+  unit_data_t(Platform& platform, Communicator& communicator)
+    : motors(platform.get<PWMPlatform>(),
         { 0, 1, 2, 3 },                              // channels
         { 0.0f, 0.0f, 0.0f, 0.0f },                  // offsets
         0.0f, 1.0f,                                  // input range
@@ -33,7 +33,7 @@ struct unit_data_t {
       motorMapper(motors, communicator),
       estimator(communicator),
       inputSource(communicator),
-      system(gyro, accel, estimator, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), estimator, inputSource, motorMapper, communicator) {
   }
 };
 
