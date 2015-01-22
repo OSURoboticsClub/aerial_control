@@ -42,7 +42,6 @@ int main(void) {
   static Communicator communicator(primaryStream);
 
   Unit unit(platform, communicator);
-  unit.init();
 
   // Start the background threads
   static HeartbeatThread heartbeatThread;

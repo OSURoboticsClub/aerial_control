@@ -4,8 +4,5 @@ DummyVehicleSystem::DummyVehicleSystem(Communicator& communicator)
   : VehicleSystem(communicator) {
 }
 
-void DummyVehicleSystem::init() {
-}
-
 void DummyVehicleSystem::update() {
 }

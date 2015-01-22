@@ -5,8 +5,6 @@
 
 class MotorMapper {
 public:
-  virtual void init() = 0;
-
   /**
    * Maps roll/pitch/yaw setpoints to motor output values.
    */

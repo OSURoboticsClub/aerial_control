@@ -8,10 +8,6 @@ Unit::Unit(Platform& platform, Communicator& communicator)
     platform.get<PWMPlatform>(), communicator) {
 }
 
-void Unit::init() {
-  data.system.init();
-}
-
 VehicleSystem& Unit::getSystem() {
   return data.system;
 }

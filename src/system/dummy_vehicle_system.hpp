@@ -8,7 +8,6 @@ class DummyVehicleSystem : public VehicleSystem {
 public:
   DummyVehicleSystem(Communicator& communicator);
 
-  void init() override;
   void update() override;
 };
 

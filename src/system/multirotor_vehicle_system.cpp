@@ -13,9 +13,6 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
   setArmed(false);
 }
 
-void MultirotorVehicleSystem::init() {
-}
-
 void MultirotorVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyroReading = gyroscope.readGyro();

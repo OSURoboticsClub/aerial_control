@@ -22,7 +22,6 @@ public:
       PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
       Communicator& communicator);
 
-  void init() override;
   void update() override;
 
   void on(const protocol::message::set_arm_state_message_t& m) override;

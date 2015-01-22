@@ -13,9 +13,6 @@ RocketSystem::RocketSystem(
   setArmed(false);
 }
 
-void RocketSystem::init() {
-}
-
 void RocketSystem::update() {
   // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyroReading = gyroscope.readGyro();

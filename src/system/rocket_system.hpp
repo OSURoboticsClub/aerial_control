@@ -29,7 +29,6 @@ public:
       AttitudeEstimator& estimator, InputSource& inputSource,
       MotorMapper& motorMapper, Communicator& communicator);
 
-  void init() override;
   void update() override;
 
   void on(const protocol::message::set_arm_state_message_t& m) override;

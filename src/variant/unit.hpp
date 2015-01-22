@@ -11,8 +11,6 @@ class Unit {
 public:
   Unit(Platform& platform, Communicator& communicator);
 
-  void init();
-
   VehicleSystem& getSystem();
 
 private:

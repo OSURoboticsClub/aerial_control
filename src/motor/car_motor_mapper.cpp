@@ -10,9 +10,6 @@ CarMotorMapper::CarMotorMapper(PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4
     throttleStream(communicator, 1) {
 }
 
-void CarMotorMapper::init() {
-}
-
 void CarMotorMapper::run(bool armed, actuator_setpoint_t& input) {
   // Motor speeds depend only on throttle input
   std::array<float, 4> motors {

@@ -11,7 +11,6 @@ class EsraRocketMotorMapper : public MotorMapper {
 public:
   EsraRocketMotorMapper(PWMDeviceGroup<1>& motors, Communicator& communicator);
 
-  void init() override;
   void run(bool armed, actuator_setpoint_t& input) override;
 
 private:

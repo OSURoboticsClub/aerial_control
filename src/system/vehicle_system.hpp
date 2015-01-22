@@ -10,12 +10,6 @@
 class VehicleSystem {
 public:
   /**
-   * Initialize any subsystems that were not passed into the constructor (those
-   * should already have been initialized).
-   */
-  virtual void init() = 0;
-
-  /**
    * Periodic update function. Called at a fixed interval.
    */
   virtual void update() = 0;

@@ -13,9 +13,6 @@ CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelero
   setArmed(false);
 }
 
-void CarVehicleSystem::init() {
-}
-
 void CarVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyroReading = gyroscope.readGyro();

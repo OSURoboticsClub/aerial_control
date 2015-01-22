@@ -9,9 +9,6 @@ MultirotorQuadPlusMotorMapper::MultirotorQuadPlusMotorMapper(PWMDeviceGroup<4>& 
     throttleStream(communicator, 10) {
 }
 
-void MultirotorQuadPlusMotorMapper::init() {
-}
-
 void MultirotorQuadPlusMotorMapper::run(bool armed, actuator_setpoint_t& input) {
   // Calculate output shifts
   // TODO(yoos): comment on motor indexing convention starting from positive

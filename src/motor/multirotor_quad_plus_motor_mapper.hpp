@@ -6,13 +6,11 @@
 #include "controller/setpoint_types.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "variant/pwm_platform.hpp"
 
 class MultirotorQuadPlusMotorMapper : public MotorMapper {
 public:
   MultirotorQuadPlusMotorMapper(PWMDeviceGroup<4>& motors, Communicator& communicator);
 
-  void init() override;
   void run(bool armed, actuator_setpoint_t& input) override;
 
 private:
