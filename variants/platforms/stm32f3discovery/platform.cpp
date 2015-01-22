@@ -27,7 +27,7 @@ static const I2CConfig lsm303dlhc_i2c_config = {
   0
 };
 
-const i2caddr_t LSM303_I2C_ACC_ADDRESS = 0x19;
+static const i2caddr_t LSM303_I2C_ACC_ADDRESS = 0x19;
 
 Platform::Platform() {
 }
