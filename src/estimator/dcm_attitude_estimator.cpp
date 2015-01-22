@@ -48,7 +48,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
     protocol::message::attitude_message_t m {
       .dcm = {
         // estimate.roll, estimate.pitch, estimate.yaw,
-        // accel(0), accel(1), accel(2),
+        // accel(0), accel(1), accel(2), // NOTE: normalized
         // gyro(0), gyro(1), gyro(2),
         dcm(0, 0), dcm(0, 1), dcm(0, 2),
         dcm(1, 0), dcm(1, 1), dcm(1, 2),
