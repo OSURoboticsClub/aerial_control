@@ -36,8 +36,10 @@ void RocketSystem::update() {
         break;
       }
       case RocketStage::FLY: {
+        break;
       }
       case RocketStage::LAND: {
+        break;
       }
     }
   } else {
