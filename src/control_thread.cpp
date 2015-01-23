@@ -1,8 +1,8 @@
 #include "control_thread.hpp"
 
+#include "communication_thread.hpp"
 #include "heartbeat_thread.hpp"
 #include "communication/communicator.hpp"
-#include "communication/communication_thread.hpp"
 
 #include "unit_config.hpp"
 #include "variant/platform.hpp"
