@@ -1,6 +1,6 @@
 Aerial Control Firmware
 =======================
-_To control anything that flies, for now._
+_To control anything that ~~flies~~ moves, for now._
 
 Building
 --------
