@@ -33,10 +33,12 @@ INCLUDES += -Iinclude/protocol/include
 include variants/platforms/stm32f3discovery/Tupfile
 include variants/platforms/stm32f4discovery/Tupfile
 include variants/platforms/aerial_v3/Tupfile
+include variants/platforms/aerial_v4/Tupfile
 include variants/platforms/rocket_v0.1/Tupfile
 
 # Units
 include variants/units/apollo/Tupfile
+include variants/units/helios/Tupfile
 include variants/units/hera/Tupfile
 include variants/units/hestia/Tupfile
 include variants/units/speed/Tupfile
