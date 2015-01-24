@@ -14,16 +14,14 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
   Eigen::Vector3f gyro(gyroReading.axes.data());
   Eigen::Vector3f accel(accelReading.axes.data());
 
-  float accWeight = 0.002f;
-  if(abs(accel.norm()) > 1.5 || abs(accel.norm()) < 0.5) {
-    accWeight = 0.0f;
-  }
+  // Calculate accelerometer weight before normalization
+  float accelWeight = getAccelWeight(accel);
 
   accel.normalize();
 
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
-  corr += gyro * unit_config::DT * (1.0f - accWeight);
-  corr -= dcm.col(2).cross(-accel) * accWeight;
+  corr += gyro * unit_config::DT * (1.0f - accelWeight);
+  corr -= dcm.col(2).cross(-accel) * accelWeight;
 
   Eigen::Matrix3f dcmStep;
   dcmStep <<      1.0f,  corr.z(), -corr.y(),
@@ -78,4 +76,20 @@ void DCMAttitudeEstimator::orthonormalize() {
 
   // Normalize all vectors
   dcm.rowwise().normalize();
+}
+
+float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) {
+  // TODO(kyle): Pull these out as parameters
+  float maxAccelWeight = 0.002f; // Accelerometer weight at exactly 1g
+  float validAccelRange = 0.5f; // Maximum additional acceleration until accelWeight goes to 0
+
+  // Deweight accelerometer as a linear function of the reading's difference
+  // from 1g.
+  float accelOffset = std::abs(1.0f - accel.norm());
+  float accelWeight = -maxAccelWeight / validAccelRange * accelOffset + maxAccelWeight;
+
+  // Limit weight to a minimum of 0
+  accelWeight = std::max(0.0f, accelWeight);
+
+  return accelWeight;
 }

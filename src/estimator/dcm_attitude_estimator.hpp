@@ -15,6 +15,7 @@ public:
 
 private:
   void orthonormalize();
+  float getAccelWeight(Eigen::Vector3f accel);
 
   Eigen::Matrix3f dcm;
   RateLimitedStream attitudeMessageStream;
