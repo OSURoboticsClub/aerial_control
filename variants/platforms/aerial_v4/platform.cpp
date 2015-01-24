@@ -2,7 +2,7 @@
 
 #include "hal.h"
 
-#include "drivers/mpu6000.hpp"
+#include "drivers/mpu9250.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
 #include "variant/i2c_platform.hpp"
@@ -10,31 +10,49 @@
 #include "variant/spi_platform.hpp"
 #include "variant/usart_platform.hpp"
 
-// MPU6000 SPI configuration
-static const SPIConfig MPU6000_CONFIG {
-  NULL,
-  GPIOB,
-  2,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
-};
-
 Platform::Platform() {
 }
 
+// MS5611 SPI configuration
+// TODO(yoos): verify clock speed
+static const SPIConfig MS5611_CONFIG {
+  NULL,
+  GPIOC,
+  13,
+  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+};
+
+// MPU9250 SPI configuration
+static const SPIConfig MPU9250_CONFIG {
+  NULL,
+  GPIOC,
+  14,
+  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+};
+
+// H3LIS331DL SPI configuration
+// TODO(yoos): verify clock speed
+static const SPIConfig H3LIS331DL_CONFIG {
+  NULL,
+  GPIOC,
+  15,
+  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+};
+
 template <>
-MPU6000& Platform::get() {
-  static MPU6000 imu(&SPID1, &MPU6000_CONFIG);
+MPU9250& Platform::get() {
+  static MPU9250 imu(&SPID1, &MPU9250_CONFIG);
   return imu;
 }
 
 template <>
 Gyroscope& Platform::get() {
-  return get<MPU6000>();
+  return get<MPU9250>();
 }
 
 template <>
 Accelerometer& Platform::get() {
-  return get<MPU6000>();
+  return get<MPU9250>();
 }
 
 template <>
@@ -68,5 +86,5 @@ void Platform::init() {
   get<USARTPlatform>();
 
   // Initialize IMU
-  get<MPU6000>().init();
+  get<MPU9250>().init();
 }

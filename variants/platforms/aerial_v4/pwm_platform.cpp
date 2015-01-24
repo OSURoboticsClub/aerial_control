@@ -2,7 +2,9 @@
 
 #include "hal.h"
 
-static const PWMConfig MOTOR_PWM_CONFIG {
+// TODO(yoos): v4.0 will switch these around so we can share a 50 Hz timer
+// channel between servos and status LEDs.
+static const PWMConfig PWMD1_CONFIG {
   500000,    // 500 kHz PWM clock frequency.
   1000,      // PWM period 2.0 ms.
   NULL,      // No callback.
@@ -15,15 +17,57 @@ static const PWMConfig MOTOR_PWM_CONFIG {
   0,0   // HW dependent
 };
 
+static const PWMConfig PWMD3_CONFIG {
+  500000,    // 500 kHz PWM clock frequency.
+  1000,      // PWM period 2.0 ms.
+  NULL,      // No callback.
+  {
+    {PWM_OUTPUT_DISABLED, NULL},      // RSSI
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},   // Status R
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},   // Status G
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL}    // Status B
+  },   // Channel configurations
+  0,0   // HW dependent
+};
+
+static const PWMConfig PWMD4_CONFIG {
+  500000,    // 500 kHz PWM clock frequency.
+  1000,      // PWM period 2.0 ms.
+  NULL,      // No callback.
+  {
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL}
+  },   // Channel configurations
+  0,0   // HW dependent
+};
+
+
 PWMPlatform::PWMPlatform() {
-  pwmStart(&PWMD8, &MOTOR_PWM_CONFIG);
-  palSetPadMode(GPIOC, 6, PAL_MODE_ALTERNATE(3));
-  palSetPadMode(GPIOC, 7, PAL_MODE_ALTERNATE(3));
-  palSetPadMode(GPIOC, 8, PAL_MODE_ALTERNATE(3));
-  palSetPadMode(GPIOC, 9, PAL_MODE_ALTERNATE(3));
+  // TIM1
+  pwmStart(&PWMD1, &PWMD1_CONFIG);
+  palSetPadMode(GPIOA, 8, PAL_MODE_ALTERNATE(1));
+  palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(1));
+  palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(1));
+  palSetPadMode(GPIOA, 11, PAL_MODE_ALTERNATE(1));
+
+  // TIM3
+  pwmStart(&PWMD3, &PWMD3_CONFIG);
+  palSetPadMode(GPIOA, 6, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOA, 7, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 0, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 1, PAL_MODE_ALTERNATE(2));
+
+  // TIM4
+  pwmStart(&PWMD4, &PWMD4_CONFIG);
+  palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 8, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 9, PAL_MODE_ALTERNATE(2));
 }
 
 void PWMPlatform::set(std::uint8_t ch, float dc) {
-  pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc * 10000.0f);
-  pwmEnableChannel(&PWMD8, ch, width);
+  pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD1, dc * 10000.0f);
+  pwmEnableChannel(&PWMD1, ch, width);
 }
