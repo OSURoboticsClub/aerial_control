@@ -1,3 +1,21 @@
+template <typename M>
+void Communicator::on(const M& m) {
+  for(auto listener : listeners) {
+    if(listener != nullptr) {
+      listener->on(m);
+    }
+  }
+}
+
+template <typename M>
+void Communicator::send(const M& message) {
+  std::array<std::uint8_t, 255> encodeBuffer;
+  std::uint16_t len = encoder.encode(message, &encodeBuffer);
+
+  // Offload work onto the writer thead.
+  writer.append(encodeBuffer, len);
+}
+
 template <typename M, std::size_t buffer_size>
 static const M& packet_cast(const protocol::decoded_message_t<buffer_size>& decoded) {
   return reinterpret_cast<const M&>(decoded.payload);
@@ -27,10 +45,3 @@ void Communicator::dispatch(const protocol::decoded_message_t<buffer_size>& deco
   }
 }
 
-template <typename M>
-void Communicator::send(const M& message) {
-  static std::array<std::uint8_t, 255> encodeBuffer;
-  std::uint16_t len = encoder.encode(message, &encodeBuffer);
-
-  stream.write(encodeBuffer.data(), len);
-}

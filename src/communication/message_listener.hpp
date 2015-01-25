@@ -6,6 +6,11 @@
 // Forward declaration
 class Communicator;
 
+/**
+ * Overloads callbacks for all message types.
+ *
+ * To use, override the `on` methods you are interested in.
+ */
 class MessageListener {
 public:
   // TODO: Any way to do this without explicitly overloading for each message

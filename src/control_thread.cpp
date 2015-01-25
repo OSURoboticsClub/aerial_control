@@ -1,6 +1,5 @@
 #include "control_thread.hpp"
 
-#include "communication_thread.hpp"
 #include "heartbeat_thread.hpp"
 #include "communication/communicator.hpp"
 
@@ -15,16 +14,16 @@ msg_t ControlThread::main() {
   platform.init();
 
   auto& primaryStream = platform.get<USARTPlatform>().getPrimaryStream();
-  static Communicator communicator(primaryStream);
-
-  Unit unit(platform, communicator);
 
   // Start the background threads
   static HeartbeatThread heartbeatThread;
-  static CommunicationThread communicationThread(communicator);
+  static Communicator communicator(primaryStream);
 
   heartbeatThread.start(LOWPRIO);
-  communicationThread.start(LOWPRIO);
+  communicator.start();
+
+  // Build the unit
+  Unit unit(platform, communicator);
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.

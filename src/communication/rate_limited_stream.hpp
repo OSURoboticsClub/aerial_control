@@ -5,6 +5,11 @@
 
 #include "communication/communicator.hpp"
 
+/**
+ * A utility class to prevent a message generator from saturating an output
+ * channel. Provides an easy way to limit message sending to a specified
+ * maximum frequency.
+ */
 class RateLimitedStream {
 public:
   RateLimitedStream(Communicator& communicator, int frequency);
