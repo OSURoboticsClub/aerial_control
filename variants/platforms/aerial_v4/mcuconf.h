@@ -36,12 +36,12 @@
 #define STM32_NO_INIT                       FALSE
 #define STM32_HSI_ENABLED                   TRUE
 #define STM32_LSI_ENABLED                   TRUE
-#define STM32_HSE_ENABLED                   FALSE   // TODO(yoos): enable once we have hardware
+#define STM32_HSE_ENABLED                   TRUE   // We have external crystal oscillator
 #define STM32_LSE_ENABLED                   FALSE
 #define STM32_CLOCK48_REQUIRED              TRUE
 #define STM32_SW                            STM32_SW_PLL
-#define STM32_PLLSRC                        STM32_PLLSRC_HSI   // Set this to STM32_PLLSRC_HSE if using external oscillator.
-#define STM32_PLLM_VALUE                    16   // Set this to frequency of oscillator. Currently, we are using the 16 MHz internal oscillator.
+#define STM32_PLLSRC                        STM32_PLLSRC_HSE   // Set this to STM32_PLLSRC_HSE if using external oscillator.
+#define STM32_PLLM_VALUE                    8   // Set this to frequency of oscillator.
 #define STM32_PLLN_VALUE                    336
 #define STM32_PLLP_VALUE                    2
 #define STM32_PLLQ_VALUE                    7
