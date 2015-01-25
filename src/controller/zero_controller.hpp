@@ -5,6 +5,9 @@
 #include "controller/setpoint_types.hpp"
 #include "estimator/attitude_estimator.hpp"
 
+/**
+ * A dumb controller that simply outputs zeros on all channels.
+ */
 template <typename SP>
 class ZeroController : public Controller<SP, actuator_setpoint_t> {
 public:

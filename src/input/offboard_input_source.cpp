@@ -5,6 +5,7 @@ OffboardInputSource::OffboardInputSource(Communicator& communicator)
 }
 
 controller_input_t OffboardInputSource::read() {
+  // Invalidate the last input if it was received a long time ago.
   if(lastInputTimestamp + MS2ST(100) < chibios_rt::System::getTime()) {
     lastInput.valid = false;
   } else {

@@ -3,11 +3,11 @@
 
 #include "controller/setpoint_types.hpp"
 
+/**
+ * Maps roll/pitch/yaw setpoints to hardware controllers.
+ */
 class MotorMapper {
 public:
-  /**
-   * Maps roll/pitch/yaw setpoints to motor output values.
-   */
   virtual void run(bool armed, actuator_setpoint_t& input) = 0;
 };
 

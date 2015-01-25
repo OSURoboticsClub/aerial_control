@@ -1,6 +1,9 @@
 #ifndef SETPOINT_TYPES_HPP_
 #define SETPOINT_TYPES_HPP_
 
+// Setpoint types collected here to prevent circular dependencies between
+// controllers.
+
 struct position_setpoint_t {
   float latitude_sp;
   float longitude_sp;
