@@ -42,6 +42,7 @@ include variants/units/helios/Tupfile
 include variants/units/hera/Tupfile
 include variants/units/hestia/Tupfile
 include variants/units/speed/Tupfile
+include variants/units/zephyrus/Tupfile
 include variants/units/zeus/Tupfile
 
 include_rules
