@@ -11,8 +11,7 @@ PWMDeviceGroup<device_count>::PWMDeviceGroup(PWMPlatform& pwmPlatform,
     inMax(inMax), outMin(outMin), outMax(outMax), outSafe(outSafe) {
 }
 
-// TODO: map2 -> map
-static float map2(float inputRangeMin, float inputRangeMax, float outputRangeMin, float outputRangeMax, float a) {
+static float map(float inputRangeMin, float inputRangeMax, float outputRangeMin, float outputRangeMax, float a) {
   float scale = (outputRangeMax - outputRangeMin) / (inputRangeMax - inputRangeMin);
   return (a - inputRangeMin) * scale + outputRangeMin;
 }
@@ -24,8 +23,8 @@ void PWMDeviceGroup<device_count>::set(bool armed, const std::array<float, devic
     float smax = std::max(inMax, *std::max_element(percents.begin(), percents.end()));
 
     for(std::size_t i = 0; i < device_count; i++) {
-      float zo = map2(smin, smax, inMin, inMax, percents[i]);
-      float pwm = map2(inMin, inMax, outMin, outMax, zo);
+      float zo = map(smin, smax, inMin, inMax, percents[i]);
+      float pwm = map(inMin, inMax, outMin, outMax, zo);
 
       pwmPlatform.set(channels[i], pwm + offsets[i]);
     }
