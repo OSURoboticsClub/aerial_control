@@ -16,11 +16,9 @@ To add another unit `UUU` of platform type `PPP` as variant `VVV`, add the follo
   * `variants/units/UUU/Tupfile`
   * `variants/platforms/PPP/Tupfile`
   * `variants/VVV.config`
-  * `platforms/PPP`
 
 As necessary, further add the following:
 
-  * `units/UUU`
   * Appropriate system code in `src/system`
 
 By convention, we name variants after units, so `UUU` and `VVV` are currently
