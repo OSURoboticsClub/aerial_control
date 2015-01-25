@@ -1,5 +1,9 @@
 #include "system/vehicle_system.hpp"
 
+VehicleSystem::VehicleSystem(Communicator& communicator)
+  : communicator(communicator) {
+}
+
 bool VehicleSystem::isArmed() {
   return armed;
 }

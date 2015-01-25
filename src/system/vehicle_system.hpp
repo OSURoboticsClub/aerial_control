@@ -18,9 +18,7 @@ public:
   void setArmed(bool armed_);
 
 protected:
-  // TODO: Defining this in the implementation file causes linker errors...
-  VehicleSystem(Communicator& communicator) : communicator(communicator) {
-  }
+  VehicleSystem(Communicator& communicator);
 
 private:
   bool armed;
