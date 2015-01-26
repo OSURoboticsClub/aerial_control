@@ -43,7 +43,6 @@ static const PWMConfig PWMD4_CONFIG {
   0,0   // HW dependent
 };
 
-
 PWMPlatform::PWMPlatform() {
   // TIM1
   pwmStart(&PWMD1, &PWMD1_CONFIG);
@@ -68,6 +67,16 @@ PWMPlatform::PWMPlatform() {
 }
 
 void PWMPlatform::set(std::uint8_t ch, float dc) {
-  pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD1, dc * 10000.0f);
-  pwmEnableChannel(&PWMD1, ch, width);
+  if (ch < 4) {
+    pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD1, dc * 10000.0f);
+    pwmEnableChannel(&PWMD1, ch, width);
+  }
+  else if (ch < 8) {
+    pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD4, dc * 10000.0f);
+    pwmEnableChannel(&PWMD4, ch-4, width);
+  }
+  else if (ch < 12) {
+    pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD3, dc * 10000.0f);
+    pwmEnableChannel(&PWMD3, ch-8, width);
+  }
 }
