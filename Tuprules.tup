@@ -23,7 +23,7 @@ CFLAGS += -DEIGEN_NO_DEBUG=1
 
 CXXFLAGS += $(CFLAGS)
 CXXFLAGS += -Wreorder
-CXXFLAGS += -std=c++11 -fno-rtti -fno-exceptions
+CXXFLAGS += -std=c++14 -fno-rtti -fno-exceptions
 
 LDLIBS += -lm
 LDFLAGS += -nostartfiles
