@@ -14,7 +14,7 @@ public:
    */
   virtual void update() = 0;
 
-  bool isArmed();
+  bool isArmed() const;
   void setArmed(bool armed_);
 
 protected:

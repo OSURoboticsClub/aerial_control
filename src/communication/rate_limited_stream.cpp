@@ -5,7 +5,7 @@ RateLimitedStream::RateLimitedStream(Communicator& communicator, int frequency)
     lastPublish(chibios_rt::System::getTime()) {
 }
 
-bool RateLimitedStream::ready() {
+bool RateLimitedStream::ready() const {
   systime_t now = chibios_rt::System::getTime();
   return now >= lastPublish + MS2ST(period);
 }

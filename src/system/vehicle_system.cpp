@@ -4,7 +4,7 @@ VehicleSystem::VehicleSystem(Communicator& communicator)
   : communicator(communicator) {
 }
 
-bool VehicleSystem::isArmed() {
+bool VehicleSystem::isArmed() const {
   return armed;
 }
 

@@ -18,7 +18,7 @@ public:
    * Returns whether or not the rate limit delay has expired since the last
    * publish.
    */
-  bool ready();
+  bool ready() const;
 
   /**
    * Send a message, regardless of the time since the last publish.

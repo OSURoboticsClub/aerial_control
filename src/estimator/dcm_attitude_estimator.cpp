@@ -79,7 +79,7 @@ void DCMAttitudeEstimator::orthonormalize() {
   dcm.rowwise().normalize();
 }
 
-float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) {
+float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   // TODO(kyle): Pull these out as parameters
   float maxAccelWeight = 0.005f; // Accelerometer weight at exactly 1g
   float validAccelRange = 0.5f; // Maximum additional acceleration until accelWeight goes to 0
