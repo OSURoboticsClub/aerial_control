@@ -31,7 +31,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
   // Complementary filter
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
   corr += gyro * unit_config::DT * (1.0f - accelWeight);
-  corr -= dcm.col(2).cross(-accel) * accelWeight;
+  corr += dcm.col(2).cross(-accel) * accelWeight;   // Proper acceleration at standstill is negative of gravitational acceleration.
 
   Eigen::Matrix3f dcmStep;
   dcmStep <<      1.0f,  corr.z(), -corr.y(),
