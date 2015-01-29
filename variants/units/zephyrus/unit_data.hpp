@@ -3,7 +3,7 @@
 
 #include "communication/communicator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "motor/multirotor_quad_plus_motor_mapper.hpp"
+#include "motor/multirotor_tri_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
@@ -15,8 +15,9 @@ static const float MOTOR_PWM_MAX = 0.93f;
 static const float MOTOR_PWM_SAFE = 0.30f;
 
 struct unit_data_t {
-  PWMDeviceGroup<4> motors;
-  MultirotorQuadPlusMotorMapper motorMapper;
+  PWMDeviceGroup<3> motors;
+  PWMDeviceGroup<1> servos;
+  MultirotorTriMotorMapper motorMapper;
 
   DCMAttitudeEstimator estimator;
   OffboardInputSource inputSource;
@@ -25,11 +26,14 @@ struct unit_data_t {
 
   unit_data_t(Platform& platform, Communicator& communicator)
     : motors(platform.get<PWMPlatform>(),
-        { 0, 1, 2, 3 },                              // channels
-        { 0.0f, 0.0f, 0.0f, 0.0f },                  // offsets
+        { 0, 1, 2 },                              // channels
+        { 0.0f, 0.0f, 0.0f },                  // offsets
         0.0f, 1.0f,                                  // input range
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range
       ),
+    servos(platform.get<PWMPlatform>
+
+
       motorMapper(motors, communicator),
       estimator(communicator),
       inputSource(communicator),
