@@ -1,5 +1,5 @@
-#ifndef ESRA_ROCKET_MOTOR_MAPPER_HPP_
-#define ESRA_ROCKET_MOTOR_MAPPER_HPP_
+#ifndef TRI_MULTIROTOR_MOTOR_MAPPER_HPP_
+#define TRI_MULTIROTOR_MOTOR_MAPPER_HPP_
 
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
@@ -7,13 +7,14 @@
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
 
-class EsraRocketMotorMapper : public MotorMapper {
+class MultirotorTriMotorMapper : public MotorMapper {
 public:
-  EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator);
+  MultirotorTriMotorMapper(PWMDeviceGroup<3>& motors, PWMDeviceGroup<1>& servos, Communicator& communicator);
 
   void run(bool armed, actuator_setpoint_t& input) override;
 
 private:
+  PWMDeviceGroup<3> motors;
   PWMDeviceGroup<1> servos;
   RateLimitedStream throttleStream;
 };

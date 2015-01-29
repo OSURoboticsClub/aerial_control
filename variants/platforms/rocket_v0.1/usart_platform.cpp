@@ -4,7 +4,15 @@
 
 // USART1 configuration
 static const SerialConfig USART1_CONFIG {
-  115200,
+  38400,
+  0,
+  USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+  0
+};
+
+// USART3 configuration
+static const SerialConfig USART3_CONFIG {
+  38400,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
@@ -12,8 +20,11 @@ static const SerialConfig USART1_CONFIG {
 
 USARTPlatform::USARTPlatform() {
   sdStart(&SD1, &USART1_CONFIG);
-  palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(7));
-  palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(7));
+  sdStart(&SD3, &USART3_CONFIG);
+  palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(7)); // USART1 TX
+  palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(7)); // USART1 RX
+  palSetPadMode(GPIOB, 10, PAL_MODE_ALTERNATE(7)); // USART3 TX
+  palSetPadMode(GPIOB, 11, PAL_MODE_ALTERNATE(7)); // USART3 RX
 }
 
 chibios_rt::BaseSequentialStreamInterface& USARTPlatform::getPrimaryStream() {

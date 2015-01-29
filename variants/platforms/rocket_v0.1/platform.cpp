@@ -67,5 +67,6 @@ void Platform::init() {
   get<SPIPlatform>();
   get<USARTPlatform>();
 
+  // Initialize IMU
   get<MPU6000>().init();
 }
