@@ -2,12 +2,11 @@
 
 #include "hal.h"
 
-// PWM config for ESCs using TIM8 channels 1-4 (C6, C7, C8, C9).
-// See datasheet page 29 for available timers and their capabilities.
-// See datasheet page 45 for pinouts.
+// PWM config for servos using TIM8 channels 1-4 (C6, C7, C8, C9).
+// We only have one servo, though.
 static const PWMConfig PWMD8_CONFIG {
-  500000,    // 500 kHz PWM clock frequency.
-  1000,      // PWM period 2.0 ms.
+  250000,    // 500 kHz PWM clock frequency.
+  1000,      // PWM period 4.0 ms.
   NULL,      // No callback.
   {
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
