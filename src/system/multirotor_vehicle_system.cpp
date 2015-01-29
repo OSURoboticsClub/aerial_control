@@ -1,13 +1,14 @@
 #include "system/multirotor_vehicle_system.hpp"
 
+#include "util/moving_average.hpp"
+
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyroscope, Accelerometer& accelerometer,
-    AttitudeEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), mode(MultirotorControlMode::ANGULAR_POS) {
+    motorMapper(motorMapper), communicator(communicator),
+    mode(MultirotorControlMode::ANGULAR_POS) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -76,4 +77,22 @@ void MultirotorVehicleSystem::update() {
 
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
+}
+
+void MultirotorVehicleSystem::on(const protocol::message::sensor_calibration_request_message_t& m) {
+  MovingAverage avgs[3];
+
+  for(int i = 0; i < 100; i++) {
+    accelerometer_reading_t accelReading = accelerometer.readAccel();
+    for(int i = 0; i < 3; i++) {
+      avgs[i].add(accelReading.axes[i]);
+    }
+  }
+
+  protocol::message::sensor_calibration_response_message_t resp {
+    .type = protocol::message::sensor_calibration_response_message_t::SensorType::ACCEL,
+    .offsets = { avgs[0].getAverage(), avgs[1].getAverage(), avgs[2].getAverage() }
+  };
+
+  communicator.send(resp);
 }

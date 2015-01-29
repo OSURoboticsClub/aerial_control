@@ -33,6 +33,7 @@ public:
   void update() override;
 
   void on(const protocol::message::set_arm_state_message_t& m) override;
+  void on(const protocol::message::sensor_calibration_request_message_t& m) override;
 
 private:
   Gyroscope& gyroscope;
@@ -49,6 +50,8 @@ private:
   ZeroController<actuator_setpoint_t> zeroController;
 
   MotorMapper& motorMapper;
+
+  Communicator& communicator;
 
   MultirotorControlMode mode;
 };
