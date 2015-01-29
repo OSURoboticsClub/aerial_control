@@ -14,6 +14,15 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
   Eigen::Vector3f gyro(gyroReading.axes.data());
   Eigen::Vector3f accel(accelReading.axes.data());
 
+  // Calibration code
+  //static float calib[] = {0, 0, 0};
+  //static uint32_t calib_count = 0;
+  //for (int i=0; i<3; i++) {
+  //  calib_count++;
+  //  //calib[i] = (calib[i]*(calib_count-1) + accel(i))/calib_count;
+  //  calib[i] = calib[i]*0.95 + accel(i)*0.05;
+  //}
+
   // Calculate accelerometer weight before normalization
   float accelWeight = getAccelWeight(accel);
 
@@ -47,8 +56,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
     protocol::message::attitude_message_t m {
       .dcm = {
         // estimate.roll, estimate.pitch, estimate.yaw,
-        // accel(0), accel(1), accel(2), // NOTE: normalized
-        // gyro(0), gyro(1), gyro(2),
+        //calib[0], calib[1], calib[2],
         dcm(0, 0), dcm(0, 1), dcm(0, 2),
         dcm(1, 0), dcm(1, 1), dcm(1, 2),
         dcm(2, 0), dcm(2, 1), dcm(2, 2)
