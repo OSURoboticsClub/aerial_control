@@ -9,12 +9,12 @@
 
 class EsraRocketMotorMapper : public MotorMapper {
 public:
-  EsraRocketMotorMapper(PWMDeviceGroup<1>& motors, Communicator& communicator);
+  EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator);
 
   void run(bool armed, actuator_setpoint_t& input) override;
 
 private:
-  PWMDeviceGroup<1> motors;
+  PWMDeviceGroup<1> servos;
   RateLimitedStream throttleStream;
 };
 
