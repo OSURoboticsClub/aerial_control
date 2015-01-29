@@ -12,12 +12,12 @@ const float MAX_PITCH_ROLL_POS = 30.0;
 const float MAX_PITCH_ROLL_VEL = 100.0;
 
 // Sensor offsets
-const float GYR_X_OFFSET = -0.025;
-const float GYR_Y_OFFSET = 0.021;
-const float GYR_Z_OFFSET = 0.040;
-const float ACC_X_OFFSET = 0.0;
-const float ACC_Y_OFFSET = 0.0;
-const float ACC_Z_OFFSET = -0.02;
+const float GYR_X_OFFSET = -0.016;
+const float GYR_Y_OFFSET = -0.021;
+const float GYR_Z_OFFSET = -0.002;
+const float ACC_X_OFFSET = -0.005;
+const float ACC_Y_OFFSET = -0.020;
+const float ACC_Z_OFFSET =  0.071;
 
 // Initial angular velocity controller gains
 const float ANGVEL_X_KP = 0.2;
