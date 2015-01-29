@@ -42,6 +42,12 @@ void Communicator::dispatch(const protocol::decoded_message_t<buffer_size>& deco
     case protocol::message::offboard_attitude_control_message_t::ID:
       on(packet_cast<protocol::message::offboard_attitude_control_message_t>(decoded));
       break;
+    case protocol::message::sensor_calibration_request_message_t::ID:
+      on(packet_cast<protocol::message::sensor_calibration_request_message_t>(decoded));
+      break;
+    case protocol::message::sensor_calibration_response_message_t::ID:
+      on(packet_cast<protocol::message::sensor_calibration_response_message_t>(decoded));
+      break;
   }
 }
 

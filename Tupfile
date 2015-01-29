@@ -23,6 +23,7 @@ CXXSRCS += src/input/*.cpp
 CXXSRCS += src/motor/*.cpp
 CXXSRCS += src/sensor/*.cpp
 CXXSRCS += src/system/*.cpp
+CXXSRCS += src/util/*.cpp
 
 INCLUDES += -Isrc
 

@@ -21,6 +21,8 @@ public:
   virtual void on(const protocol::message::set_arm_state_message_t& m) {}
   virtual void on(const protocol::message::set_control_mode_message_t& m) {}
   virtual void on(const protocol::message::offboard_attitude_control_message_t& m) {}
+  virtual void on(const protocol::message::sensor_calibration_request_message_t& m) {}
+  virtual void on(const protocol::message::sensor_calibration_response_message_t& m) {}
 
 protected:
   MessageListener(Communicator& communicator);
