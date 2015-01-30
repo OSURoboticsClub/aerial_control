@@ -15,10 +15,12 @@ angular_velocity_setpoint_t AngularPositionController::run(const attitude_estima
   float rollPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.roll_pos_sp));
   float pitchPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.pitch_pos_sp));
 
+  // Run PID controllers
   float rollVelSp = rollPosPid.calculate(rollPosSp, estimate.roll, unit_config::DT);
   float pitchVelSp = pitchPosPid.calculate(pitchPosSp, estimate.pitch, unit_config::DT);
   float yawVelSp = yawPosPid.calculate(input.yaw_pos_sp, estimate.yaw, unit_config::DT);
 
+  // Output
   angular_velocity_setpoint_t setpoint {
     .roll_vel_sp = rollVelSp,
     .pitch_vel_sp = pitchVelSp,
