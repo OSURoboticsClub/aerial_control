@@ -6,11 +6,11 @@
 #include "controller/setpoint_types.hpp"
 #include "estimator/attitude_estimator.hpp"
 
-class AngularVelocityController : public Controller<angular_velocity_setpoint_t, actuator_setpoint_t> {
+class AngularVelocityController : public Controller<angular_velocity_setpoint_t, angular_acceleration_setpoint_t> {
 public:
   AngularVelocityController();
 
-  actuator_setpoint_t run(const attitude_estimate_t& estimate, const angular_velocity_setpoint_t& input) override;
+  angular_acceleration_setpoint_t run(const attitude_estimate_t& estimate, const angular_velocity_setpoint_t& input) override;
 
 private:
   PIDController rollVelPid;
