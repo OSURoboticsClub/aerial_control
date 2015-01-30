@@ -49,7 +49,10 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
     .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
     .roll_vel = gyro.x(),
     .pitch_vel = gyro.y(),
-    .yaw_vel = gyro.z()
+    .yaw_vel = gyro.z(),
+    .roll_acc = 0.0f,
+    .pitch_acc = 0.0f,
+    .yaw_acc = 0.0f
   };
 
   if(attitudeMessageStream.ready()) {
