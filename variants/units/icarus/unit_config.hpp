@@ -5,11 +5,14 @@ namespace unit_config {
 
 const float DT = 0.001;
 
-// Maximum angular position in the roll and pitch axes (rad)
-const float MAX_PITCH_ROLL_POS = 10.0;   // No limit
+// Maximum angular acceleration (rad/s^2)
+const float MAX_PITCH_ROLL_ACC = 4.0;   // TODO: calculate properly
 
 // Maximum angular velocity in the roll and pitch axes (rad/s)
 const float MAX_PITCH_ROLL_VEL = 2.0;
+
+// Maximum angular position in the roll and pitch axes (rad)
+const float MAX_PITCH_ROLL_POS = 10.0;   // No limit
 
 // Sensor offsets
 const float GYR_X_OFFSET = 0.016;
