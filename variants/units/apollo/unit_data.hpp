@@ -1,12 +1,15 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
+#include <experimental/optional>
+
 #include "communication/communicator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "motor/multirotor_quad_plus_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
-#include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "variant/platform.hpp"
 
@@ -33,7 +36,11 @@ struct unit_data_t {
       motorMapper(motors, communicator),
       estimator(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), estimator, inputSource, motorMapper, communicator) {
+      system(
+          platform.get<Gyroscope>(),
+          platform.get<Accelerometer>(),
+          std::experimental::nullopt,
+          estimator, inputSource, motorMapper, communicator) {
   }
 };
 

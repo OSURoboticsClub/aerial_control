@@ -1,16 +1,22 @@
 #include "system/multirotor_vehicle_system.hpp"
 
-#include <experimental/optional>
-
 MultirotorVehicleSystem::MultirotorVehicleSystem(
-    Gyroscope& gyroscope, Accelerometer& accelerometer,
-    Magnetometer& magnetometer, AttitudeEstimator& estimator,
-    InputSource& inputSource, MotorMapper& motorMapper,
+    Gyroscope& gyroscope,
+    Accelerometer& accelerometer,
+    std::experimental::optional<Magnetometer *> magnetometer,
+    AttitudeEstimator& estimator,
+    InputSource& inputSource,
+    MotorMapper& motorMapper,
     Communicator& communicator)
-  : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer), magnetometer(magnetometer),
-    estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), mode(MultirotorControlMode::ANGULAR_POS) {
+  : VehicleSystem(communicator),
+    MessageListener(communicator),
+    gyroscope(gyroscope),
+    accelerometer(accelerometer),
+    magnetometer(magnetometer),
+    estimator(estimator),
+    inputSource(inputSource),
+    motorMapper(motorMapper),
+    mode(MultirotorControlMode::ANGULAR_POS) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -20,12 +26,18 @@ void MultirotorVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyroReading = gyroscope.readGyro();
   accelerometer_reading_t accelReading = accelerometer.readAccel();
-  magnetometer_reading_t magReading = magnetometer.readMag();
+  std::experimental::optional<magnetometer_reading_t> magReading;
 
+  // Only use magnetometer if it is available
+  if(magnetometer) {
+    magReading = (*magnetometer)->readMag();
+  }
+
+  // TODO: Currently copying all readings
   sensor_reading_group_t readings {
     .gyro = std::experimental::make_optional(gyroReading),
     .accel = std::experimental::make_optional(accelReading),
-    .mag = std::experimental::make_optional(magReading)
+    .mag = magReading
   };
 
   // Update the attitude estimate

@@ -1,6 +1,8 @@
 #ifndef MULTIROTOR_SYSTEM_HPP_
 #define MULTIROTOR_SYSTEM_HPP_
 
+#include <experimental/optional>
+
 #include "communication/communicator.hpp"
 #include "communication/message_listener.hpp"
 #include "controller/angular_position_controller.hpp"
@@ -27,9 +29,13 @@ enum class MultirotorControlMode {
 
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
-  MultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
-      Magnetometer& magnetometer, AttitudeEstimator& estimator,
-      InputSource& inputSource, MotorMapper& motorMapper,
+  MultirotorVehicleSystem(
+      Gyroscope& gyroscope,
+      Accelerometer& accelerometer,
+      std::experimental::optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
+      AttitudeEstimator& estimator,
+      InputSource& inputSource,
+      MotorMapper& motorMapper,
       Communicator& communicator);
 
   void update() override;
@@ -39,7 +45,7 @@ public:
 private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
-  Magnetometer& magnetometer;
+  std::experimental::optional<Magnetometer *> magnetometer;
 
   AttitudeEstimator& estimator;
   InputSource& inputSource;
