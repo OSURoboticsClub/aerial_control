@@ -82,12 +82,12 @@ void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_
 void MultirotorVehicleSystem::on(const protocol::message::sensor_calibration_request_message_t& m) {
   MovingAverage avgs[3];
 
-  for(int i = 0; i < 100; i++) {
-    accelerometer_reading_t accelReading = accelerometer.readAccel();
-    for(int i = 0; i < 3; i++) {
-      avgs[i].add(accelReading.axes[i]);
-    }
-  }
+  // for(int i = 0; i < 10; i++) {
+  //   accelerometer_reading_t accelReading = accelerometer.readAccel();
+  //   for(int s = 0; s < 3; s++) {
+  //     avgs[i].add(accelReading.axes[i]);
+  //   }
+  // }
 
   protocol::message::sensor_calibration_response_message_t resp {
     .type = protocol::message::sensor_calibration_response_message_t::SensorType::ACCEL,
