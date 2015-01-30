@@ -34,7 +34,7 @@ void CarVehicleSystem::update() {
       .yaw_vel_sp = input.yaw_sp,
       .throttle_sp = input.throttle_sp
     };
-    actuatorSp = pipeline.run(estimate, sp, attVelController);
+    actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
   } else {
     // Run the zero controller
     actuatorSp = zeroController.run(estimate, actuatorSp);
