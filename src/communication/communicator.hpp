@@ -6,9 +6,6 @@
 #include "ch.hpp"
 #include "hal.h"
 #include "protocol/protocol.hpp"
-#include "protocol/messages.hpp"
-#include "protocol/encoder.hpp"
-#include "protocol/decoder.hpp"
 
 #include "communication/message_listener.hpp"
 #include "communication/sink.hpp"

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+
 #include "protocol/messages.hpp"
 
 CarMotorMapper::CarMotorMapper(PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices, Communicator& communicator)

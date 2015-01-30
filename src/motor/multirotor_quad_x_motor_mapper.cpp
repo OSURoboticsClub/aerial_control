@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+
 #include "protocol/messages.hpp"
 
 MultirotorQuadXMotorMapper::MultirotorQuadXMotorMapper(PWMDeviceGroup<4>& motors, Communicator& communicator)
