@@ -3,8 +3,8 @@
 
 #include "communication/communicator.hpp"
 #include "communication/message_listener.hpp"
-#include "controller/angular_position_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
+#include "controller/rocket_angular_acceleration_controller.hpp"
 #include "controller/position_controller.hpp"
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
@@ -19,8 +19,7 @@
 
 enum class RocketStage {
   LAUNCH,
-  FLY,
-  LAND
+  FLY
 };
 
 class RocketSystem : public VehicleSystem, public MessageListener {
@@ -41,8 +40,8 @@ private:
   InputSource& inputSource;
 
   PositionController posController;
-  AngularPositionController attPosController;
   AngularVelocityController attVelController;
+  RocketAngularAccelerationController attAccController;
   ControllerPipeline<actuator_setpoint_t> pipeline;
 
   ZeroController<actuator_setpoint_t> zeroController;

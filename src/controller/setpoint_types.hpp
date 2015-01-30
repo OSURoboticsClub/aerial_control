@@ -25,6 +25,13 @@ struct angular_velocity_setpoint_t {
   float throttle_sp;
 };
 
+struct angular_acceleration_setpoint_t {
+  float roll_acc_sp;
+  float pitch_acc_sp;
+  float yaw_acc_sp;
+  float throttle_sp;
+};
+
 struct actuator_setpoint_t {
   float roll_sp;
   float pitch_sp;

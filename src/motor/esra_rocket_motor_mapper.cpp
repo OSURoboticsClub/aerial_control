@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cmath>
 
 EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator)
   : servos(servos),
@@ -9,6 +10,7 @@ EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communic
 }
 
 void EsraRocketMotorMapper::run(bool armed, actuator_setpoint_t& input) {
-  std::array<float, 1> outputs { input.throttle_sp };
+  // Interpret input roll_sp as servo angle
+  std::array<float, 1> outputs { input.roll_sp };
   servos.set(armed, outputs);
 }
