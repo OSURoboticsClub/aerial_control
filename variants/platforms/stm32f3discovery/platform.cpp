@@ -39,9 +39,19 @@ Gyroscope& Platform::get() {
 }
 
 template <>
-Accelerometer& Platform::get() {
+LSM303DLHC& Platform::get() {
   static LSM303DLHC accel(&I2CD1, &LSM303_CONFIG, LSM303_I2C_ACC_ADDRESS);
   return accel;
+}
+
+template <>
+Accelerometer& Platform::get() {
+  return get<LSM303DLHC>();
+}
+
+template <>
+Magnetometer& Platform::get() {
+  return get<LSM303DLHC>();
 }
 
 template <>
