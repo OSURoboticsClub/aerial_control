@@ -36,12 +36,12 @@ void MultirotorVehicleSystem::update() {
           .yaw_pos_sp = input.yaw_sp,
           .altitude_sp = input.throttle_sp
         };
-        actuatorSp = pipeline.run(estimate, sp, posController, attPosController, attVelController);
+        actuatorSp = pipeline.run(estimate, sp, posController, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::VELOCITY: {
         // TODO: implement
-        // actuatorSp = pipeline.run(estimate, sp, velController, attPosController, attVelController);
+        // actuatorSp = pipeline.run(estimate, sp, velController, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::ANGULAR_POS: {
@@ -51,7 +51,7 @@ void MultirotorVehicleSystem::update() {
           .yaw_pos_sp = input.yaw_sp,
           .throttle_sp = input.throttle_sp
         };
-        actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController);
+        actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::ANGULAR_RATE: {
@@ -61,7 +61,7 @@ void MultirotorVehicleSystem::update() {
           .yaw_vel_sp = input.yaw_sp,
           .throttle_sp = input.throttle_sp
         };
-        actuatorSp = pipeline.run(estimate, sp, attVelController);
+        actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
         break;
       }
     }

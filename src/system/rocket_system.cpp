@@ -33,9 +33,13 @@ void RocketSystem::update() {
         break;
       }
       case RocketStage::FLY: {
-        break;
-      }
-      case RocketStage::LAND: {
+        angular_velocity_setpoint_t sp {
+          .roll_vel_sp  = 0.0f,
+          .pitch_vel_sp = 0.0f,
+          .yaw_vel_sp   = 0.0f,
+          .throttle_sp  = 0.0f
+        };
+        actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
         break;
       }
     }
