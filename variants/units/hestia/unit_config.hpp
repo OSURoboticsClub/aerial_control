@@ -2,11 +2,13 @@ namespace unit_config {
 
 const float DT = 0.001;
 
-// Maximum angular position in the roll and pitch axes (deg)
-const float MAX_PITCH_ROLL_POS = 30.0;
+const double PI = 3.14159265358979323846;
 
-// Maximum angular velocity in the roll and pitch axes (deg/s)
-const float MAX_PITCH_ROLL_VEL = 100.0;
+// Maximum angular position in the roll and pitch axes (rad)
+const float MAX_PITCH_ROLL_POS = 30.0 * PI / 180.0;
+
+// Maximum angular velocity in the roll and pitch axes (rad/s)
+const float MAX_PITCH_ROLL_VEL = 100.0 * PI / 180.0;
 
 // Maximum angular acceleration (rad/s^2)
 const float MAX_PITCH_ROLL_ACC = 4.0;   // TODO: calculate properly
