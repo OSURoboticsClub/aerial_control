@@ -1,29 +1,54 @@
 #ifndef ROCKET_SYSTEM_HPP_
 #define ROCKET_SYSTEM_HPP_
 
-#include <controller/setpoint_types.hpp>
-#include <estimator/attitude_estimator.hpp>
-#include <input/input_source.hpp>
-#include <sensor/gyroscope.hpp>
-#include <sensor/accelerometer.hpp>
-#include <system/vehicle_system.hpp>
+#include "communication/communicator.hpp"
+#include "communication/message_listener.hpp"
+#include "controller/angular_velocity_controller.hpp"
+#include "controller/rocket_angular_acceleration_controller.hpp"
+#include "controller/position_controller.hpp"
+#include "controller/controller_pipeline.hpp"
+#include "controller/setpoint_types.hpp"
+#include "controller/zero_controller.hpp"
+#include "estimator/attitude_estimator.hpp"
+#include "input/input_source.hpp"
+#include "motor/motor_mapper.hpp"
+#include "motor/pwm_device_group.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/accelerometer.hpp"
+#include "system/vehicle_system.hpp"
 
-template <int num_rotors>
-class RocketSystem : public VehicleSystem {
-public:
-  void init() override;
-  void update() override;
-
-protected:
-  virtual Gyroscope *getGyroscope() = 0;
-  virtual Accelerometer *getAccelerometer() = 0;
-  virtual AttitudeEstimator *getAttitudeEstimator() = 0;
-  virtual InputSource *getInputSource() = 0;
-  virtual MotorMapper *getMotorMapper() = 0;
-
-  virtual actuator_setpoint_t runController(attitude_estimate_t &estimate, angular_position_setpoint_t& setpoint) = 0;
+enum class RocketStage {
+  LAUNCH,
+  FLY
 };
 
-#include <system/rocket_system.tpp>
+class RocketSystem : public VehicleSystem, public MessageListener {
+public:
+  RocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
+      AttitudeEstimator& estimator, InputSource& inputSource,
+      MotorMapper& motorMapper, Communicator& communicator);
+
+  void update() override;
+
+  void on(const protocol::message::set_arm_state_message_t& m) override;
+
+private:
+  Gyroscope& gyroscope;
+  Accelerometer& accelerometer;
+
+  AttitudeEstimator& estimator;
+  InputSource& inputSource;
+
+  PositionController posController;
+  AngularVelocityController attVelController;
+  RocketAngularAccelerationController attAccController;
+  ControllerPipeline<actuator_setpoint_t> pipeline;
+
+  ZeroController<actuator_setpoint_t> zeroController;
+
+  MotorMapper& motorMapper;
+
+  RocketStage mode;
+};
 
 #endif

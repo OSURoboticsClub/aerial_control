@@ -1,5 +1,7 @@
-#ifndef SYSTEM_HPP_
-#define SYSTEM_HPP_
+#ifndef VEHICLE_SYSTEM_HPP_
+#define VEHICLE_SYSTEM_HPP_
+
+#include "communication/communicator.hpp"
 
 /**
  * A collection of sensors, input sources, estimators, and controllers that
@@ -8,15 +10,20 @@
 class VehicleSystem {
 public:
   /**
-   * Initialize any subsystems that were not passed into the constructor (those
-   * should already have been initialized).
-   */
-  virtual void init() = 0;
-
-  /**
    * Periodic update function. Called at a fixed interval.
    */
   virtual void update() = 0;
+
+  bool isArmed() const;
+  void setArmed(bool armed_);
+
+protected:
+  VehicleSystem(Communicator& communicator);
+
+private:
+  bool armed;
+
+  Communicator& communicator;
 };
 
 #endif

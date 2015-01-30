@@ -1,0 +1,90 @@
+###############################################################################
+# XBee configuration
+###############################################################################
+
+  ID: PAN ID
+  CH: channel (0x0B to 0x1A)
+  SH: source high 32-bit
+  SL: source low 32-bit
+  DH: destination high 32-bit
+  DL: destination low 32-bit
+  BD: baudrate
+      0: 1200
+      1: 2400
+      2: 4800
+      3: 9600
+      4: 19200
+      5: 38400
+      6: 57600
+      7: 115200
+  RO: packetization timeout for wireless programming
+  D0: digital I/O pin 0 for KILL. Modes:
+      0: Disabled
+      1: NA
+      2: ADC
+      4: DI
+      4: DO LOW
+      5: DO HIGH
+  IC: ditigal I/O change detect (bitmask). E.g., 0x08 is the mask to listen on only D3.
+  IU: I/O output; whether or not the receiver displays the status update on the serial line.
+  IA: I/O line passing input address. 0xffff matches all addresses.
+  PR: Pullup resistors (bitmask)
+
+---
+
+XBee 900 MHz
+
+     Ground   Quad     Factory default
+ID   1111     1111     7FFF
+CH   _        _        FF
+SH   13A200   13A200   READ-ONLY
+SL   409A1822 4098CCB3 READ-ONLY
+DH   13A200   13A200   0
+DL   4098CCB3 409A1822 FFFF
+BD   5        5        3
+RO   _        _        3
+D0   3        5        0
+IC   _        _        0
+MT   _        _        3
+RR   3        3        10
+CE   _        _        0
+
+---
+
+XBee Pro 2.4 GHz
+
+     Ground   Quad     Factory default
+ID   1500     1500     3332
+CH   D        D        C
+SH   13A200   13A200   READ-ONLY
+SL   402CA538 40BD8538 READ-ONLY
+DH   13A200   13A200   0
+DL   40BD8538 402CA538 FFFF
+BD   5        5        3
+RO   _        _        3
+D0   3        5        0
+IC   _        _        0
+IU   _        _        1
+RR   _        _        0
+CE   _        _        0
+
+---
+
+yoos 900 MHz
+
+     Ground   Quad     Factory default
+ID   1107     1107     7FFF
+CH   B        B        FF
+SH   13A200   13A200   READ-ONLY
+SL   40941ACD 4098CCB8 READ-ONLY
+DH   13A200   13A200   0
+DL   4098CCB8 40941AC2 FFFF
+BD   5        5        3
+RO   _        _        3
+D0   3        5        0
+IC   _        _        0
+MT   _        _        3
+RR   3        3        10
+CE   _        _        0
+
+

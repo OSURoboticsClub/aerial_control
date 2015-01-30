@@ -1,37 +1,19 @@
-#include <ch.hpp>
-#include <hal.h>
+#include "hal.h"
+#include "ch.hpp"
 
-#include <hal_config.hpp>
-#include <platform_config.hpp>
-
-// Misc
-// #include <communicator.hpp>
-#include <debugger.hpp>
-
-static platform::HeartbeatThread heartbeatThread;
-static Debugger debugger;
+#include "control_thread.hpp"
 
 int main(void) {
+  // Initialize ChibiOS.
   halInit();
   chibios_rt::System::init();
 
-  // Start the background threads
-  heartbeatThread.start(LOWPRIO);
-  debugger.start(LOWPRIO);
+  // Start the main control thread.
+  static ControlThread controlThread;
+  controlThread.start(HIGHPRIO);
 
-  // Build and initialize the system
-  platform::init();
-
-  // Loop at a fixed rate forever
-  // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
-  systime_t deadline = chTimeNow();
-  while(true) {
-    deadline += MS2ST(DT * 1000);
-
-    platform::system.update();
-
-    chibios_rt::BaseThread::sleepUntil(deadline);
-  }
+  // Wait for the control thread to exit. This should never happen.
+  controlThread.wait();
 
   return 0;
 }

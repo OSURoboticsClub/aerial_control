@@ -1,15 +1,21 @@
 #ifndef ESRA_ROCKET_MOTOR_MAPPER_HPP_
 #define ESRA_ROCKET_MOTOR_MAPPER_HPP_
 
-#include <controller/setpoint_types.hpp>
-#include <motor/pwm_motor_mapper.hpp>
+#include "communication/communicator.hpp"
+#include "communication/rate_limited_stream.hpp"
+#include "controller/setpoint_types.hpp"
+#include "motor/motor_mapper.hpp"
+#include "motor/pwm_device_group.hpp"
 
-class EsraRocketMotorMapper : public PWMMotorMapper<4> {
+class EsraRocketMotorMapper : public MotorMapper {
 public:
-  EsraRocketMotorMapper();
+  EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator);
 
-  void init() override;
-  void run(actuator_setpoint_t& input) override;
+  void run(bool armed, actuator_setpoint_t& input) override;
+
+private:
+  PWMDeviceGroup<1> servos;
+  RateLimitedStream throttleStream;
 };
 
 #endif

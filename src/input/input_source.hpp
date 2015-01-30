@@ -4,6 +4,7 @@
 // TODO: Think about how to generalize this. Some input sources may provide
 // roll/pitch/yaw setpoints, other may provide x_pos/y_pos/z_pos, etc.
 struct controller_input_t {
+  bool valid;
   float roll_sp;
   float pitch_sp;
   float yaw_sp;

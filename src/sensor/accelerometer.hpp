@@ -1,8 +1,10 @@
 #ifndef ACCELEROMETER_HPP_
 #define ACCELEROMETER_HPP_
 
+#include <array>
+
 struct accelerometer_reading_t {
-  float axes[3];
+  std::array<float, 3> axes;
 };
 
 class Accelerometer {

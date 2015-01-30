@@ -1,8 +1,8 @@
 #ifndef ATTITUDE_ESTIMATOR_HPP_
 #define ATTITUDE_ESTIMATOR_HPP_
 
-#include <sensor/gyroscope.hpp>
-#include <sensor/accelerometer.hpp>
+#include "sensor/gyroscope.hpp"
+#include "sensor/accelerometer.hpp"
 
 struct attitude_estimate_t {
   float roll;
@@ -12,6 +12,10 @@ struct attitude_estimate_t {
   float roll_vel;
   float pitch_vel;
   float yaw_vel;
+
+  float roll_acc;
+  float pitch_acc;
+  float yaw_acc;
 };
 
 class AttitudeEstimator {
@@ -20,8 +24,7 @@ public:
    * Runs the estimator on the latest gyroscope and accelerometer readings,
    * producing a new attitude estimate.
    */
-  virtual attitude_estimate_t update(gyroscope_reading_t& gyro_reading, accelerometer_reading_t& accel_reading) = 0;
+  virtual attitude_estimate_t update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) = 0;
 };
 
 #endif
-
