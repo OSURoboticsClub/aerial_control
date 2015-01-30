@@ -15,14 +15,6 @@ actuator_setpoint_t RocketAngularAccelerationController::run(const attitude_esti
   float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.roll_acc_sp));
   float pitchAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.pitch_acc_sp));
 
-  //float rollActuatorSp = rollAccPid.calculate(rollAccSp, estimate.roll_acc, unit_config::DT);
-  //float pitchActuatorSp = pitchAccPid.calculate(pitchAccSp, estimate.pitch_acc, unit_config::DT);
-  //float yawActuatorSp = yawAccPid.calculate(input.yaw_acc_sp, estimate.yaw_acc, unit_config::DT);
-
-  ///////////////////////////////////
-  // Begin rocket fin calculations
-  ///////////////////////////////////
-
   // Constants
   const float M_PI = 3.1415926535;
   const float F_LE   = M_PI * 7/18;    // Fin leading edge angle (rad)
