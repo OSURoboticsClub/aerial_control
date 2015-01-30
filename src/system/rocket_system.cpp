@@ -18,8 +18,13 @@ void RocketSystem::update() {
   gyroscope_reading_t gyroReading = gyroscope.readGyro();
   accelerometer_reading_t accelReading = accelerometer.readAccel();
 
+  sensor_reading_group_t readings {
+    .gyro = std::experimental::make_optional(gyroReading),
+    .accel = std::experimental::make_optional(accelReading),
+  };
+
   // Update the attitude estimate
-  attitude_estimate_t estimate = estimator.update(gyroReading, accelReading);
+  attitude_estimate_t estimate = estimator.update(readings);
 
   // Poll for controller input
   controller_input_t input = inputSource.read();

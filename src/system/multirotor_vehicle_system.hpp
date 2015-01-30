@@ -13,8 +13,9 @@
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
 #include "system/vehicle_system.hpp"
 
 enum class MultirotorControlMode {
@@ -27,8 +28,9 @@ enum class MultirotorControlMode {
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
-      AttitudeEstimator& estimator, InputSource& inputSource,
-      MotorMapper& motorMapper, Communicator& communicator);
+      Magnetometer& magnetometer, AttitudeEstimator& estimator,
+      InputSource& inputSource, MotorMapper& motorMapper,
+      Communicator& communicator);
 
   void update() override;
 
@@ -37,6 +39,7 @@ public:
 private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
+  Magnetometer& magnetometer;
 
   AttitudeEstimator& estimator;
   InputSource& inputSource;

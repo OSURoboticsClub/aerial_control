@@ -1,8 +1,11 @@
 #ifndef ATTITUDE_ESTIMATOR_HPP_
 #define ATTITUDE_ESTIMATOR_HPP_
 
-#include "sensor/gyroscope.hpp"
+#include <experimental/optional>
+
 #include "sensor/accelerometer.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
 
 struct attitude_estimate_t {
   float roll;
@@ -14,13 +17,19 @@ struct attitude_estimate_t {
   float yaw_vel;
 };
 
+struct sensor_reading_group_t {
+  std::experimental::optional<gyroscope_reading_t> gyro;
+  std::experimental::optional<accelerometer_reading_t> accel;
+  std::experimental::optional<magnetometer_reading_t> mag;
+};
+
 class AttitudeEstimator {
 public:
   /**
-   * Runs the estimator on the latest gyroscope and accelerometer readings,
-   * producing a new attitude estimate.
+   * Runs the estimator on the latest sensor readings, producing a new attitude
+   * estimate.
    */
-  virtual attitude_estimate_t update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) = 0;
+  virtual attitude_estimate_t update(const sensor_reading_group_t& readings) = 0;
 };
 
 #endif

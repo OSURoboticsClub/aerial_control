@@ -10,9 +10,8 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
     attitudeMessageStream(communicator, 20) {
 }
 
-attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) {
-  Eigen::Vector3f gyro(gyroReading.axes.data());
-  Eigen::Vector3f accel(accelReading.axes.data());
+attitude_estimate_t DCMAttitudeEstimator::update(const sensor_reading_group_t& readings) {
+  Eigen::Vector3f corr = Eigen::Vector3f::Zero();
 
   // Calibration code
   //static float calib[] = {0, 0, 0};
@@ -23,50 +22,60 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
   //  calib[i] = calib[i]*0.95 + accel(i)*0.05;
   //}
 
-  // Calculate accelerometer weight before normalization
-  float accelWeight = getAccelWeight(accel);
+  float accelWeight = 0.0f;
+  float magWeight = 0.01f; // TODO(kyle): Just made this number up.
 
-  accel.normalize();
+  // If an accelerometer is available, use the provided gravity vector to
+  // correct for drift in the DCM.
+  if(readings.accel) {
+    Eigen::Vector3f accel((*readings.accel).axes.data());
 
-  // Complementary filter
-  Eigen::Vector3f corr = Eigen::Vector3f::Zero();
-  corr += gyro * unit_config::DT * (1.0f - accelWeight);
-  corr += dcm.col(2).cross(-accel) * accelWeight;   // Proper acceleration at standstill is negative of gravitational acceleration.
+    // Calculate accelerometer weight before normalization
+    accelWeight = getAccelWeight(accel);
 
+    accel.normalize();
+    corr += dcm.col(2).cross(-accel) * accelWeight;
+  }
+
+  // If a gyroscope is available, integrate the provided rotational velocity and
+  // add it to the correction vector.
+  if(readings.gyro) {
+    Eigen::Vector3f gyro((*readings.gyro).axes.data());
+    corr += gyro * unit_config::DT * (1.0f - accelWeight);
+  }
+
+  // If a magnetometer is available, use the provided north vector to correct
+  // the yaw.
+  // TODO(kyle):
+  if(readings.mag) {
+    Eigen::Vector3f mag((*readings.mag).axes.data());
+    // mag.normalize();
+    corr -= dcm.col(1).cross(-mag) * magWeight;
+  }
+
+  // Use small angle approximations to build a rotation matrix modelling the
+  // attitude change over the time step.
   Eigen::Matrix3f dcmStep;
   dcmStep <<      1.0f,  corr.z(), -corr.y(),
              -corr.z(),      1.0f,  corr.x(),
               corr.y(), -corr.x(),      1.0f;
 
+  // Rotate the DCM.
   dcm = dcmStep * dcm;
 
   orthonormalize();
 
-  attitude_estimate_t estimate {
+  updateStream();
+
+  return attitude_estimate_t {
     // TODO: Are these trig functions safe at extreme angles?
     .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
     .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
     .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
-    .roll_vel = gyro.x(),
-    .pitch_vel = gyro.y(),
-    .yaw_vel = gyro.z()
+    .roll_vel = 0.0f, //gyro.x(),
+    .pitch_vel = 0.0f, //gyro.y(),
+    .yaw_vel = 0.0f, //gyro.z()
   };
-
-  if(attitudeMessageStream.ready()) {
-    protocol::message::attitude_message_t m {
-      .dcm = {
-        // estimate.roll, estimate.pitch, estimate.yaw,
-        //calib[0], calib[1], calib[2],
-        dcm(0, 0), dcm(0, 1), dcm(0, 2),
-        dcm(1, 0), dcm(1, 1), dcm(1, 2),
-        dcm(2, 0), dcm(2, 1), dcm(2, 2)
-      }
-    };
-
-    attitudeMessageStream.publish(m);
-  }
-
-  return estimate;
 }
 
 void DCMAttitudeEstimator::orthonormalize() {
@@ -101,4 +110,21 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   accelWeight = std::max(0.0f, accelWeight);
 
   return accelWeight;
+}
+
+void DCMAttitudeEstimator::updateStream() {
+  if(attitudeMessageStream.ready()) {
+    protocol::message::attitude_message_t m {
+      .dcm = {
+        // estimate.roll, estimate.pitch, estimate.yaw,
+        // accel(0), accel(1), accel(2), // NOTE: normalized
+        // gyro(0), gyro(1), gyro(2),
+        dcm(0, 0), dcm(0, 1), dcm(0, 2),
+        dcm(1, 0), dcm(1, 1), dcm(1, 2),
+        dcm(2, 0), dcm(2, 1), dcm(2, 2)
+      }
+    };
+
+    attitudeMessageStream.publish(m);
+  }
 }
