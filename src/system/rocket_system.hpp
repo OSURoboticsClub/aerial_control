@@ -18,8 +18,10 @@
 #include "system/vehicle_system.hpp"
 
 enum class RocketStage {
-  LAUNCH,
-  FLY
+  DISABLED,
+  PAD,
+  ASCENT,
+  DESCENT
 };
 
 class RocketSystem : public VehicleSystem, public MessageListener {
@@ -48,7 +50,7 @@ private:
 
   MotorMapper& motorMapper;
 
-  RocketStage mode;
+  RocketStage stage;
 };
 
 #endif

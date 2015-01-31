@@ -7,10 +7,10 @@ RocketSystem::RocketSystem(
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), mode(RocketStage::FLY) {
+    motorMapper(motorMapper), stage(RocketStage::DISABLED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
-  setArmed(true);
+  setArmed(false);
 }
 
 void RocketSystem::update() {
@@ -24,15 +24,43 @@ void RocketSystem::update() {
   // Poll for controller input
   controller_input_t input = inputSource.read();
 
+  // Keep moving average of acceleration
+  static float accel = -1.0f;
+  accel = 0.5*accel + 0.5*accelReading.axes[0];
+
   // Run the controllers
   actuator_setpoint_t actuatorSp;
-  if(isArmed()) {
-    // Run the controller pipeline as determined by the subclass
-    switch(mode) {
-      case RocketStage::LAUNCH: {
+
+  // Run the controller pipeline as determined by the subclass
+  switch(stage) {
+    case RocketStage::DISABLED:
+      {
+        // If armed, proceed to pad prep.
+        if (isArmed()) {
+          stage = RocketStage::PAD;
+        }
         break;
       }
-      case RocketStage::FLY: {
+    case RocketStage::PAD:
+      {
+        // Set fins to neutral
+        actuator_setpoint_t sp {
+          .roll_sp     = 0.5f,
+          .pitch_sp    = 0.0f,
+          .yaw_sp      = 0.0f,
+          .throttle_sp = 0.0f
+        };
+        actuatorSp = sp;
+
+        // If acceleration moving average exceeds 2g (should occur around 0.44s
+        // according to sim), proceed to ascent.
+        if (accel < -2.0f) {
+          stage = RocketStage::ASCENT;
+        }
+        break;
+      }
+    case RocketStage::ASCENT:
+      {
         angular_velocity_setpoint_t sp {
           .roll_vel_sp  = 0.0f,
           .pitch_vel_sp = 0.0f,
@@ -40,12 +68,16 @@ void RocketSystem::update() {
           .throttle_sp  = 0.0f
         };
         actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
+
+        // If deviated more than 30 deg past vertical, proceed to descent.
+        // TODO
         break;
       }
-    }
-  } else {
-    // Run the zero controller
-    actuatorSp = zeroController.run(estimate, actuatorSp);
+    case RocketStage::DESCENT:
+      {
+        setArmed(false);
+        break;
+      }
   }
 
   // Update motor outputs
