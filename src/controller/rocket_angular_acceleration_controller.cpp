@@ -27,8 +27,8 @@ actuator_setpoint_t RocketAngularAccelerationController::run(const attitude_esti
   const float I      = 1;              // TODO: Rocket rotational inertia
 
   // Sensor inputs
-  float alt = 4900;   // Altitude (m)
-  float v_rocket = 0;   // TODO: Magically figure this out from sensors (m/s)
+  float alt = 1414;   // Altitude (m)
+  float v_rocket = 50;   // TODO: Magically figure this out from sensors (m/s)
   // TODO: Expand estimate to full 12-space
 
   // Calculate atmospheric pressure. We should eventually get this from MS5611.
@@ -39,39 +39,40 @@ actuator_setpoint_t RocketAngularAccelerationController::run(const attitude_esti
 
   // Calculate air density, speed of sound
   float p_air = pressure/(287.058*temp);   // Air density from ideal gas law (kg/m^3)
-  float v_air = 20.05*sqrt(temp+273.15);   // Speed of sound (m/s)
+  float v_air = 20.05*sqrt(temp);   // Speed of sound (m/s)
 
   // Mach number
   float M = v_rocket / v_air;   // Mach number
 
   // Mach angle
-  float u = asin(1/M);                   // Unicorn
-  float beta = sqrt(pow(M,2) - 1);       // Bollocks
-  float m = beta * tan(M_PI/2 - F_LE);   // Magic cot(x) = tan(pi/2 - x)
+  //float u = asin(1/M);                   // Unicorn
+  //float beta = sqrt(pow(M,2) - 1);       // Bollocks
+  //float m = beta * tan(M_PI/2 - F_LE);   // Magic cot(x) = tan(pi/2 - x)
 
   // Elliptic Integral
-  const float a[] = {0.44325141463,
-                     0.06260601220,
-                     0.04757383546,
-                     0.01736506451};
-  const float b[] = {0.24998368310,
-                     0.09200180037,
-                     0.04069697526,
-                     0.00526449639};
-  float E = 1;
-  for (int i=0; i<4; i++) {
-    E += a[i]*pow(m,2*(i+1)) + log(1/pow(m,2))*b[i]*pow(m,2*(i+1));   // 0 <= m < 1
-  }
-
-  // Lift coefficient
-  float C_L = (2 * M_PI * m) / (E * beta);
+  //const float a[] = {0.44325141463,
+  //                   0.06260601220,
+  //                   0.04757383546,
+  //                   0.01736506451};
+  //const float b[] = {0.24998368310,
+  //                   0.09200180037,
+  //                   0.04069697526,
+  //                   0.00526449639};
+  //float E = 1;
+  //for (int i=0; i<4; i++) {
+  //  E += a[i]*pow(m,2*(i+1)) + log(1/pow(m,2))*b[i]*pow(m,2*(i+1));   // 0 <= m < 1
+  //}
 
   // Roll controller
   float torque = I * rollAccSp;
   float F_L = torque / (F_NUM * F_D);   // Force required per fin (N)
 
+  // Lift coefficient
+  float C_L = 2*F_L/(p_air * pow(v_rocket,2) * F_AREA);   // Subsonic
+  //float C_L = (2 * M_PI * m) / (E * beta);   // Supersonic
+
   // Fin controller
-  float rollActuatorSp = (2*F_L) / (C_L * p_air * pow(v_air,2) * F_AREA);   // Output fin angle
+  float rollActuatorSp = 0.5 + C_L/(2*M_PI);   // Fin angle
 
   // Output
   actuator_setpoint_t setpoint {
