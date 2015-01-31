@@ -7,10 +7,10 @@ RocketSystem::RocketSystem(
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper) {
+    motorMapper(motorMapper), mode(RocketStage::FLY) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
-  setArmed(false);
+  setArmed(true);
 }
 
 void RocketSystem::update() {
@@ -26,7 +26,7 @@ void RocketSystem::update() {
 
   // Run the controllers
   actuator_setpoint_t actuatorSp;
-  if(isArmed() && input.valid) {
+  if(isArmed()) {
     // Run the controller pipeline as determined by the subclass
     switch(mode) {
       case RocketStage::LAUNCH: {
