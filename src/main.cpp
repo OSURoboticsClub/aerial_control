@@ -1,8 +1,9 @@
 #include "hal.h"
 #include "ch.hpp"
 
-#include "parameter.hpp"
 #include "control_thread.hpp"
+#include "parameter/parameter.hpp"
+#include "parameter/parameter_store.hpp"
 
 int main(void) {
   // Initialize ChibiOS.
