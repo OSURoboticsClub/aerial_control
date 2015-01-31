@@ -12,7 +12,7 @@
 
 static const float MOTOR_PWM_MIN = 0.40f;
 static const float MOTOR_PWM_MAX = 0.50f;
-static const float MOTOR_PWM_SAFE = 0.45f;
+static const float MOTOR_PWM_SAFE = 0.0f;   // Disable servo
 
 struct unit_data_t {
   PWMDeviceGroup<1> servos;
