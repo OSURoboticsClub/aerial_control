@@ -13,6 +13,8 @@ RocketSystem::RocketSystem(
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
+  palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+  palClearPad(GPIOA, 6);
 }
 
 void RocketSystem::update() {
@@ -27,7 +29,7 @@ void RocketSystem::update() {
   controller_input_t input = inputSource.read();
 
   // Keep moving average of acceleration
-  static float accel = -1.0f;
+  static float accel = 0.0f;
   accel = 0.5*accel + 0.5*accelReading.axes[0];
 
   // Run the controllers
@@ -58,6 +60,7 @@ void RocketSystem::update() {
         // according to sim), proceed to ascent.
         if (accel > 0.8f) {
           stage = RocketStage::ASCENT;
+          palSetPad(GPIOA, 6);
         }
         break;
       }
@@ -73,8 +76,9 @@ void RocketSystem::update() {
         actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController, attAccController);
 
         // If deviated more than 60 deg past vertical, proceed to descent.
-        if (estimate.pitch < 0.5) {
+        if (estimate.pitch < 0.5 || unit_config::launchtime > 15) {
           stage = RocketStage::DESCENT;
+          palClearPad(GPIOA, 6);
         }
         break;
       }
