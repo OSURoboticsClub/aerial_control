@@ -23,18 +23,18 @@ const float ACC_Y_OFFSET = -0.020;
 const float ACC_Z_OFFSET = -0.071;
 
 // Initial angular position controller gains
-const float ANGPOS_X_KP = 0.0;
+const float ANGPOS_X_KP = 1.0;
 const float ANGPOS_X_KI = 0.0;
 const float ANGPOS_X_KD = 0.0;
-const float ANGPOS_Y_KP = 0.2;
+const float ANGPOS_Y_KP = 0.0;
 const float ANGPOS_Y_KI = 0.0;
 const float ANGPOS_Y_KD = 0.0;
-const float ANGPOS_Z_KP = 0.2;
+const float ANGPOS_Z_KP = 0.0;
 const float ANGPOS_Z_KI = 0.0;
 const float ANGPOS_Z_KD = 0.0;
 
 // Initial angular velocity controller gains
-const float ANGVEL_X_KP = -1.0;
+const float ANGVEL_X_KP = 1.0;
 const float ANGVEL_X_KI = 0.0;
 const float ANGVEL_X_KD = 0.0;
 const float ANGVEL_Y_KP = 0.0;
