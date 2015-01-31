@@ -35,11 +35,11 @@ void MPU6000::init() {
   txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
   exchange(2);
 
-  // Set accelerometer full range to 4 g. See DS p. 13.
+  // Set accelerometer full range to 16 g. See DS p. 13.
   txbuf[0] = mpu6000::ACCEL_CONFIG | (1<<7);
   exchange(2);
   txbuf[0] = mpu6000::ACCEL_CONFIG;
-  txbuf[1] = (rxbuf[1] & ~0x18) | 0x08;
+  txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
   exchange(2);
 
   // Read once to clear out bad data?
@@ -82,9 +82,9 @@ accelerometer_reading_t MPU6000::readAccel() {
   // Get data
   txbuf[0] = mpu6000::ACCEL_XOUT_H | (1<<7);
   exchange(7);
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0 + unit_config::ACC_X_OFFSET;
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0 + unit_config::ACC_Y_OFFSET;
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0 + unit_config::ACC_Z_OFFSET;
+  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 2048.0 + unit_config::ACC_X_OFFSET;
+  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 2048.0 + unit_config::ACC_Y_OFFSET;
+  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 2048.0 + unit_config::ACC_Z_OFFSET;
 
   return reading;
 }
