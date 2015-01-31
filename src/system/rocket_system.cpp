@@ -54,23 +54,25 @@ void RocketSystem::update() {
 
         // If acceleration moving average exceeds 2g (should occur around 0.44s
         // according to sim), proceed to ascent.
-        if (accel < -2.0f) {
+        if (accel > 0.8f) {
           stage = RocketStage::ASCENT;
         }
         break;
       }
     case RocketStage::ASCENT:
       {
-        angular_velocity_setpoint_t sp {
-          .roll_vel_sp  = 0.0f,
-          .pitch_vel_sp = 0.0f,
-          .yaw_vel_sp   = 0.0f,
+        angular_position_setpoint_t sp {
+          .roll_pos_sp  = 0.0f,
+          .pitch_pos_sp = 0.0f,
+          .yaw_pos_sp   = 0.0f,
           .throttle_sp  = 0.0f
         };
-        actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
+        actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController, attAccController);
 
-        // If deviated more than 30 deg past vertical, proceed to descent.
-        // TODO
+        // If deviated more than 60 deg past vertical, proceed to descent.
+        if (estimate.pitch < 0.5) {
+          stage = RocketStage::DESCENT;
+        }
         break;
       }
     case RocketStage::DESCENT:
