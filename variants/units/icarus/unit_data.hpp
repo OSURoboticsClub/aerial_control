@@ -10,9 +10,9 @@
 #include "sensor/accelerometer.hpp"
 #include "variant/platform.hpp"
 
-static const float MOTOR_PWM_MIN = 0.53f;
-static const float MOTOR_PWM_MAX = 0.93f;
-static const float MOTOR_PWM_SAFE = 0.30f;
+static const float MOTOR_PWM_MIN = 0.40f;
+static const float MOTOR_PWM_MAX = 0.50f;
+static const float MOTOR_PWM_SAFE = 0.45f;
 
 struct unit_data_t {
   PWMDeviceGroup<1> servos;
