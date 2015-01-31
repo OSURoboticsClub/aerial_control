@@ -15,7 +15,7 @@ int main(void) {
   ParameterStore store;
   store.insert(&myParam);
 
-  store.find("MY_PARAM");
+  store.find<int>("MY_PARAM");
   // TODO: Parameter test code <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   // Start the main control thread.

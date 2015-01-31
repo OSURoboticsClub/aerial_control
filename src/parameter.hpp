@@ -43,19 +43,24 @@ private:
 
 class ParameterStore {
 public:
+  ParameterStore() : pos(0), parameters{nullptr} {
+  }
+
   void insert(BaseParameter *param) {
     parameters[pos++] = param;
   }
 
-  BaseParameter *find(const char *name) const {
+  template <typename T>
+  Parameter<T> *find(const char *name) const {
     for(auto *param : parameters) {
       if(param && std::strcmp(param->getName(), name) == 0) {
-        return param;
+        return static_cast<Parameter<T> *>(param);
       }
     }
 
     return nullptr;
   }
+
 private:
   std::size_t pos;
   std::array<BaseParameter *, 100> parameters;
