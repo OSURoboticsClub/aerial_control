@@ -1,5 +1,7 @@
 #include "system/rocket_system.hpp"
 
+#include "unit_config.hpp"
+
 RocketSystem::RocketSystem(
     Gyroscope& gyroscope, Accelerometer& accelerometer,
     AttitudeEstimator& estimator, InputSource& inputSource,
@@ -61,6 +63,7 @@ void RocketSystem::update() {
       }
     case RocketStage::ASCENT:
       {
+        unit_config::launchtime += 0.001;
         angular_position_setpoint_t sp {
           .roll_pos_sp  = 0.0f,
           .pitch_pos_sp = 0.0f,

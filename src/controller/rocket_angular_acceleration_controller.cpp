@@ -24,11 +24,24 @@ actuator_setpoint_t RocketAngularAccelerationController::run(const attitude_esti
   const float F_CP   = 0.33 * F_LEN;   // Fin Cp (m)
   const float F_NUM  = 2;              // Number of fins
   const float F_D    = 0.06477;        // Distance from roll axis to fin Cp (m)
-  const float I      = 1;              // TODO: Rocket rotational inertia
+  const float I      = 82.58e-6;            // TODO: Rocket rotational inertia
 
   // Sensor inputs
   float alt = 1414;   // Altitude (m)
-  float v_rocket = 50;   // TODO: Magically figure this out from sensors (m/s)
+  float v_rocket =
+    // 10-th degree polynomial approximation of sim 0-11s, apogee around 9s.
+    // R2 = 0.9996312149
+    - 2.6840582709e-5 * pow(unit_config::launchtime,10)
+    + 0.0014233804    * pow(unit_config::launchtime,9)
+    - 0.0316956142    * pow(unit_config::launchtime,8)
+    + 0.3829791948    * pow(unit_config::launchtime,7)
+    - 2.6989140977    * pow(unit_config::launchtime,6)
+    + 11.002863196    * pow(unit_config::launchtime,5)
+    - 23.739539259    * pow(unit_config::launchtime,4)
+    + 22.393657699    * pow(unit_config::launchtime,3)
+    - 24.365983223    * pow(unit_config::launchtime,2)
+    + 86.00216523     * unit_config::launchtime;
+
   // TODO: Expand estimate to full 12-space
 
   // Calculate atmospheric pressure. We should eventually get this from MS5611.
