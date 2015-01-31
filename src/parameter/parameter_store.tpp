@@ -1,3 +1,5 @@
+#include <cstring>
+
 template <typename T>
 Parameter<T> *ParameterStore::find(const char *name) const {
   for(auto *param : parameters) {

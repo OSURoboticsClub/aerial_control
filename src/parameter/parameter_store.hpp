@@ -2,7 +2,6 @@
 #define PARAMETER_STORE_HPP_
 
 #include <array>
-#include <cstring>
 #include <cstddef>
 
 #include "parameter/base_parameter.hpp"
