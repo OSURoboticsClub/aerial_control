@@ -29,6 +29,8 @@ public:
 
 private:
   std::size_t pos;
+
+  // TODO(kyle): Fixed size array is probably a bad idea.
   std::array<BaseParameter *, 100> parameters;
 };
 
