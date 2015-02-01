@@ -13,6 +13,6 @@ T Parameter<T>::get() {
 }
 
 template <typename T>
-void Parameter<T>::put(T value) {
-  *value = value;
+void Parameter<T>::put(T value_) {
+  *value = value_;
 }

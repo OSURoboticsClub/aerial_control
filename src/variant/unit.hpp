@@ -4,6 +4,7 @@
 #include "unit_data.hpp"
 
 #include "communication/communicator.hpp"
+#include "parameter/parameter_store.hpp"
 #include "system/vehicle_system.hpp"
 #include "variant/platform.hpp"
 
@@ -15,6 +16,8 @@ public:
 
 private:
   unit_data_t data;
+
+  ParameterStore params;
 };
 
 #endif

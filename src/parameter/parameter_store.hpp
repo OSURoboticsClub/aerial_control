@@ -11,7 +11,18 @@ class ParameterStore {
 public:
   ParameterStore();
 
+  /**
+   * Insert a pre-allocated parameter.
+   *
+   * NOTE: The argument MUST outlive the ParameterStore.
+   */
   void insert(BaseParameter *param);
+
+  /**
+   * Automatically allocate a new parameter and insert it into the store.
+   */
+  template <typename T>
+  void insert(const char *name, T value);
 
   template <typename T>
   Parameter<T> *find(const char *name) const;

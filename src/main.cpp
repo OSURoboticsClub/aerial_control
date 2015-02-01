@@ -10,15 +10,6 @@ int main(void) {
   halInit();
   chibios_rt::System::init();
 
-  // TODO: Parameter test code >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-  Parameter<int> myParam("MY_PARAM", 5);
-
-  ParameterStore store;
-  store.insert(&myParam);
-
-  store.find<int>("MY_PARAM");
-  // TODO: Parameter test code <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
   // Start the main control thread.
   static ControlThread controlThread;
   controlThread.start(HIGHPRIO);
