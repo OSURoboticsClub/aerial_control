@@ -73,20 +73,26 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
 }
 
 void DCMAttitudeEstimator::orthonormalize() {
-  // Make the i and j vectors orthogonal
-  float error = dcm.row(0).dot(dcm.row(1));
+  // Orthogonalize i and j vectors
+  //
+  // We assume small angles. We calculate the magnitude of error as the
+  // projection of i on j and generate correction vectors i' and j' with
+  // magnitude error/2 and direction opposite j and i, respectively. Then we
+  // update i and j:
+  //
+  //   i = i + i'
+  //   j = j + j'
+  //
+  float error = dcm.row(0).dot(dcm.row(1));   // Magnitude of error
+  Eigen::Matrix3f corr = Eigen::Matrix3f::Zero();   // Generate correction vectors
+  corr.row(0) = (-error / 2) * dcm.row(1);   // i'
+  corr.row(1) = (-error / 2) * dcm.row(0);   // j'
 
-  Eigen::Matrix3f corr = Eigen::Matrix3f::Zero();
-  corr.row(0) = dcm.row(1) * (-error) / 2;
-  corr.row(1) = dcm.row(0) * (-error) / 2;
+  dcm.row(0) += corr.row(0);   // i = i + i'
+  dcm.row(1) += corr.row(1);   // j = j + j'
 
-  dcm.row(0) += corr.row(0);
-  dcm.row(1) += corr.row(1);
-
-  // Estimate k vector from corrected i and j vectors
-  dcm.row(2) = dcm.row(0).cross(dcm.row(1));
-
-  // Normalize all vectors
+  // Regenerate k from the corrected i and j and normalize the DCM.
+  dcm.row(2) = dcm.row(0).cross(dcm.row(1));   // k = i x j
   dcm.rowwise().normalize();
 }
 
