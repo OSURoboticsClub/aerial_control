@@ -11,7 +11,7 @@ public:
   /**
    * Return a copy of the parameter's contained value.
    */
-  T get();
+  T get() const;
 
   /**
    * Update the value of the parameter.

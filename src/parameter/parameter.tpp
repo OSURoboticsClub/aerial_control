@@ -8,7 +8,7 @@ Parameter<T>::Parameter(const char *name, T value_) : BaseParameter(name) {
 }
 
 template <typename T>
-T Parameter<T>::get() {
+T Parameter<T>::get() const {
   return *value;
 }
 
