@@ -24,6 +24,8 @@ void RocketSystem::update() {
 
   // Update the attitude estimate
   attitude_estimate_t estimate = estimator.update(gyroReading, accelReading);
+  static float _time_launch = 0.0f;
+  estimate.time_launch = _time_launch;
 
   // Poll for controller input
   controller_input_t input = inputSource.read();
@@ -58,15 +60,15 @@ void RocketSystem::update() {
 
         // If acceleration moving average exceeds 2g (should occur around 0.44s
         // according to sim), proceed to ascent.
-        if (accel > 0.8f) {
+        if (accel > 3.0f) {
           stage = RocketStage::ASCENT;
           palSetPad(GPIOA, 6);
+          _time_launch = estimate.time;
         }
         break;
       }
     case RocketStage::ASCENT:
       {
-        unit_config::launchtime += 0.001;
         angular_position_setpoint_t sp {
           .roll_pos_sp  = 0.0f,
           .pitch_pos_sp = 0.0f,
@@ -76,7 +78,7 @@ void RocketSystem::update() {
         actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController, attAccController);
 
         // If deviated more than 60 deg past vertical, proceed to descent.
-        if (estimate.pitch < 0.5 || unit_config::launchtime > 15) {
+        if (estimate.pitch < 0.5 || (estimate.time - estimate.time_launch) > 15) {
           stage = RocketStage::DESCENT;
           palClearPad(GPIOA, 6);
         }
