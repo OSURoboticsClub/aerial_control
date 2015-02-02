@@ -3,8 +3,6 @@
 
 namespace unit_config {
 
-static float launchtime = 0.0f;
-
 const float DT = 0.001;
 
 // Maximum angular position in the roll and pitch axes (rad)
