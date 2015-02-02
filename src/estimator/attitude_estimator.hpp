@@ -16,6 +16,9 @@ struct attitude_estimate_t {
   float roll_acc;
   float pitch_acc;
   float yaw_acc;
+
+  float time;
+  float time_launch;
 };
 
 class AttitudeEstimator {

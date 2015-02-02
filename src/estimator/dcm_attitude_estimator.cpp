@@ -42,6 +42,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
 
   orthonormalize();
 
+  static float time = 0.0f;
   attitude_estimate_t estimate {
     // TODO: Are these trig functions safe at extreme angles?
     //.roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),   // Incorrect
@@ -54,23 +55,28 @@ attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReadin
     .yaw_vel = gyro.z(),
     .roll_acc = 0.0f,
     .pitch_acc = 0.0f,
-    .yaw_acc = 0.0f
+    .yaw_acc = 0.0f,
+    .time = time
   };
+  time += 0.001;
 
   if(attitudeMessageStream.ready()) {
     protocol::message::attitude_message_t m {
       .dcm = {
         //estimate.roll, estimate.pitch, estimate.yaw,
         //calib[0], calib[1], calib[2],
-        (int8_t) (127*dcm(0, 0)),
-        (int8_t) (127*dcm(0, 1)),
-        (int8_t) (127*dcm(0, 2)),
-        (int8_t) (127*dcm(1, 0)),
-        (int8_t) (127*dcm(1, 1)),
-        (int8_t) (127*dcm(1, 2)),
-        (int8_t) (127*dcm(2, 0)),
-        (int8_t) (127*dcm(2, 1)),
-        (int8_t) (127*dcm(2, 2))
+        dcm(0, 0),
+        dcm(0, 1),
+        dcm(0, 2),
+        dcm(1, 0),
+        dcm(1, 1),
+        dcm(1, 2),
+        dcm(2, 0),
+        dcm(2, 1),
+        dcm(2, 2)
+        //gyro(0),
+        //accel(0),
+        //time
       }
     };
 
