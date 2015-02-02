@@ -23,7 +23,7 @@ struct unit_data_t {
 
   MultirotorVehicleSystem system;
 
-  unit_data_t(Platform& platform, Communicator& communicator)
+  unit_data_t(Platform& platform, ParameterStore& params, Communicator& communicator)
     : motors(platform.get<PWMPlatform>(),
         { 0, 1, 2, 3 },                              // channels
         { 0.0f, 0.0f, 0.0f, 0.0f },                  // offsets

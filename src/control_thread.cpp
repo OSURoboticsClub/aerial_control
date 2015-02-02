@@ -29,7 +29,9 @@ msg_t ControlThread::main() {
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
   systime_t deadline = chibios_rt::System::getTime();
   while(true) {
-    deadline += MS2ST(unit_config::DT * 1000);
+    float dt = unit.getParams().find<float>("DT")->get();
+
+    deadline += MS2ST(dt * 1000);
 
     unit.getSystem().update();
 

@@ -14,6 +14,10 @@ public:
 
   VehicleSystem& getSystem();
 
+  ParameterStore& getParams() {
+    return params;
+  }
+
 private:
   unit_data_t data;
 
