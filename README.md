@@ -9,20 +9,22 @@ Building
     tup variant variants/*.config # Generate variant build directories
     tup build-apollo              # To build variant 'apollo'
 
-Adding another platform
------------------------
-To add another unit `UUU` of platform type `PPP` as variant `VVV`, add the following:
+Adding another unit/platform
+----------------------------
+To add another unit `UUU` of platform type `PPP`, add the following:
 
+  * `variants/UUU.config`
   * `variants/units/UUU/Tupfile`
   * `variants/platforms/PPP/Tupfile`
-  * `variants/VVV.config`
+
+And add the following includes to the root Tupfile:
+
+  * `include variants/units/UUU/Tupfile`
+  * `include variants/platforms/PPP/Tupfile`
 
 As necessary, further add the following:
 
   * Appropriate system code in `src/system`
-
-By convention, we name variants after units, so `UUU` and `VVV` are currently
-the same in all cases.
 
 Conventions
 -----------
