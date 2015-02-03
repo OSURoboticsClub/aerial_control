@@ -36,11 +36,11 @@ struct unit_data_t {
       motorMapper(motors, communicator),
       estimator(communicator),
       inputSource(communicator),
-      system(
-          platform.get<Gyroscope>(),
-          platform.get<Accelerometer>(),
-          std::experimental::nullopt,
-          estimator, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(),
+             platform.get<Accelerometer>(),
+             std::experimental::make_optional(&platform.get<Magnetometer>()),
+             estimator, inputSource, motorMapper, communicator
+      ) {
   }
 };
 
