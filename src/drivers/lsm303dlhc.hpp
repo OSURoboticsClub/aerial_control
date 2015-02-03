@@ -7,7 +7,6 @@
 
 #include "drivers/i2c_device.hpp"
 #include "sensor/accelerometer.hpp"
-#include "sensor/magnetometer.hpp"
 
 namespace lsm303dlhc {
 
@@ -42,22 +41,14 @@ const std::uint8_t I2C_AD_TIME_LIMIT_A    = 0x3B;
 const std::uint8_t I2C_AD_TIME_LATENCY_A  = 0x3C;
 const std::uint8_t I2C_AD_TIME_WINDOW_A   = 0x3D;
 
-const std::uint8_t I2C_MAG_OUT_X_H_M      = 0x03;
-const std::uint8_t I2C_MAG_OUT_X_L_M      = 0x04;
-const std::uint8_t I2C_MAG_OUT_Z_H_M      = 0x05;
-const std::uint8_t I2C_MAG_OUT_Z_L_M      = 0x06;
-const std::uint8_t I2C_MAG_OUT_Y_H_M      = 0x07;
-const std::uint8_t I2C_MAG_OUT_Y_L_M      = 0x08;
-
 }
 
-class LSM303DLHC : protected I2CDevice<8, 8>, public Accelerometer, public Magnetometer {
+class LSM303DLHC : protected I2CDevice<8, 8>, public Accelerometer {
 public:
   using I2CDevice::I2CDevice;
 
   void init() override;
   accelerometer_reading_t readAccel() override;
-  magnetometer_reading_t readMag() override;
 
 private:
   uint8_t readRegister(uint8_t reg);
