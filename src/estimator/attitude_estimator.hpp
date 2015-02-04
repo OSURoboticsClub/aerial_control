@@ -1,11 +1,10 @@
 #ifndef ATTITUDE_ESTIMATOR_HPP_
 #define ATTITUDE_ESTIMATOR_HPP_
 
-#include <experimental/optional>
-
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
+#include "util/optional.hpp"
 
 struct attitude_estimate_t {
   float roll;
@@ -18,9 +17,9 @@ struct attitude_estimate_t {
 };
 
 struct sensor_reading_group_t {
-  std::experimental::optional<gyroscope_reading_t> gyro;
-  std::experimental::optional<accelerometer_reading_t> accel;
-  std::experimental::optional<magnetometer_reading_t> mag;
+  optional<gyroscope_reading_t> gyro;
+  optional<accelerometer_reading_t> accel;
+  optional<magnetometer_reading_t> mag;
 };
 
 class AttitudeEstimator {

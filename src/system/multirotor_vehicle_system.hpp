@@ -1,8 +1,6 @@
 #ifndef MULTIROTOR_SYSTEM_HPP_
 #define MULTIROTOR_SYSTEM_HPP_
 
-#include <experimental/optional>
-
 #include "communication/communicator.hpp"
 #include "communication/message_listener.hpp"
 #include "controller/angular_position_controller.hpp"
@@ -19,6 +17,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
 #include "system/vehicle_system.hpp"
+#include "util/optional.hpp"
 
 enum class MultirotorControlMode {
   POSITION,
@@ -32,7 +31,7 @@ public:
   MultirotorVehicleSystem(
       Gyroscope& gyroscope,
       Accelerometer& accelerometer,
-      std::experimental::optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
+      optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
       AttitudeEstimator& estimator,
       InputSource& inputSource,
       MotorMapper& motorMapper,
@@ -45,7 +44,7 @@ public:
 private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
-  std::experimental::optional<Magnetometer *> magnetometer;
+  optional<Magnetometer *> magnetometer;
 
   AttitudeEstimator& estimator;
   InputSource& inputSource;

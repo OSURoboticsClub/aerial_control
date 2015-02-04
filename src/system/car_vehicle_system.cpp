@@ -2,6 +2,8 @@
 
 #include "hal.h"
 
+#include "util/optional.hpp"
+
 CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
     PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
     Communicator& communicator)

@@ -3,7 +3,7 @@
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyroscope,
     Accelerometer& accelerometer,
-    std::experimental::optional<Magnetometer *> magnetometer,
+    optional<Magnetometer *> magnetometer,
     AttitudeEstimator& estimator,
     InputSource& inputSource,
     MotorMapper& motorMapper,
@@ -26,7 +26,7 @@ void MultirotorVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyroReading = gyroscope.readGyro();
   accelerometer_reading_t accelReading = accelerometer.readAccel();
-  std::experimental::optional<magnetometer_reading_t> magReading;
+  optional<magnetometer_reading_t> magReading;
 
   // Only use magnetometer if it is available
   if(magnetometer) {

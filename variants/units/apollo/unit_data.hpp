@@ -1,8 +1,6 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
-#include <experimental/optional>
-
 #include "communication/communicator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "motor/multirotor_quad_plus_motor_mapper.hpp"
@@ -11,6 +9,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
+#include "util/optional.hpp"
 #include "variant/platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.53f;
