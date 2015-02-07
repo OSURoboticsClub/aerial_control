@@ -6,7 +6,7 @@ USARTDevice<tx_size, rx_size>::USARTDevice(SerialDriver *sd)
 template <std::size_t tx_size, std::size_t rx_size>
 void USARTDevice<tx_size, rx_size>::read(std::size_t count) {
   // Read
-  sdAsynchronousRead(sd, rxbuf, 10);
+  sdAsynchronousRead(sd, rxbuf.data(), count);
 
   // Do something with it
 }
@@ -17,5 +17,5 @@ void USARTDevice<tx_size, rx_size>::write(std::size_t count) {
   // TODO
 
   // Write
-  sdAsynchronousWrite(sd, txbuf, 10);
+  sdAsynchronousWrite(sd, txbuf.data(), count);
 }
