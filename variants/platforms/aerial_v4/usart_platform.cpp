@@ -20,7 +20,7 @@ static const SerialConfig UART4_CONFIG {
 
 // UART6 configuration (GPS)
 static const SerialConfig UART6_CONFIG {
-  38400,
+  9600,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
