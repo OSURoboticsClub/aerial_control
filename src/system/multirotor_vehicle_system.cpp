@@ -1,11 +1,11 @@
 #include "system/multirotor_vehicle_system.hpp"
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
-    Gyroscope& gyroscope, Accelerometer& accelerometer,
+    Gyroscope& gyroscope, Accelerometer& accelerometer, GPS& gps,
     AttitudeEstimator& estimator, InputSource& inputSource,
     MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer),
+    gyroscope(gyroscope), accelerometer(accelerometer), gps(gps),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), mode(MultirotorControlMode::ANGULAR_POS) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
