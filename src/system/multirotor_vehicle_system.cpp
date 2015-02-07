@@ -2,11 +2,11 @@
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyroscope, Accelerometer& accelerometer, GPS& gps,
-    AttitudeEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator)
+    WorldEstimator& world, AttitudeEstimator& attitude, InputSource&
+    inputSource, MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer), gps(gps),
-    estimator(estimator), inputSource(inputSource),
+    gyroscope(gyroscope), accelerometer(accelerometer), gps(gps), world(world),
+    attitude(attitude), inputSource(inputSource),
     motorMapper(motorMapper), mode(MultirotorControlMode::ANGULAR_POS) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
@@ -18,8 +18,15 @@ void MultirotorVehicleSystem::update() {
   gyroscope_reading_t gyroReading = gyroscope.readGyro();
   accelerometer_reading_t accelReading = accelerometer.readAccel();
 
-  // Update the attitude estimate
-  attitude_estimate_t estimate = estimator.update(gyroReading, accelReading);
+  gps_reading_t gpsReading;
+  static int i=0;
+  if (i++ % 100 == 0) {
+    gpsReading = gps.readGPS();
+  }
+
+  // Update estimates
+  world_estimate_t world_estimate = world.update(gpsReading);
+  attitude_estimate_t estimate = attitude.update(gyroReading, accelReading);
 
   // Poll for controller input
   controller_input_t input = inputSource.read();

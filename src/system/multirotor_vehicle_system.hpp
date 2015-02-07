@@ -11,6 +11,7 @@
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
@@ -29,8 +30,9 @@ enum class MultirotorControlMode {
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
-      GPS& gps, AttitudeEstimator& estimator, InputSource& inputSource,
-      MotorMapper& motorMapper, Communicator& communicator);
+      GPS& gps, WorldEstimator& world, AttitudeEstimator& attitude,
+      InputSource& inputSource, MotorMapper& motorMapper, Communicator&
+      communicator);
 
   void update() override;
 
@@ -41,7 +43,8 @@ private:
   Accelerometer& accelerometer;
   GPS& gps;
 
-  AttitudeEstimator& estimator;
+  WorldEstimator& world;
+  AttitudeEstimator& attitude;
   InputSource& inputSource;
 
   PositionController posController;
