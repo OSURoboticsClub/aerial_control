@@ -7,6 +7,7 @@
 #include "input/offboard_input_source.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
+#include "sensor/gps.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "variant/platform.hpp"
 
@@ -33,7 +34,7 @@ struct unit_data_t {
       motorMapper(motors, communicator),
       estimator(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), estimator, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<GPS>(), estimator, inputSource, motorMapper, communicator) {
   }
 };
 

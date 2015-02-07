@@ -5,6 +5,10 @@
 #include "drivers/mpu9250.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
+
+#include "drivers/ublox_neo7.hpp"
+#include "sensor/gps.hpp"
+
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
@@ -53,6 +57,12 @@ Gyroscope& Platform::get() {
 template <>
 Accelerometer& Platform::get() {
   return get<MPU9250>();
+}
+
+template <>
+GPS& Platform::get() {
+  static UBloxNEO7 gps(&SD6);
+  return gps;
 }
 
 template <>
