@@ -8,6 +8,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
+#include "util/optional.hpp"
 #include "variant/platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.53f;
@@ -33,7 +34,7 @@ struct unit_data_t {
       motorMapper(motors, communicator),
       estimator(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), estimator, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), std::experimental::nullopt, estimator, inputSource, motorMapper, communicator) {
   }
 };
 
