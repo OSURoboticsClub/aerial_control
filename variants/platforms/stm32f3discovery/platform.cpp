@@ -85,4 +85,5 @@ void Platform::init() {
 
   get<Gyroscope>().init();
   get<Accelerometer>().init();
+  get<Magnetometer>().init();
 }
