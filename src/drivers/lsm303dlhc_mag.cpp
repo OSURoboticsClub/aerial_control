@@ -5,11 +5,14 @@
 #include "unit_config.hpp"
 
 void LSM303DLHCMag::init() {
-  // Enable the magnetometer
-  writeRegister(lsm303dlhc_mag::I2C_MR_REG_M, 0x00);
+  // Set output rate to 220Hz
+  writeRegister(lsm303dlhc_mag::I2C_CRA_REG_M, 0x00 | (1 << 2) | (1 << 3) | (1 << 4));
 
-  // Set gain
-  writeRegister(lsm303dlhc_mag::I2C_CRB_REG_M, 0x20);
+  // Set gain to +/-1.3 Gauss
+  writeRegister(lsm303dlhc_mag::I2C_CRB_REG_M, 0x00 | (1 << 5) | (1 << 6) | (1 << 7));
+
+  // Set to continuous conversion mode
+  writeRegister(lsm303dlhc_mag::I2C_MR_REG_M, 0x00);
 }
 
 magnetometer_reading_t LSM303DLHCMag::readMag() {
@@ -19,9 +22,9 @@ magnetometer_reading_t LSM303DLHCMag::readMag() {
 
   // Swapped for board orientation
   std::array<std::int16_t, 3> raw;
-  raw[0] = ((rxbuf[1] << 8) | rxbuf[0]) / 1100.0f;
-  raw[1] = ((rxbuf[3] << 8) | rxbuf[2]) / 1100.0f;
-  raw[2] = ((rxbuf[5] << 8) | rxbuf[4]) / 980.0f;
+  raw[0] = ((rxbuf[0] << 8) | rxbuf[1]);
+  raw[1] = ((rxbuf[4] << 8) | rxbuf[5]);
+  raw[2] = ((rxbuf[2] << 8) | rxbuf[3]);
 
   magnetometer_reading_t reading;
 
