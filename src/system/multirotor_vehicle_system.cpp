@@ -1,13 +1,22 @@
 #include "system/multirotor_vehicle_system.hpp"
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
-    Gyroscope& gyroscope, Accelerometer& accelerometer,
-    AttitudeEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator)
-  : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer),
-    estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), mode(MultirotorControlMode::ANGULAR_POS) {
+    Gyroscope& gyroscope,
+    Accelerometer& accelerometer,
+    optional<Magnetometer *> magnetometer,
+    AttitudeEstimator& estimator,
+    InputSource& inputSource,
+    MotorMapper& motorMapper,
+    Communicator& communicator)
+  : VehicleSystem(communicator),
+    MessageListener(communicator),
+    gyroscope(gyroscope),
+    accelerometer(accelerometer),
+    magnetometer(magnetometer),
+    estimator(estimator),
+    inputSource(inputSource),
+    motorMapper(motorMapper),
+    mode(MultirotorControlMode::ANGULAR_POS) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -17,9 +26,22 @@ void MultirotorVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
   gyroscope_reading_t gyroReading = gyroscope.readGyro();
   accelerometer_reading_t accelReading = accelerometer.readAccel();
+  optional<magnetometer_reading_t> magReading;
+
+  // Only use magnetometer if it is available
+  if(magnetometer) {
+    magReading = (*magnetometer)->readMag();
+  }
+
+  // TODO: Currently copying all readings
+  sensor_reading_group_t readings {
+    .gyro = std::experimental::make_optional(gyroReading),
+    .accel = std::experimental::make_optional(accelReading),
+    .mag = magReading
+  };
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = estimator.update(gyroReading, accelReading);
+  attitude_estimate_t estimate = estimator.update(readings);
 
   // Poll for controller input
   controller_input_t input = inputSource.read();

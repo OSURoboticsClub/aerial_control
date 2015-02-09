@@ -11,11 +11,32 @@ class DCMAttitudeEstimator : public AttitudeEstimator {
 public:
   DCMAttitudeEstimator(Communicator& communicator);
 
-  attitude_estimate_t update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) override;
+  /**
+   * Update the internal DCM and return a new attitude estimate.
+   */
+  attitude_estimate_t update(const sensor_reading_group_t& readings) override;
 
 private:
+  /**
+   * Return the component vectors to orthogonality. This is accomplished by
+   * first bringing the i and j vectors to orthogonality, then drawing the k
+   * vector from them.
+   */
   void orthonormalize();
+
+  /**
+   * Determine the accelerometer correction weight based on the reading. The
+   * weighting should have an inverse relationship with the reading's difference
+   * from 1g.
+   */
   float getAccelWeight(Eigen::Vector3f accel) const;
+
+  attitude_estimate_t makeEstimate(const sensor_reading_group_t& readings);
+
+  /**
+   * Publish a new message to the output stream if necessary.
+   */
+  void updateStream();
 
   Eigen::Matrix3f dcm;
   RateLimitedStream attitudeMessageStream;
