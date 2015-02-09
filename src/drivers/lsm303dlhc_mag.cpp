@@ -9,7 +9,7 @@ void LSM303DLHCMag::init() {
   writeRegister(lsm303dlhc_mag::I2C_CRA_REG_M, 0x00 | (1 << 2) | (1 << 3) | (1 << 4));
 
   // Set gain to +/-1.3 Gauss
-  writeRegister(lsm303dlhc_mag::I2C_CRB_REG_M, 0x00 | (1 << 5) | (1 << 6) | (1 << 7));
+  writeRegister(lsm303dlhc_mag::I2C_CRB_REG_M, 0x00 | (1 << 5));
 
   // Set to continuous conversion mode
   writeRegister(lsm303dlhc_mag::I2C_MR_REG_M, 0x00);
