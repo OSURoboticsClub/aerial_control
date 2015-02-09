@@ -21,6 +21,7 @@ void RocketSystem::update() {
   sensor_reading_group_t readings {
     .gyro = std::experimental::make_optional(gyroReading),
     .accel = std::experimental::make_optional(accelReading),
+    .mag = std::experimental::nullopt
   };
 
   // Update the attitude estimate
