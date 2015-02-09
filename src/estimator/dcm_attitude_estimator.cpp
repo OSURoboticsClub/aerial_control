@@ -12,6 +12,7 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
 attitude_estimate_t DCMAttitudeEstimator::update(const sensor_reading_group_t& readings) {
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
 
+  // Assume zero weights until we have verified the presence of these sensors.
   float accelWeight = 0.0f;
   float magWeight = 0.0f;
 
