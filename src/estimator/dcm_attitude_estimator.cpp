@@ -69,15 +69,7 @@ attitude_estimate_t DCMAttitudeEstimator::update(const sensor_reading_group_t& r
 
   updateStream();
 
-  return attitude_estimate_t {
-    // TODO: Are these trig functions safe at extreme angles?
-    .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
-    .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
-    .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
-    .roll_vel = 0.0f, //gyro.x(),
-    .pitch_vel = 0.0f, //gyro.y(),
-    .yaw_vel = 0.0f, //gyro.z()
-  };
+  return makeEstimate(readings);
 }
 
 void DCMAttitudeEstimator::orthonormalize() {

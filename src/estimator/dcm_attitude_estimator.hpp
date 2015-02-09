@@ -31,6 +31,8 @@ private:
    */
   float getAccelWeight(Eigen::Vector3f accel) const;
 
+  attitude_estimate_t makeEstimate(const sensor_reading_group_t& readings);
+
   /**
    * Publish a new message to the output stream if necessary.
    */
