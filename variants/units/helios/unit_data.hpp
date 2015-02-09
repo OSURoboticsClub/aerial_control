@@ -8,6 +8,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
+#include "util/optional.hpp"
 #include "variant/platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.53f;
