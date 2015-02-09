@@ -1,6 +1,5 @@
 #include "estimator/dcm_attitude_estimator.hpp"
 
-#include "hal.h"
 #include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
@@ -13,17 +12,8 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
 attitude_estimate_t DCMAttitudeEstimator::update(const sensor_reading_group_t& readings) {
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
 
-  // Calibration code
-  //static float calib[] = {0, 0, 0};
-  //static uint32_t calib_count = 0;
-  //for (int i=0; i<3; i++) {
-  //  calib_count++;
-  //  //calib[i] = (calib[i]*(calib_count-1) + accel(i))/calib_count;
-  //  calib[i] = calib[i]*0.95 + accel(i)*0.05;
-  //}
-
   float accelWeight = 0.0f;
-  float magWeight = 0.01f; // TODO(kyle): Just made this number up.
+  float magWeight = 0.0f;
 
   // If an accelerometer is available, use the provided gravity vector to
   // correct for drift in the DCM.
@@ -37,20 +27,32 @@ attitude_estimate_t DCMAttitudeEstimator::update(const sensor_reading_group_t& r
     corr += dcm.col(2).cross(-accel) * accelWeight;
   }
 
+  // If a magnetometer is available, use the provided north vector to correct
+  // the yaw.
+  if(readings.mag) {
+    Eigen::Vector3f mag((*readings.mag).axes.data());
+
+    // TODO: Calculate mag weight?
+    magWeight = 0.001f;
+
+    // "Project" the magnetometer into the global xy plane.
+    Eigen::Vector3f magGlobal = dcm.transpose() * mag;
+    magGlobal(2) = 0.0f;
+
+    // Convert back to body coordinates.
+    Eigen::Vector3f magBody = dcm * magGlobal;
+
+    // Normalize because we only care about the prevailing direction.
+    magBody.normalize();
+
+    corr += dcm.col(0).cross(magBody - dcm.col(0)) * magWeight;
+  }
+
   // If a gyroscope is available, integrate the provided rotational velocity and
   // add it to the correction vector.
   if(readings.gyro) {
     Eigen::Vector3f gyro((*readings.gyro).axes.data());
-    corr += gyro * unit_config::DT * (1.0f - accelWeight);
-  }
-
-  // If a magnetometer is available, use the provided north vector to correct
-  // the yaw.
-  // TODO(kyle):
-  if(readings.mag) {
-    Eigen::Vector3f mag((*readings.mag).axes.data());
-    // mag.normalize();
-    corr -= dcm.col(1).cross(-mag) * magWeight;
+    corr += gyro * unit_config::DT * (1.0f - accelWeight - magWeight);
   }
 
   // Use small angle approximations to build a rotation matrix modelling the
