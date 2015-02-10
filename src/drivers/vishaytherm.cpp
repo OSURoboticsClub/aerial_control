@@ -7,11 +7,13 @@ void VishayTherm::init() {
 }
 
 ThermistorReading VishayTherm::readTherm() {
+  update();   // Update ADC measurements. TODO(yoos): "update" is probably the wrong term to be using.
+
   ThermistorReading reading;
 
-  reading.celsius = 2.345f;
+  //reading.celsius = (*avg_ch)[0] / 1024.0f;
 
-  chprintf((BaseSequentialStream*)&SD4, "%f\r\n", reading.celsius);
+  //chprintf((BaseSequentialStream*)&SD4, "%f\r\n", reading.celsius);
 
   return reading;
 }
