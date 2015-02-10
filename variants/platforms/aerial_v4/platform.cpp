@@ -5,6 +5,7 @@
 #include "drivers/mpu9250.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
+#include "drivers/lsm303dlhc_mag.hpp"
 
 #include "drivers/vishaytherm.hpp"
 #include "sensor/thermistor.hpp"
@@ -46,6 +47,15 @@ static const SPIConfig H3LIS331DL_CONFIG {
   15,
   SPI_CR1_BR_0   // 42000000/2^1 = 21000000
 };
+
+// See ChibiOS/os/hal/platforms/STM32/I2Cv1
+static const I2CConfig I2CD2_CONFIG = {
+	OPMODE_I2C,
+	400000,
+	FAST_DUTY_CYCLE_2
+};
+
+static const i2caddr_t LSM303_I2C_MAG_ADDRESS = (0x3c >> 1);
 
 const size_t ADC_GRP1_NUM_CHANNELS = 2;
 const size_t ADC_GRP1_BUF_DEPTH = 4;
@@ -96,6 +106,12 @@ Gyroscope& Platform::get() {
 template <>
 Accelerometer& Platform::get() {
   return get<MPU9250>();
+}
+
+template <>
+Magnetometer& Platform::get() {
+  static LSM303DLHCMag mag(&I2CD2, &I2CD2_CONFIG, LSM303_I2C_MAG_ADDRESS);
+  return mag;
 }
 
 template <>
@@ -159,6 +175,8 @@ void Platform::init() {
 
   // Initialize IMU
   get<MPU9250>().init();
+
+  get<Magnetometer>().init();
 
   // Initialize thermistor
   get<VishayTherm>().init();
