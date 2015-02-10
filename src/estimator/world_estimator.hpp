@@ -5,7 +5,7 @@
 #include "communication/rate_limited_stream.hpp"
 #include "sensor/gps.hpp"
 
-struct world_estimate_t {
+struct WorldEstimate {
   float globe_loc[3];
 };
 
@@ -19,7 +19,7 @@ public:
    *
    * TODO(yoos): Consolidate with attitude estimator.
    */
-  virtual world_estimate_t update(gps_reading_t& gpsReading);
+  virtual WorldEstimate update(gps_reading_t& gpsReading);
 
 private:
   RateLimitedStream worldMessageStream;
