@@ -3,14 +3,14 @@
 
 #include <array>
 
-struct gps_reading_t {
+struct GPSReading {
   float lat, lon;
 };
 
 class GPS {
 public:
   virtual void init() = 0;
-  virtual gps_reading_t readGPS() = 0;
+  virtual GPSReading readGPS() = 0;
 };
 
 #endif

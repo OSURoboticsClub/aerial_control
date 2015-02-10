@@ -44,7 +44,7 @@ void MultirotorVehicleSystem::update() {
     .mag = magReading
   };
 
-  gps_reading_t gpsReading;
+  GPSReading gpsReading;
   static int i=0;
   if (i++ % 100 == 0) {
     gpsReading = gps.readGPS();
