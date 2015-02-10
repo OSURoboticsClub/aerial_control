@@ -13,7 +13,7 @@ public:
   using USARTDevice::USARTDevice;
 
   void init() override;
-  gps_reading_t readGPS() override;
+  GPSReading readGPS() override;
 };
 
 #endif

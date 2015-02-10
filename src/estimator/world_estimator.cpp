@@ -9,7 +9,7 @@ WorldEstimator::WorldEstimator(Communicator& communicator)
   : worldMessageStream(communicator, 10) {
 }
 
-WorldEstimate WorldEstimator::update(gps_reading_t& gpsReading) {
+WorldEstimate WorldEstimator::update(GPSReading& gpsReading) {
   // TODO: get GPS data
 
   WorldEstimate estimate {

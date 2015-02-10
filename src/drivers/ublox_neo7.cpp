@@ -6,8 +6,8 @@
 void UBloxNEO7::init() {
 }
 
-gps_reading_t UBloxNEO7::readGPS() {
-  gps_reading_t reading;
+GPSReading UBloxNEO7::readGPS() {
+  GPSReading reading;
 
   // Get all bytes on buffer
   read(10);   // TODO

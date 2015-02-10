@@ -39,7 +39,7 @@ void MultirotorVehicleSystem::update() {
     magReading = (*magnetometer)->readMag();
   }
 
-  gps_reading_t gpsReading;
+  GPSReading gpsReading;
   optional<ThermistorReading> thermReading;
   static int i=0;
   if (i++ % 100 == 0) {

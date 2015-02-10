@@ -19,7 +19,7 @@ public:
    *
    * TODO(yoos): Consolidate with attitude estimator.
    */
-  virtual WorldEstimate update(gps_reading_t& gpsReading);
+  virtual WorldEstimate update(GPSReading& gpsReading);
 
 private:
   RateLimitedStream worldMessageStream;
