@@ -5,8 +5,13 @@
 #include "drivers/mpu9250.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
+
 #include "drivers/vishaytherm.hpp"
 #include "sensor/thermistor.hpp"
+
+#include "drivers/ublox_neo7.hpp"
+#include "sensor/gps.hpp"
+
 #include "variant/adc_platform.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
@@ -97,6 +102,11 @@ template <>
 VishayTherm& Platform::get() {
   static VishayTherm therm(&ADCD1, &ADC_GRP1_CONFIG, &samples, &avg_ch);
   return therm;
+}
+
+GPS& Platform::get() {
+  static UBloxNEO7 gps(&SD6);
+  return gps;
 }
 
 template <>

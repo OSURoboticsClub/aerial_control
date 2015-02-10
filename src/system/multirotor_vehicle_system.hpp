@@ -11,10 +11,12 @@
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
 #include "estimator/attitude_estimator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
 #include "sensor/accelerometer.hpp"
+#include "sensor/gps.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
 #include "system/vehicle_system.hpp"
@@ -32,8 +34,10 @@ public:
   MultirotorVehicleSystem(
       Gyroscope& gyroscope,
       Accelerometer& accelerometer,
+      GPS& gps,
       optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
-      AttitudeEstimator& estimator,
+      WorldEstimator& world,
+      AttitudeEstimator& attitude,
       InputSource& inputSource,
       MotorMapper& motorMapper,
       Communicator& communicator);
@@ -45,9 +49,11 @@ public:
 private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
+  GPS& gps;
   optional<Magnetometer *> magnetometer;
 
-  AttitudeEstimator& estimator;
+  WorldEstimator& world;
+  AttitudeEstimator& attitude;
   InputSource& inputSource;
 
   PositionController posController;

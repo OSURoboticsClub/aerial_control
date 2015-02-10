@@ -3,8 +3,10 @@
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyroscope,
     Accelerometer& accelerometer,
+    GPS& gps,
     optional<Magnetometer *> magnetometer,
-    AttitudeEstimator& estimator,
+    WorldEstimator& world,
+    AttitudeEstimator& attitude,
     InputSource& inputSource,
     MotorMapper& motorMapper,
     Communicator& communicator)
@@ -12,8 +14,10 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     MessageListener(communicator),
     gyroscope(gyroscope),
     accelerometer(accelerometer),
+    gps(gps),
     magnetometer(magnetometer),
-    estimator(estimator),
+    world(world)
+    attitude(attitude),
     inputSource(inputSource),
     motorMapper(motorMapper),
     mode(MultirotorControlMode::ANGULAR_POS) {
@@ -40,8 +44,15 @@ void MultirotorVehicleSystem::update() {
     .mag = magReading
   };
 
-  // Update the attitude estimate
-  AttitudeEstimate estimate = estimator.update(readings);
+  gps_reading_t gpsReading;
+  static int i=0;
+  if (i++ % 100 == 0) {
+    gpsReading = gps.readGPS();
+  }
+
+  // Update estimates
+  AttitudeEstimate attitude_estimate = attitude.update(readings);
+  world_estimate_t world_estimate = world.update(gpsReading);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
@@ -58,12 +69,12 @@ void MultirotorVehicleSystem::update() {
           .yawPos = input.yaw,
           .altitude = input.throttle
         };
-        actuatorSp = pipeline.run(estimate, sp, posController, attPosController, attVelController, attAccController);
+        actuatorSp = pipeline.run(attitude_estimate, sp, posController, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::VELOCITY: {
         // TODO: implement
-        // actuatorSp = pipeline.run(estimate, sp, velController, attPosController, attVelController, attAccController);
+        // actuatorSp = pipeline.run(attitude_estimate, sp, velController, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::ANGULAR_POS: {
