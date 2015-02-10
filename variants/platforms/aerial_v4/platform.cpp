@@ -60,9 +60,14 @@ Accelerometer& Platform::get() {
 }
 
 template <>
-GPS& Platform::get() {
+UBloxNEO7& Platform::get() {
   static UBloxNEO7 gps(&SD6);
   return gps;
+}
+
+template <>
+GPS& Platform::get() {
+  return get<UBloxNEO7>();
 }
 
 template <>
@@ -97,4 +102,7 @@ void Platform::init() {
 
   // Initialize IMU
   get<MPU9250>().init();
+
+  // Initialize GPS
+  get<UBloxNEO7>().init();
 }

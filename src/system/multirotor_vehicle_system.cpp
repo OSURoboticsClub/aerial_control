@@ -16,7 +16,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     accelerometer(accelerometer),
     gps(gps),
     magnetometer(magnetometer),
-    world(world)
+    world(world),
     attitude(attitude),
     inputSource(inputSource),
     motorMapper(motorMapper),
@@ -84,7 +84,7 @@ void MultirotorVehicleSystem::update() {
           .yawPos = input.yaw,
           .throttle = input.throttle
         };
-        actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController, attAccController);
+        actuatorSp = pipeline.run(attitude_estimate, sp, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::ANGULAR_RATE: {
@@ -94,13 +94,13 @@ void MultirotorVehicleSystem::update() {
           .yawVel = input.yaw,
           .throttle = input.throttle
         };
-        actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
+        actuatorSp = pipeline.run(attitude_estimate, sp, attVelController, attAccController);
         break;
       }
     }
   } else {
     // Run the zero controller
-    actuatorSp = zeroController.run(estimate, actuatorSp);
+    actuatorSp = zeroController.run(attitude_estimate, actuatorSp);
   }
 
   // Update motor outputs
