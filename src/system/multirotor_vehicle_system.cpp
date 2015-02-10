@@ -60,7 +60,7 @@ void MultirotorVehicleSystem::update() {
 
   // Update estimates
   AttitudeEstimate attitude_estimate = attitude.update(readings);
-  world_estimate_t world_estimate = world.update(readings);
+  WorldEstimate world_estimate = world.update(readings);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
