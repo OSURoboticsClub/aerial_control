@@ -10,18 +10,18 @@ PositionController::PositionController()
     altitudePid(10.0, 0.0, 0.0) {
 }
 
-angular_position_setpoint_t PositionController::run(const attitude_estimate_t& estimate, const position_setpoint_t& input) {
+AngularPositionSetpoint PositionController::run(const AttitudeEstimate& estimate, const PositionSetpoint& input) {
   // TODO(kyle): Transform from local x/y to global lat/long (need mag)
 
-  float rollPosSp = latPid.calculate(input.latitude_sp, 0 /* TODO: estimate.latitude */, unit_config::DT);
-  float pitchPosSp = lonPid.calculate(input.longitude_sp, 0 /* TODO: estimate.longitude */, unit_config::DT);
-  float throttleSp = altitudePid.calculate(input.altitude_sp, 0 /* TODO: estimate.altitude */, unit_config::DT);
+  float rollPosSp = latPid.calculate(input.latitude, 0 /* TODO: estimate.latitude */, unit_config::DT);
+  float pitchPosSp = lonPid.calculate(input.longitude, 0 /* TODO: estimate.longitude */, unit_config::DT);
+  float throttleSp = altitudePid.calculate(input.altitude, 0 /* TODO: estimate.altitude */, unit_config::DT);
 
-  angular_position_setpoint_t setpoint {
-    .roll_pos_sp = rollPosSp,
-    .pitch_pos_sp = pitchPosSp,
-    .yaw_pos_sp = input.yaw_pos_sp,
-    .throttle_sp = throttleSp
+  AngularPositionSetpoint setpoint {
+    .rollPos = rollPosSp,
+    .pitchPos = pitchPosSp,
+    .yawPos = input.yawPos,
+    .throttle = throttleSp
   };
 
   return setpoint;

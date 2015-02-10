@@ -10,21 +10,21 @@ MultirotorQuadPlusMotorMapper::MultirotorQuadPlusMotorMapper(PWMDeviceGroup<4>& 
     throttleStream(communicator, 10) {
 }
 
-void MultirotorQuadPlusMotorMapper::run(bool armed, actuator_setpoint_t& input) {
+void MultirotorQuadPlusMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // Calculate output shifts
   // TODO(yoos): comment on motor indexing convention starting from positive
   // X in counterclockwise order.
   std::array<float, 4> shifts {
-    - 1.0f * input.pitch_sp + 1.0f * input.yaw_sp,   // front
-      1.0f * input.roll_sp  - 1.0f * input.yaw_sp,   // left
-      1.0f * input.pitch_sp + 1.0f * input.yaw_sp,   // back
-    - 1.0f * input.roll_sp  - 1.0f * input.yaw_sp    // right
+    - 1.0f * input.pitch + 1.0f * input.yaw,   // front
+      1.0f * input.roll  - 1.0f * input.yaw,   // left
+      1.0f * input.pitch + 1.0f * input.yaw,   // back
+    - 1.0f * input.roll  - 1.0f * input.yaw    // right
   };
 
   // Add throttle to shifts to get absolute output value
   std::array<float, 4> outputs;
   for(std::size_t i = 0; i < 4; i++) {
-    outputs[i] = input.throttle_sp + shifts[i];
+    outputs[i] = input.throttle + shifts[i];
   }
 
   motors.set(armed, outputs);

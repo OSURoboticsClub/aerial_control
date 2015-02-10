@@ -10,13 +10,14 @@
 #include "sensor/accelerometer.hpp"
 #include "sensor/gps.hpp"
 #include "system/multirotor_vehicle_system.hpp"
+#include "util/optional.hpp"
 #include "variant/platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.53f;
 static const float MOTOR_PWM_MAX = 0.93f;
 static const float MOTOR_PWM_SAFE = 0.30f;
 
-struct unit_data_t {
+struct UnitData {
   PWMDeviceGroup<4> motors;
   MultirotorQuadPlusMotorMapper motorMapper;
 
@@ -26,7 +27,7 @@ struct unit_data_t {
 
   MultirotorVehicleSystem system;
 
-  unit_data_t(Platform& platform, Communicator& communicator)
+  UnitData(Platform& platform, Communicator& communicator)
     : motors(platform.get<PWMPlatform>(),
         { 0, 1, 2, 3 },                              // channels
         { 0.0f, 0.0f, 0.0f, 0.0f },                  // offsets
@@ -37,7 +38,7 @@ struct unit_data_t {
       world(communicator),
       attitude(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<GPS>(), world, attitude, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<GPS>(), std::experimental::nullopt, world, attitude, inputSource, motorMapper, communicator) {
   }
 };
 

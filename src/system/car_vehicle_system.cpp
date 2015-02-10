@@ -2,6 +2,8 @@
 
 #include "hal.h"
 
+#include "util/optional.hpp"
+
 CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
     PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
     Communicator& communicator)
@@ -15,24 +17,30 @@ CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelero
 
 void CarVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
-  gyroscope_reading_t gyroReading = gyroscope.readGyro();
-  accelerometer_reading_t accelReading = accelerometer.readAccel();
+  GyroscopeReading gyroReading = gyroscope.readGyro();
+  AccelerometerReading accelReading = accelerometer.readAccel();
+
+  SensorReadingGroup readings {
+    .gyro = std::experimental::make_optional(gyroReading),
+    .accel = std::experimental::make_optional(accelReading),
+    .mag = std::experimental::nullopt
+  };
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = estimator.update(gyroReading, accelReading);
+  AttitudeEstimate estimate = estimator.update(readings);
 
   // Poll for controller input
-  controller_input_t input = inputSource.read();
+  ControllerInput input = inputSource.read();
 
   // Run the controllers
-  actuator_setpoint_t actuatorSp;
+  ActuatorSetpoint actuatorSp;
   if(isArmed()) {
     // Run the controller pipeline as determined by the subclass
-    angular_velocity_setpoint_t sp {
-      .roll_vel_sp = input.roll_sp,
-      .pitch_vel_sp = input.pitch_sp,
-      .yaw_vel_sp = input.yaw_sp,
-      .throttle_sp = input.throttle_sp
+    AngularVelocitySetpoint sp {
+      .rollVel = input.roll,
+      .pitchVel = input.pitch,
+      .yawVel = input.yaw,
+      .throttle = input.throttle
     };
     actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
   } else {

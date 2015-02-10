@@ -3,12 +3,12 @@
 
 // TODO: Think about how to generalize this. Some input sources may provide
 // roll/pitch/yaw setpoints, other may provide x_pos/y_pos/z_pos, etc.
-struct controller_input_t {
+struct ControllerInput {
   bool valid;
-  float roll_sp;
-  float pitch_sp;
-  float yaw_sp;
-  float throttle_sp;
+  float roll;
+  float pitch;
+  float yaw;
+  float throttle;
 };
 
 /**
@@ -19,7 +19,7 @@ public:
   /**
    * Reads from the source and returns the setpoints.
    */
-  virtual controller_input_t read() = 0;
+  virtual ControllerInput read() = 0;
 };
 
 #endif

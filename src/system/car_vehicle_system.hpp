@@ -37,9 +37,9 @@ private:
 
   AngularVelocityController attVelController;
   AngularAccelerationController attAccController;
-  ControllerPipeline<actuator_setpoint_t> pipeline;
+  ControllerPipeline<ActuatorSetpoint> pipeline;
 
-  ZeroController<actuator_setpoint_t> zeroController;
+  ZeroController<ActuatorSetpoint> zeroController;
 };
 
 #endif

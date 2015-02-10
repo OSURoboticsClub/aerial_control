@@ -15,10 +15,12 @@
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gps.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
 #include "system/vehicle_system.hpp"
+#include "util/optional.hpp"
 
 enum class MultirotorControlMode {
   POSITION,
@@ -29,10 +31,16 @@ enum class MultirotorControlMode {
 
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
-  MultirotorVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
-      GPS& gps, WorldEstimator& world, AttitudeEstimator& attitude,
-      InputSource& inputSource, MotorMapper& motorMapper, Communicator&
-      communicator);
+  MultirotorVehicleSystem(
+      Gyroscope& gyroscope,
+      Accelerometer& accelerometer,
+      GPS& gps,
+      optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
+      WorldEstimator& world,
+      AttitudeEstimator& attitude,
+      InputSource& inputSource,
+      MotorMapper& motorMapper,
+      Communicator& communicator);
 
   void update() override;
 
@@ -42,6 +50,7 @@ private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
   GPS& gps;
+  optional<Magnetometer *> magnetometer;
 
   WorldEstimator& world;
   AttitudeEstimator& attitude;
@@ -51,9 +60,9 @@ private:
   AngularPositionController attPosController;
   AngularVelocityController attVelController;
   AngularAccelerationController attAccController;
-  ControllerPipeline<actuator_setpoint_t> pipeline;
+  ControllerPipeline<ActuatorSetpoint> pipeline;
 
-  ZeroController<actuator_setpoint_t> zeroController;
+  ZeroController<ActuatorSetpoint> zeroController;
 
   MotorMapper& motorMapper;
 

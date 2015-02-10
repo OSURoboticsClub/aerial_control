@@ -9,7 +9,7 @@ void LSM303DLHC::init() {
   writeRegister(lsm303dlhc::I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
 }
 
-accelerometer_reading_t LSM303DLHC::readAccel() {
+AccelerometerReading LSM303DLHC::readAccel() {
   txbuf[0] = lsm303dlhc::I2C_AD_OUT_X_L_A | 0x80;
 
   exchange(1, 6);
@@ -20,7 +20,7 @@ accelerometer_reading_t LSM303DLHC::readAccel() {
   raw[1] = (rxbuf[3] << 8) | rxbuf[2];
   raw[2] = (rxbuf[5] << 8) | rxbuf[4];
 
-  accelerometer_reading_t reading;
+  AccelerometerReading reading;
 
   for(std::size_t i = 0; i < 3; i++) {
     reading.axes[i] = (float) raw[i] / 32768.0 * 2.0;

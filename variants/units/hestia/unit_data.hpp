@@ -4,10 +4,10 @@
 #include "communication/communicator.hpp"
 #include "system/dummy_vehicle_system.hpp"
 
-struct unit_data_t {
+struct UnitData {
   DummyVehicleSystem system;
 
-  unit_data_t(Communicator& communicator)
+  UnitData(Communicator& communicator)
     : system(communicator) {
   }
 };

@@ -9,8 +9,8 @@ EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communic
     throttleStream(communicator, 10) {
 }
 
-void EsraRocketMotorMapper::run(bool armed, actuator_setpoint_t& input) {
-  // Interpret input roll_sp as servo angle
-  std::array<float, 1> outputs { input.roll_sp };
+void EsraRocketMotorMapper::run(bool armed, ActuatorSetpoint& input) {
+  // Interpret input roll as servo angle
+  std::array<float, 1> outputs { input.roll };
   servos.set(armed, outputs);
 }

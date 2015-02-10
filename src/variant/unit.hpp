@@ -14,7 +14,7 @@ public:
   VehicleSystem& getSystem();
 
 private:
-  unit_data_t data;
+  UnitData data;
 };
 
 #endif

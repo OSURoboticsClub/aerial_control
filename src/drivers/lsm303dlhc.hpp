@@ -48,7 +48,7 @@ public:
   using I2CDevice::I2CDevice;
 
   void init() override;
-  accelerometer_reading_t readAccel() override;
+  AccelerometerReading readAccel() override;
 
 private:
   uint8_t readRegister(uint8_t reg);
