@@ -105,9 +105,8 @@ VishayTherm& Platform::get() {
 }
 
 template <>
-ADCPlatform& Platform::get() {
-  static ADCPlatform adcPlatform;
-  return adcPlatform;
+Thermistor& Platform::get() {
+  return get<VishayTherm>();
 }
 
 template <>
@@ -119,6 +118,12 @@ UBloxNEO7& Platform::get() {
 template <>
 GPS& Platform::get() {
   return get<UBloxNEO7>();
+}
+
+template <>
+ADCPlatform& Platform::get() {
+  static ADCPlatform adcPlatform;
+  return adcPlatform;
 }
 
 template <>

@@ -9,6 +9,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gps.hpp"
+#include "sensor/thermistor.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
@@ -38,7 +39,12 @@ struct UnitData {
       world(communicator),
       attitude(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<GPS>(), std::experimental::nullopt, std::experimental::nullopt, world, attitude, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(),
+             platform.get<Accelerometer>(),
+             platform.get<GPS>(),
+             std::experimental::nullopt,
+             std::experimental::make_optional(&platform.get<Thermistor>()),
+             world, attitude, inputSource, motorMapper, communicator) {
   }
 };
 
