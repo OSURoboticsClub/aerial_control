@@ -45,7 +45,7 @@ void MultirotorVehicleSystem::update() {
   if (i++ % 100 == 0) {
     gpsReading = gps.readGPS();
     if (thermistor) {
-      thermReading = (*therm)->readTherm();
+      thermReading = (*thermistor)->readTherm();
     }
   }
 

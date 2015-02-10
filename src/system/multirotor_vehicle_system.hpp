@@ -36,6 +36,7 @@ public:
       Accelerometer& accelerometer,
       GPS& gps,
       optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
+      optional<Thermistor *> thermistor,
       WorldEstimator& world,
       AttitudeEstimator& attitude,
       InputSource& inputSource,
@@ -51,6 +52,7 @@ private:
   Accelerometer& accelerometer;
   GPS& gps;
   optional<Magnetometer *> magnetometer;
+  optional<Thermistor *> thermistor;
 
   WorldEstimator& world;
   AttitudeEstimator& attitude;

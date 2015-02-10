@@ -38,7 +38,7 @@ struct UnitData {
       world(communicator),
       attitude(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<GPS>(), std::experimental::nullopt, world, attitude, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), platform.get<GPS>(), std::experimental::nullopt, std::experimental::nullopt, world, attitude, inputSource, motorMapper, communicator) {
   }
 };
 
