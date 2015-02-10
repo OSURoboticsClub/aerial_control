@@ -5,6 +5,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     Accelerometer& accelerometer,
     GPS& gps,
     optional<Magnetometer *> magnetometer,
+    optional<Thermistor *> thermistor,
     WorldEstimator& world,
     AttitudeEstimator& attitude,
     InputSource& inputSource,
@@ -16,6 +17,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     accelerometer(accelerometer),
     gps(gps),
     magnetometer(magnetometer),
+    thermistor(thermistor),
     world(world),
     attitude(attitude),
     inputSource(inputSource),
@@ -37,22 +39,28 @@ void MultirotorVehicleSystem::update() {
     magReading = (*magnetometer)->readMag();
   }
 
+  gps_reading_t gpsReading;
+  optional<ThermistorReading> thermReading;
+  static int i=0;
+  if (i++ % 100 == 0) {
+    gpsReading = gps.readGPS();
+    if (thermistor) {
+      thermReading = (*therm)->readTherm();
+    }
+  }
+
   // TODO: Currently copying all readings
   SensorReadingGroup readings {
     .gyro = std::experimental::make_optional(gyroReading),
     .accel = std::experimental::make_optional(accelReading),
-    .mag = magReading
+    .mag = magReading,
+    .gps = gpsReading,
+    .therm = thermReading
   };
-
-  gps_reading_t gpsReading;
-  static int i=0;
-  if (i++ % 100 == 0) {
-    gpsReading = gps.readGPS();
-  }
 
   // Update estimates
   AttitudeEstimate attitude_estimate = attitude.update(readings);
-  world_estimate_t world_estimate = world.update(gpsReading);
+  world_estimate_t world_estimate = world.update(readings);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
