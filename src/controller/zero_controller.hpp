@@ -9,11 +9,11 @@
  * A dumb controller that simply outputs zeros on all channels.
  */
 template <typename SP>
-class ZeroController : public Controller<SP, actuator_setpoint_t> {
+class ZeroController : public Controller<SP, ActuatorSetpoint> {
 public:
   ZeroController();
 
-  actuator_setpoint_t run(const attitude_estimate_t& estimate, const SP& input) override;
+  ActuatorSetpoint run(const AttitudeEstimate& estimate, const SP& input) override;
 };
 
 #include "controller/zero_controller.tpp"

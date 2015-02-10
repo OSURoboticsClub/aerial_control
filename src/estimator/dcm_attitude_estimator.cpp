@@ -9,7 +9,7 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
     attitudeMessageStream(communicator, 20) {
 }
 
-attitude_estimate_t DCMAttitudeEstimator::update(const sensor_reading_group_t& readings) {
+AttitudeEstimate DCMAttitudeEstimator::update(const SensorReadingGroup& readings) {
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
 
   // Assume zero weights until we have verified the presence of these sensors.
@@ -113,30 +113,30 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   return accelWeight;
 }
 
-attitude_estimate_t DCMAttitudeEstimator::makeEstimate(const sensor_reading_group_t& readings) {
-  attitude_estimate_t estimate = {
+AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorReadingGroup& readings) {
+  AttitudeEstimate estimate = {
     // TODO: Are these trig functions safe at extreme angles?
     .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
     .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
     .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
 
     // Velocities are set later if a gyro is available.
-    .roll_vel = 0.0f,
-    .pitch_vel = 0.0f,
-    .yaw_vel = 0.0f,
+    .rollVel = 0.0f,
+    .pitchVel = 0.0f,
+    .yawVel = 0.0f,
 
     // TODO: Calculate accelerations.
-    .roll_acc = 0.0f,
-    .pitch_acc = 0.0f,
-    .yaw_acc = 0.0f
+    .rollAcc = 0.0f,
+    .pitchAcc = 0.0f,
+    .yawAcc = 0.0f
   };
 
   // If a gyro is available then use the direct readings for velocity
   // calculation.
   if(readings.gyro) {
-    estimate.roll_vel = (*readings.gyro).axes[0];
-    estimate.pitch_vel = (*readings.gyro).axes[1];
-    estimate.yaw_vel = (*readings.gyro).axes[2];
+    estimate.rollVel = (*readings.gyro).axes[0];
+    estimate.pitchVel = (*readings.gyro).axes[1];
+    estimate.yawVel = (*readings.gyro).axes[2];
   } else {
     // TODO: Differentiate estimates or just ignore?
   }

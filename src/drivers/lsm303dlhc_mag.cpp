@@ -15,7 +15,7 @@ void LSM303DLHCMag::init() {
   writeRegister(lsm303dlhc_mag::I2C_MR_REG_M, 0x00);
 }
 
-magnetometer_reading_t LSM303DLHCMag::readMag() {
+MagnetometerReading LSM303DLHCMag::readMag() {
   txbuf[0] = lsm303dlhc_mag::I2C_OUT_X_H_M;
 
   exchange(1, 6);
@@ -26,7 +26,7 @@ magnetometer_reading_t LSM303DLHCMag::readMag() {
   raw[1] = ((rxbuf[4] << 8) | rxbuf[5]);
   raw[2] = ((rxbuf[2] << 8) | rxbuf[3]);
 
-  magnetometer_reading_t reading;
+  MagnetometerReading reading;
 
   for(std::size_t i = 0; i < 3; i++) {
     // TODO(kyle): scale?

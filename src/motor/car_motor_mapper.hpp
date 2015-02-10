@@ -14,7 +14,7 @@ class CarMotorMapper : public MotorMapper {
 public:
   CarMotorMapper(PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices, Communicator& communicator);
 
-  void run(bool armed, actuator_setpoint_t& input) override;
+  void run(bool armed, ActuatorSetpoint& input) override;
 
 private:
   PWMDeviceGroup<4> motorDevices;

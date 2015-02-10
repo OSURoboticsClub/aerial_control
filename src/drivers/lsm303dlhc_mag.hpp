@@ -33,7 +33,7 @@ public:
   using I2CDevice::I2CDevice;
 
   void init() override;
-  magnetometer_reading_t readMag() override;
+  MagnetometerReading readMag() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

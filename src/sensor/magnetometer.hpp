@@ -3,14 +3,14 @@
 
 #include <array>
 
-struct magnetometer_reading_t {
+struct MagnetometerReading {
   std::array<float, 3> axes;
 };
 
 class Magnetometer {
 public:
   virtual void init() = 0;
-  virtual magnetometer_reading_t readMag() = 0;
+  virtual MagnetometerReading readMag() = 0;
 };
 
 #endif

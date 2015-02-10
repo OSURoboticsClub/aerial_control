@@ -11,13 +11,13 @@ CarMotorMapper::CarMotorMapper(PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4
     throttleStream(communicator, 1) {
 }
 
-void CarMotorMapper::run(bool armed, actuator_setpoint_t& input) {
+void CarMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // Motor speeds depend only on throttle input
   std::array<float, 4> motors {
-    input.throttle_sp,   // front left
-    input.throttle_sp,   // back left
-    input.throttle_sp,   // back right
-    input.throttle_sp    // front right
+    input.throttle,   // front left
+    input.throttle,   // back left
+    input.throttle,   // back right
+    input.throttle    // front right
   };
 
   motorDevices.set(armed, motors);
@@ -25,10 +25,10 @@ void CarMotorMapper::run(bool armed, actuator_setpoint_t& input) {
   // Servos control yaw angle of the vehicle
   std::array<float, 4> servos {
     // TODO(kyle): signs
-    -input.yaw_sp / 2,   // front left
-    input.yaw_sp / 2,   // back left
-    input.yaw_sp / 2,   // back right
-    -input.yaw_sp / 2    // front right
+    -input.yaw / 2,   // front left
+    input.yaw / 2,   // back left
+    input.yaw / 2,   // back right
+    -input.yaw / 2    // front right
   };
 
   servoDevices.set(armed, servos);

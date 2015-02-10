@@ -1,12 +1,12 @@
 #include "input/pwm_receiver_input_source.hpp"
 
-controller_input_t PWMReceiverInputSource::read() {
-  controller_input_t input {
+ControllerInput PWMReceiverInputSource::read() {
+  ControllerInput input {
     .valid = true,
-    .roll_sp = 0.0f,
-    .pitch_sp = 0.0f,
-    .yaw_sp = 0.0f,
-    .throttle_sp = 0.0f
+    .roll = 0.0f,
+    .pitch = 0.0f,
+    .yaw = 0.0f,
+    .throttle = 0.0f
   };
 
   return input;

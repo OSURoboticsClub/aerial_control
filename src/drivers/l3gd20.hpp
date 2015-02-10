@@ -70,7 +70,7 @@ public:
   using SPIDevice::SPIDevice;
 
   void init() override;
-  gyroscope_reading_t readGyro() override;
+  GyroscopeReading readGyro() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

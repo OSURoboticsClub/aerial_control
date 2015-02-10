@@ -15,27 +15,27 @@ RocketSystem::RocketSystem(
 
 void RocketSystem::update() {
   // Poll the gyroscope and accelerometer
-  gyroscope_reading_t gyroReading = gyroscope.readGyro();
-  accelerometer_reading_t accelReading = accelerometer.readAccel();
+  GyroscopeReading gyroReading = gyroscope.readGyro();
+  AccelerometerReading accelReading = accelerometer.readAccel();
 
-  sensor_reading_group_t readings {
+  SensorReadingGroup readings {
     .gyro = std::experimental::make_optional(gyroReading),
     .accel = std::experimental::make_optional(accelReading),
     .mag = std::experimental::nullopt
   };
 
   // Update the attitude estimate
-  attitude_estimate_t estimate = estimator.update(readings);
+  AttitudeEstimate estimate = estimator.update(readings);
 
   // Poll for controller input
-  controller_input_t input = inputSource.read();
+  ControllerInput input = inputSource.read();
 
   // Keep moving average of acceleration
   static float accel = -1.0f;
   accel = 0.5*accel + 0.5*accelReading.axes[0];
 
   // Run the controllers
-  actuator_setpoint_t actuatorSp;
+  ActuatorSetpoint actuatorSp;
 
   // Run the controller pipeline as determined by the subclass
   switch(stage) {
@@ -50,11 +50,11 @@ void RocketSystem::update() {
     case RocketStage::PAD:
       {
         // Set fins to neutral
-        actuator_setpoint_t sp {
-          .roll_sp     = 0.5f,
-          .pitch_sp    = 0.0f,
-          .yaw_sp      = 0.0f,
-          .throttle_sp = 0.0f
+        ActuatorSetpoint sp {
+          .roll     = 0.5f,
+          .pitch    = 0.0f,
+          .yaw      = 0.0f,
+          .throttle = 0.0f
         };
         actuatorSp = sp;
 
@@ -67,11 +67,11 @@ void RocketSystem::update() {
       }
     case RocketStage::ASCENT:
       {
-        angular_velocity_setpoint_t sp {
-          .roll_vel_sp  = 0.0f,
-          .pitch_vel_sp = 0.0f,
-          .yaw_vel_sp   = 0.0f,
-          .throttle_sp  = 0.0f
+        AngularVelocitySetpoint sp {
+          .rollVel  = 0.0f,
+          .pitchVel = 0.0f,
+          .yawVel   = 0.0f,
+          .throttle  = 0.0f
         };
         actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
 

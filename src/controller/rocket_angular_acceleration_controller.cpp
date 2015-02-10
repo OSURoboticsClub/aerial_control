@@ -10,10 +10,10 @@ RocketAngularAccelerationController::RocketAngularAccelerationController()
     yawAccPid(unit_config::ANGACC_Z_KP, unit_config::ANGACC_Z_KI, unit_config::ANGACC_Z_KD) {
 }
 
-actuator_setpoint_t RocketAngularAccelerationController::run(const attitude_estimate_t& estimate, const angular_acceleration_setpoint_t& input) {
+ActuatorSetpoint RocketAngularAccelerationController::run(const AttitudeEstimate& estimate, const AngularAccelerationSetpoint& input) {
   // Limit to maximum angular accelerations
-  float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.roll_acc_sp));
-  float pitchAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.pitch_acc_sp));
+  float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
+  float pitchAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.pitchAcc));
 
   // Constants
   const float M_PI = 3.1415926535;
@@ -75,11 +75,11 @@ actuator_setpoint_t RocketAngularAccelerationController::run(const attitude_esti
   float rollActuatorSp = 0.5 + C_L/(2*M_PI);   // Fin angle
 
   // Output
-  actuator_setpoint_t setpoint {
-    .roll_sp = rollActuatorSp,
-    .pitch_sp = 0.0f,
-    .yaw_sp = 0.0f,
-    .throttle_sp = input.throttle_sp
+  ActuatorSetpoint setpoint {
+    .roll = rollActuatorSp,
+    .pitch = 0.0f,
+    .yaw = 0.0f,
+    .throttle = input.throttle
   };
 
   return setpoint;

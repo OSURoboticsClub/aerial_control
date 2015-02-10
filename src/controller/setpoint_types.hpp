@@ -4,39 +4,39 @@
 // Setpoint types collected here to prevent circular dependencies between
 // controllers.
 
-struct position_setpoint_t {
-  float latitude_sp;
-  float longitude_sp;
-  float yaw_pos_sp;
-  float altitude_sp;
+struct PositionSetpoint {
+  float latitude;
+  float longitude;
+  float yawPos;
+  float altitude;
 };
 
-struct angular_position_setpoint_t {
-  float roll_pos_sp;
-  float pitch_pos_sp;
-  float yaw_pos_sp;
-  float throttle_sp;
+struct AngularPositionSetpoint {
+  float rollPos;
+  float pitchPos;
+  float yawPos;
+  float throttle;
 };
 
-struct angular_velocity_setpoint_t {
-  float roll_vel_sp;
-  float pitch_vel_sp;
-  float yaw_vel_sp;
-  float throttle_sp;
+struct AngularVelocitySetpoint {
+  float rollVel;
+  float pitchVel;
+  float yawVel;
+  float throttle;
 };
 
-struct angular_acceleration_setpoint_t {
-  float roll_acc_sp;
-  float pitch_acc_sp;
-  float yaw_acc_sp;
-  float throttle_sp;
+struct AngularAccelerationSetpoint {
+  float rollAcc;
+  float pitchAcc;
+  float yawAcc;
+  float throttle;
 };
 
-struct actuator_setpoint_t {
-  float roll_sp;
-  float pitch_sp;
-  float yaw_sp;
-  float throttle_sp;
+struct ActuatorSetpoint {
+  float roll;
+  float pitch;
+  float yaw;
+  float throttle;
 };
 
 #endif

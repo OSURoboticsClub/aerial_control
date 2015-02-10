@@ -47,8 +47,8 @@ void MPU6000::init() {
   readAccel();
 }
 
-gyroscope_reading_t MPU6000::readGyro() {
-  gyroscope_reading_t reading;
+GyroscopeReading MPU6000::readGyro() {
+  GyroscopeReading reading;
 
   // Poll gyro
   txbuf[0] = mpu6000::GYRO_XOUT_H | (1<<7);
@@ -76,8 +76,8 @@ gyroscope_reading_t MPU6000::readGyro() {
   return reading;
 }
 
-accelerometer_reading_t MPU6000::readAccel() {
-  accelerometer_reading_t reading;
+AccelerometerReading MPU6000::readAccel() {
+  AccelerometerReading reading;
 
   // Get data
   txbuf[0] = mpu6000::ACCEL_XOUT_H | (1<<7);
