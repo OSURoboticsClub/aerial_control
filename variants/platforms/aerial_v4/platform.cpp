@@ -104,15 +104,21 @@ VishayTherm& Platform::get() {
   return therm;
 }
 
-GPS& Platform::get() {
+template <>
+ADCPlatform& Platform::get() {
+  static ADCPlatform adcPlatform;
+  return adcPlatform;
+}
+
+template <>
+UBloxNEO7& Platform::get() {
   static UBloxNEO7 gps(&SD6);
   return gps;
 }
 
 template <>
-ADCPlatform& Platform::get() {
-  static ADCPlatform adcPlatform;
-  return adcPlatform;
+GPS& Platform::get() {
+  return get<UBloxNEO7>();
 }
 
 template <>
@@ -149,6 +155,9 @@ void Platform::init() {
   // Initialize IMU
   get<MPU9250>().init();
 
-  // Create thermistor
-  get<VishayTherm>();
+  // Initialize thermistor
+  get<VishayTherm>().init();
+
+  // Initialize GPS
+  get<UBloxNEO7>().init();
 }
