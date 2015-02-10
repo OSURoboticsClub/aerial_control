@@ -9,7 +9,7 @@ WorldEstimator::WorldEstimator(Communicator& communicator)
   : worldMessageStream(communicator, 10) {
 }
 
-WorldEstimate WorldEstimator::update(GPSReading& gpsReading) {
+WorldEstimate WorldEstimator::update(const SensorReadingGroup& readings) {
   // TODO: get GPS data
 
   WorldEstimate estimate {

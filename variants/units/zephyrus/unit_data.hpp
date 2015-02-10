@@ -2,6 +2,7 @@
 #define UNIT_DATA_HPP_
 
 #include "communication/communicator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "motor/multirotor_tri_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
@@ -25,7 +26,8 @@ struct UnitData {
   PWMDeviceGroup<1> servos;
   MultirotorTriMotorMapper motorMapper;
 
-  DCMAttitudeEstimator estimator;
+  WorldEstimator world;
+  DCMAttitudeEstimator attitude;
   OffboardInputSource inputSource;
 
   MultirotorVehicleSystem system;
@@ -44,9 +46,13 @@ struct UnitData {
         SERVO_PWM_MIN, SERVO_PWM_MAX, SERVO_PWM_SAFE // output range
       ),
       motorMapper(motors, servos, communicator),
-      estimator(communicator),
+      world(communicator),
+      attitude(communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(), std::experimental::nullopt, estimator, inputSource, motorMapper, communicator) {
+      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
+             std::experimental::nullopt,
+             std::experimental::nullopt,
+             world, attitude, inputSource, motorMapper, communicator) {
   }
 };
 

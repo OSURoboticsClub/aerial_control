@@ -2,6 +2,7 @@
 #define ATTITUDE_ESTIMATOR_HPP_
 
 #include "sensor/accelerometer.hpp"
+#include "sensor/gps.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
 #include "util/optional.hpp"
@@ -24,6 +25,7 @@ struct SensorReadingGroup {
   optional<GyroscopeReading> gyro;
   optional<AccelerometerReading> accel;
   optional<MagnetometerReading> mag;
+  optional<GPSReading> gps;
 };
 
 class AttitudeEstimator {

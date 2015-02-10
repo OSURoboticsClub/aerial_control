@@ -3,7 +3,7 @@
 
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
-#include "sensor/gps.hpp"
+#include "estimator/attitude_estimator.hpp"
 
 struct WorldEstimate {
   float globe_loc[3];
@@ -14,12 +14,12 @@ public:
   WorldEstimator(Communicator& communicator);
 
   /**
-   * Runs the estimator on the latest GPS readings, producing a new world
+   * Runs the estimator on the latest sensor readings, producing a new world
    * estimate.
    *
    * TODO(yoos): Consolidate with attitude estimator.
    */
-  virtual WorldEstimate update(GPSReading& gpsReading);
+  virtual WorldEstimate update(const SensorReadingGroup& readings);
 
 private:
   RateLimitedStream worldMessageStream;

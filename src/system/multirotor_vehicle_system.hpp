@@ -34,7 +34,7 @@ public:
   MultirotorVehicleSystem(
       Gyroscope& gyroscope,
       Accelerometer& accelerometer,
-      GPS& gps,
+      optional<GPS *> gps,
       optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
       WorldEstimator& world,
       AttitudeEstimator& attitude,
@@ -49,7 +49,7 @@ public:
 private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
-  GPS& gps;
+  optional<GPS *> gps;
   optional<Magnetometer *> magnetometer;
 
   WorldEstimator& world;

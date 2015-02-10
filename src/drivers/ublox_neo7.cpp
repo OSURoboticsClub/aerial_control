@@ -15,7 +15,7 @@ GPSReading UBloxNEO7::readGPS() {
 
   char dbg_buf[16];
   chsnprintf(dbg_buf, 12, "%12c", rxbuf.data());
-  chnWriteTimeout((BaseChannel*)&SD4, (uint8_t*)dbg_buf, 12, MS2ST(20));
+  //chnWriteTimeout((BaseChannel*)&SD4, (uint8_t*)dbg_buf, 12, MS2ST(20));
 
   // Run parser
   // TODO
