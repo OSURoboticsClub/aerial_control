@@ -47,8 +47,8 @@ void MPU9250::init() {
   readAccel();
 }
 
-gyroscope_reading_t MPU9250::readGyro() {
-  gyroscope_reading_t reading;
+GyroscopeReading MPU9250::readGyro() {
+  GyroscopeReading reading;
 
   // Poll gyro
   txbuf[0] = mpu9250::GYRO_XOUT_H | (1<<7);
@@ -76,8 +76,8 @@ gyroscope_reading_t MPU9250::readGyro() {
   return reading;
 }
 
-accelerometer_reading_t MPU9250::readAccel() {
-  accelerometer_reading_t reading;
+AccelerometerReading MPU9250::readAccel() {
+  AccelerometerReading reading;
 
   // Get data
   txbuf[0] = mpu9250::ACCEL_XOUT_H | (1<<7);

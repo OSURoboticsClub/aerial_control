@@ -106,8 +106,8 @@ public:
   using SPIDevice::SPIDevice;
 
   void init() override;
-  gyroscope_reading_t readGyro() override;
-  accelerometer_reading_t readAccel() override;
+  GyroscopeReading readGyro() override;
+  AccelerometerReading readAccel() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

@@ -11,7 +11,7 @@ class MultirotorQuadXMotorMapper : public MotorMapper {
 public:
   MultirotorQuadXMotorMapper(PWMDeviceGroup<4>& motors, Communicator& communicator);
 
-  void run(bool armed, actuator_setpoint_t& input) override;
+  void run(bool armed, ActuatorSetpoint& input) override;
 
 private:
   PWMDeviceGroup<4> motors;

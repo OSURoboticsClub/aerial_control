@@ -1,30 +1,38 @@
 #ifndef ATTITUDE_ESTIMATOR_HPP_
 #define ATTITUDE_ESTIMATOR_HPP_
 
-#include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
+#include "util/optional.hpp"
 
-struct attitude_estimate_t {
+struct AttitudeEstimate {
   float roll;
   float pitch;
   float yaw;
 
-  float roll_vel;
-  float pitch_vel;
-  float yaw_vel;
+  float rollVel;
+  float pitchVel;
+  float yawVel;
 
-  float roll_acc;
-  float pitch_acc;
-  float yaw_acc;
+  float rollAcc;
+  float pitchAcc;
+  float yawAcc;
+};
+
+struct SensorReadingGroup {
+  optional<GyroscopeReading> gyro;
+  optional<AccelerometerReading> accel;
+  optional<MagnetometerReading> mag;
 };
 
 class AttitudeEstimator {
 public:
   /**
-   * Runs the estimator on the latest gyroscope and accelerometer readings,
-   * producing a new attitude estimate.
+   * Runs the estimator on the latest sensor readings, producing a new attitude
+   * estimate.
    */
-  virtual attitude_estimate_t update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) = 0;
+  virtual AttitudeEstimate update(const SensorReadingGroup& readings) = 0;
 };
 
 #endif

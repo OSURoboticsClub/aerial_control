@@ -10,11 +10,11 @@
 #include "sensor/accelerometer.hpp"
 #include "variant/platform.hpp"
 
-static const float MOTOR_PWM_MIN = 0.53f;
-static const float MOTOR_PWM_MAX = 0.93f;
-static const float MOTOR_PWM_SAFE = 0.30f;
+static const float MOTOR_PWM_MIN = 0.40f;
+static const float MOTOR_PWM_MAX = 0.50f;
+static const float MOTOR_PWM_SAFE = 0.0f;   // Disable servo
 
-struct unit_data_t {
+struct UnitData {
   PWMDeviceGroup<1> servos;
   EsraRocketMotorMapper motorMapper;
 
@@ -23,7 +23,7 @@ struct unit_data_t {
 
   RocketSystem system;
 
-  unit_data_t(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform,
+  UnitData(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform,
       Communicator& communicator)
     : servos(pwmPlatform,
         { 0 },                              // channels

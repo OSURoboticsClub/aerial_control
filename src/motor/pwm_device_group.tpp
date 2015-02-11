@@ -26,7 +26,7 @@ void PWMDeviceGroup<device_count>::set(bool armed, const std::array<float, devic
       float zo = map(smin, smax, inMin, inMax, percents[i]);
       float pwm = map(inMin, inMax, outMin, outMax, zo);
 
-      pwmPlatform.set(channels[i], pwm + offsets[i]);
+      pwmPlatform.set(channels[i], pwm + offsets[i]); // TODO: Offset before mapping.
     }
   } else {
     for(std::size_t i = 0; i < device_count; i++) {
