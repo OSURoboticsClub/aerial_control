@@ -10,7 +10,7 @@ class PositionController : public Controller<PositionSetpoint, AngularPositionSe
 public:
   PositionController();
 
-  AngularPositionSetpoint run(const AttitudeEstimate& estimate, const PositionSetpoint& input) override;
+  AngularPositionSetpoint run(const WorldEstimate& world, const PositionSetpoint& input) override;
 
 private:
   PIDController latPid;

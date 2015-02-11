@@ -13,7 +13,7 @@ class ZeroController : public Controller<SP, ActuatorSetpoint> {
 public:
   ZeroController();
 
-  ActuatorSetpoint run(const AttitudeEstimate& estimate, const SP& input) override;
+  ActuatorSetpoint run(const WorldEstimate& world, const SP& input) override;
 };
 
 #include "controller/zero_controller.tpp"

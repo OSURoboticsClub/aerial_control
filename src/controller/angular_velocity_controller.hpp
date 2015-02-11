@@ -10,7 +10,7 @@ class AngularVelocityController : public Controller<AngularVelocitySetpoint, Ang
 public:
   AngularVelocityController();
 
-  AngularAccelerationSetpoint run(const AttitudeEstimate& estimate, const AngularVelocitySetpoint& input) override;
+  AngularAccelerationSetpoint run(const WorldEstimate& world, const AngularVelocitySetpoint& input) override;
 
 private:
   PIDController rollVelPid;

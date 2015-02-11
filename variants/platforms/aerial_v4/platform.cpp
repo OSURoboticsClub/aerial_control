@@ -5,6 +5,10 @@
 #include "drivers/mpu9250.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
+
+#include "drivers/ublox_neo7.hpp"
+#include "sensor/gps.hpp"
+
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
@@ -56,6 +60,17 @@ Accelerometer& Platform::get() {
 }
 
 template <>
+UBloxNEO7& Platform::get() {
+  static UBloxNEO7 gps(&SD6);
+  return gps;
+}
+
+template <>
+GPS& Platform::get() {
+  return get<UBloxNEO7>();
+}
+
+template <>
 I2CPlatform& Platform::get() {
   static I2CPlatform i2cPlatform;
   return i2cPlatform;
@@ -87,4 +102,7 @@ void Platform::init() {
 
   // Initialize IMU
   get<MPU9250>().init();
+
+  // Initialize GPS
+  get<UBloxNEO7>().init();
 }

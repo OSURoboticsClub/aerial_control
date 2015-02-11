@@ -14,7 +14,7 @@ public:
   /**
    * Update the internal DCM and return a new attitude estimate.
    */
-  AttitudeEstimate update(const SensorReadingGroup& readings) override;
+  AttitudeEstimate update(const SensorMeasurements& meas) override;
 
 private:
   /**
@@ -31,7 +31,7 @@ private:
    */
   float getAccelWeight(Eigen::Vector3f accel) const;
 
-  AttitudeEstimate makeEstimate(const SensorReadingGroup& readings);
+  AttitudeEstimate makeEstimate(const SensorMeasurements& meas);
 
   /**
    * Publish a new message to the output stream if necessary.

@@ -3,8 +3,9 @@
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyroscope,
     Accelerometer& accelerometer,
+    optional<GPS *> gps,
     optional<Magnetometer *> magnetometer,
-    AttitudeEstimator& estimator,
+    WorldEstimator& estimator,
     InputSource& inputSource,
     MotorMapper& motorMapper,
     Communicator& communicator)
@@ -12,6 +13,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     MessageListener(communicator),
     gyroscope(gyroscope),
     accelerometer(accelerometer),
+    gps(gps),
     magnetometer(magnetometer),
     estimator(estimator),
     inputSource(inputSource),
@@ -27,21 +29,31 @@ void MultirotorVehicleSystem::update() {
   GyroscopeReading gyroReading = gyroscope.readGyro();
   AccelerometerReading accelReading = accelerometer.readAccel();
   optional<MagnetometerReading> magReading;
+  optional<GPSReading> gpsReading;
 
   // Only use magnetometer if it is available
   if(magnetometer) {
     magReading = (*magnetometer)->readMag();
   }
 
+  if (gps) {
+    static int i=0;
+    if (i++ % 100 == 0) {
+      // TODO(yoos): GPS read makes board freeze
+      //gpsReading = (*gps)->readGPS();
+    }
+  }
+
   // TODO: Currently copying all readings
-  SensorReadingGroup readings {
-    .gyro = std::experimental::make_optional(gyroReading),
+  SensorMeasurements meas {
     .accel = std::experimental::make_optional(accelReading),
-    .mag = magReading
+    .gps   = gpsReading,
+    .gyro  = std::experimental::make_optional(gyroReading),
+    .mag   = magReading
   };
 
-  // Update the attitude estimate
-  AttitudeEstimate estimate = estimator.update(readings);
+  // Update estimates
+  WorldEstimate world = estimator.update(meas);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
@@ -58,12 +70,12 @@ void MultirotorVehicleSystem::update() {
           .yawPos = input.yaw,
           .altitude = input.throttle
         };
-        actuatorSp = pipeline.run(estimate, sp, posController, attPosController, attVelController, attAccController);
+        actuatorSp = pipeline.run(world, sp, posController, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::VELOCITY: {
         // TODO: implement
-        // actuatorSp = pipeline.run(estimate, sp, velController, attPosController, attVelController, attAccController);
+        // actuatorSp = pipeline.run(world, sp, velController, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::ANGULAR_POS: {
@@ -73,7 +85,7 @@ void MultirotorVehicleSystem::update() {
           .yawPos = input.yaw,
           .throttle = input.throttle
         };
-        actuatorSp = pipeline.run(estimate, sp, attPosController, attVelController, attAccController);
+        actuatorSp = pipeline.run(world, sp, attPosController, attVelController, attAccController);
         break;
       }
       case MultirotorControlMode::ANGULAR_RATE: {
@@ -83,13 +95,13 @@ void MultirotorVehicleSystem::update() {
           .yawVel = input.yaw,
           .throttle = input.throttle
         };
-        actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
+        actuatorSp = pipeline.run(world, sp, attVelController, attAccController);
         break;
       }
     }
   } else {
     // Run the zero controller
-    actuatorSp = zeroController.run(estimate, actuatorSp);
+    actuatorSp = zeroController.run(world, actuatorSp);
   }
 
   // Update motor outputs
