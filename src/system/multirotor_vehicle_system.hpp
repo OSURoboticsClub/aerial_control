@@ -1,8 +1,14 @@
 #ifndef MULTIROTOR_SYSTEM_HPP_
 #define MULTIROTOR_SYSTEM_HPP_
 
+#include "system/vehicle_system.hpp"
+#include "util/optional.hpp"
+
+// Communication
 #include "communication/communicator.hpp"
 #include "communication/message_listener.hpp"
+
+// Control
 #include "controller/angular_position_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
 #include "controller/angular_acceleration_controller.hpp"
@@ -10,17 +16,18 @@
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
-#include "estimator/attitude_estimator.hpp"
-#include "estimator/world_estimator.hpp"
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
+
+// World estimation
+#include "estimator/world_estimator.hpp"
+
+// Sensors
 #include "sensor/accelerometer.hpp"
 #include "sensor/gps.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
-#include "system/vehicle_system.hpp"
-#include "util/optional.hpp"
 
 enum class MultirotorControlMode {
   POSITION,
@@ -36,8 +43,7 @@ public:
       Accelerometer& accelerometer,
       optional<GPS *> gps,
       optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
-      WorldEstimator& world,
-      AttitudeEstimator& attitude,
+      WorldEstimator& worldEstimator,
       InputSource& inputSource,
       MotorMapper& motorMapper,
       Communicator& communicator);
@@ -52,8 +58,7 @@ private:
   optional<GPS *> gps;
   optional<Magnetometer *> magnetometer;
 
-  WorldEstimator& world;
-  AttitudeEstimator& attitude;
+  WorldEstimator& worldEstimator;
   InputSource& inputSource;
 
   PositionController posController;
