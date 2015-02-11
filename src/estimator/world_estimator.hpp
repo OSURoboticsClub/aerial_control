@@ -21,12 +21,10 @@ public:
   AttitudeEstimator& attEstimator;
 
   /**
-   * Runs the estimator on the latest sensor readings, producing a new world
-   * estimate.
-   *
-   * TODO(yoos): Consolidate with attitude estimator.
+   * Run location and attitude estimators on the latest sensor measurements,
+   * producing a new world estimate.
    */
-  virtual WorldEstimate update(const SensorMeasurements& meas);
+  WorldEstimate update(const SensorMeasurements& meas);
 
 private:
   RateLimitedStream worldMessageStream;
