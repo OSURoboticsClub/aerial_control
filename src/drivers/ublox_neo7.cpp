@@ -9,7 +9,8 @@ void UBloxNEO7::init() {
 GPSReading UBloxNEO7::readGPS() {
   GPSReading reading;
 
-  // Read all available bytes until the newline character.
+  // Read all available bytes until the newline character. NMEA dictates that
+  // messages should end with a CRLF, but we'll only look for the LF.
   std::size_t len = readUntil('\n');
 
   // Check if a full line is ready to be processed
