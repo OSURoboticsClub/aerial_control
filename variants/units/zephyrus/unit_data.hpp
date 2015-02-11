@@ -3,6 +3,7 @@
 
 #include "communication/communicator.hpp"
 #include "estimator/world_estimator.hpp"
+#include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "motor/multirotor_tri_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
@@ -27,6 +28,7 @@ struct UnitData {
   MultirotorTriMotorMapper motorMapper;
 
   WorldEstimator world;
+  AtmosphericLocationEstimator location;
   DCMAttitudeEstimator attitude;
   OffboardInputSource inputSource;
 
@@ -46,13 +48,14 @@ struct UnitData {
         SERVO_PWM_MIN, SERVO_PWM_MAX, SERVO_PWM_SAFE // output range
       ),
       motorMapper(motors, servos, communicator),
-      world(communicator),
+      location(communicator),
       attitude(communicator),
+      world(location, attitude, communicator),
       inputSource(communicator),
       system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::nullopt,
              std::experimental::nullopt,
-             world, attitude, inputSource, motorMapper, communicator) {
+             world, inputSource, motorMapper, communicator) {
   }
 };
 

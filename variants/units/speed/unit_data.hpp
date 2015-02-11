@@ -2,6 +2,7 @@
 #define UNIT_DATA_HPP_
 
 #include "communication/communicator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "motor/pwm_device_group.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
