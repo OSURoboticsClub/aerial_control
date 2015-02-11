@@ -35,7 +35,7 @@ void MultirotorVehicleSystem::update() {
 
   // Only use magnetometer if it is available
   if(magnetometer) {
-    magReading = (*magnetometer)->readMag();
+    //magReading = (*magnetometer)->readMag();
   }
 
   optional<ThermistorReading> thermReading;
@@ -46,7 +46,7 @@ void MultirotorVehicleSystem::update() {
       //gpsReading = (*gps)->readGPS();
     }
     if (thermistor) {
-      thermReading = (*thermistor)->readTherm();
+      //thermReading = (*thermistor)->readTherm();
     }
   }
 
