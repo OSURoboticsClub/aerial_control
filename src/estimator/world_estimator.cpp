@@ -24,7 +24,7 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
 
   if(worldMessageStream.ready()) {
     protocol::message::log_message_t m;
-    sprintf(m.data, "therm: %f", readings.therm->celsius);
+    sprintf(m.data, "therm: %f", meas.therm->celsius);
 
     worldMessageStream.publish(m);
   }
