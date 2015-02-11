@@ -39,7 +39,8 @@ void MultirotorVehicleSystem::update() {
   if (gps) {
     static int i=0;
     if (i++ % 100 == 0) {
-      gpsReading = (*gps)->readGPS();
+      // TODO(yoos): GPS read makes board freeze
+      //gpsReading = (*gps)->readGPS();
     }
   }
 
