@@ -1,15 +1,17 @@
 #ifndef SENSOR_MEASUREMENTS_HPP_
 #define SENSOR_MEASUREMENTS_HPP_
 
-#include "sensors/accelerometer.hpp"
-#include "sensors/gps.hpp"
-#include "sensors/gyroscope.hpp"
-#include "sensors/magnetometer.hpp"
+#include "sensor/accelerometer.hpp"
+#include "sensor/gps.hpp"
+#include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
+
+#include "util/optional.hpp"
 
 struct SensorMeasurements {
   optional<AccelerometerReading> accel;
-  optional<GyroscopeReading> gyro;
   optional<GPSReading> gps;
+  optional<GyroscopeReading> gyro;
   optional<MagnetometerReading> mag;
 };
 
