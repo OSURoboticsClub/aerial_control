@@ -13,12 +13,22 @@ public:
   USARTDevice(SerialDriver *sd);
 
 protected:
-  void read(std::size_t count);
+  /**
+   * Continue appending to the internal buffer until the `stop` byte is
+   * encountered.
+   *
+   * Returns the number of bytes available if the the `stop` byte was found.
+   * Otherwise, return 0.
+   */
+  std::size_t readUntil(std::uint8_t stop);
+
   void write(std::size_t count);
 
   SerialDriver *sd;
 
   std::array<std::uint8_t, tx_size> txbuf;
+
+  std::size_t rxpos;
   std::array<std::uint8_t, rx_size> rxbuf;
 };
 
