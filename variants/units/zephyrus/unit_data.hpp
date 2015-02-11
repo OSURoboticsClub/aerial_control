@@ -55,6 +55,7 @@ struct UnitData {
       system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::nullopt,
              std::experimental::nullopt,
+             std::experimental::nullopt,
              world, inputSource, motorMapper, communicator) {
   }
 };

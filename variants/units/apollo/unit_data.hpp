@@ -45,6 +45,7 @@ struct UnitData {
              platform.get<Accelerometer>(),
              std::experimental::nullopt,
              std::experimental::make_optional(&platform.get<Magnetometer>()),
+             std::experimental::nullopt,
              world, inputSource, motorMapper, communicator
       ) {
   }
