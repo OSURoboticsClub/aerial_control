@@ -5,15 +5,21 @@
 
 #include "unit_config.hpp"
 
-WorldEstimator::WorldEstimator(Communicator& communicator)
-  : worldMessageStream(communicator, 10) {
+WorldEstimator::WorldEstimator(
+    LocationEstimator& locEstimator,
+    AttitudeEstimator& attEstimator,
+    Communicator& communicator)
+  : locEstimator(locEstimator),
+    attEstimator(attEstimator),
+    worldMessageStream(communicator, 10) {
 }
 
-WorldEstimate WorldEstimator::update(const SensorReadingGroup& readings) {
+WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
   // TODO: get GPS data
 
   WorldEstimate estimate {
-    .globe_loc = {1, 2, 3}
+    .loc = locEstimator.update(meas),
+    .att = attEstimator.update(meas)
   };
 
   if(worldMessageStream.ready()) {
