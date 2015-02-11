@@ -12,10 +12,10 @@ template <typename R>
 class ControllerPipeline {
 public:
   template <typename SP, typename C>
-  R run(const AttitudeEstimate& estimate, const SP& input, C& tail);
+  R run(const WorldEstimate& world, const SP& input, C& tail);
 
   template <typename SP, typename C, typename... Cs>
-  R run(const AttitudeEstimate& estimate, const SP& input, C& head, Cs&... controllers);
+  R run(const WorldEstimate& world, const SP& input, C& head, Cs&... controllers);
 };
 
 #include "controller/controller_pipeline.tpp"

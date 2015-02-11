@@ -9,7 +9,7 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
     attitudeMessageStream(communicator, 20) {
 }
 
-AttitudeEstimate DCMAttitudeEstimator::update(const SensorReadingGroup& readings) {
+AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
 
   // Assume zero weights until we have verified the presence of these sensors.
@@ -18,8 +18,8 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorReadingGroup& readings
 
   // If an accelerometer is available, use the provided gravity vector to
   // correct for drift in the DCM.
-  if(readings.accel) {
-    Eigen::Vector3f accel((*readings.accel).axes.data());
+  if(meas.accel) {
+    Eigen::Vector3f accel((*meas.accel).axes.data());
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
@@ -30,8 +30,8 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorReadingGroup& readings
 
   // If a magnetometer is available, use the provided north vector to correct
   // the yaw.
-  if(readings.mag) {
-    Eigen::Vector3f mag((*readings.mag).axes.data());
+  if(meas.mag) {
+    Eigen::Vector3f mag((*meas.mag).axes.data());
 
     // TODO: Calculate mag weight?
     magWeight = 0.001f;
@@ -51,8 +51,8 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorReadingGroup& readings
 
   // If a gyroscope is available, integrate the provided rotational velocity and
   // add it to the correction vector.
-  if(readings.gyro) {
-    Eigen::Vector3f gyro((*readings.gyro).axes.data());
+  if(meas.gyro) {
+    Eigen::Vector3f gyro((*meas.gyro).axes.data());
     corr += gyro * unit_config::DT * (1.0f - accelWeight - magWeight);
   }
 
@@ -70,7 +70,7 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorReadingGroup& readings
 
   updateStream();
 
-  return makeEstimate(readings);
+  return makeEstimate(meas);
 }
 
 void DCMAttitudeEstimator::orthonormalize() {
@@ -113,7 +113,7 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   return accelWeight;
 }
 
-AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorReadingGroup& readings) {
+AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& meas) {
   AttitudeEstimate estimate = {
     // TODO: Are these trig functions safe at extreme angles?
     .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
@@ -131,12 +131,12 @@ AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorReadingGroup& re
     .yawAcc = 0.0f
   };
 
-  // If a gyro is available then use the direct readings for velocity
+  // If a gyro is available then use the direct measurements for velocity
   // calculation.
-  if(readings.gyro) {
-    estimate.rollVel = (*readings.gyro).axes[0];
-    estimate.pitchVel = (*readings.gyro).axes[1];
-    estimate.yawVel = (*readings.gyro).axes[2];
+  if(meas.gyro) {
+    estimate.rollVel = (*meas.gyro).axes[0];
+    estimate.pitchVel = (*meas.gyro).axes[1];
+    estimate.yawVel = (*meas.gyro).axes[2];
   } else {
     // TODO: Differentiate estimates or just ignore?
   }

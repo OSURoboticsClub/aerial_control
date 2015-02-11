@@ -10,7 +10,7 @@ class AngularPositionController : public Controller<AngularPositionSetpoint, Ang
 public:
   AngularPositionController();
 
-  AngularVelocitySetpoint run(const AttitudeEstimate& estimate, const AngularPositionSetpoint& input) override;
+  AngularVelocitySetpoint run(const WorldEstimate& world, const AngularPositionSetpoint& input) override;
 
 private:
   PIDController rollPosPid;

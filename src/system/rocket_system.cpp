@@ -2,7 +2,7 @@
 
 RocketSystem::RocketSystem(
     Gyroscope& gyroscope, Accelerometer& accelerometer,
-    AttitudeEstimator& estimator, InputSource& inputSource,
+    WorldEstimator& worldEstimator, InputSource& inputSource,
     MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
@@ -18,14 +18,15 @@ void RocketSystem::update() {
   GyroscopeReading gyroReading = gyroscope.readGyro();
   AccelerometerReading accelReading = accelerometer.readAccel();
 
-  SensorReadingGroup readings {
-    .gyro = std::experimental::make_optional(gyroReading),
+  SensorMeasurements meas {
     .accel = std::experimental::make_optional(accelReading),
-    .mag = std::experimental::nullopt
+    .gps   = std::experimental::nullopt,
+    .gyro  = std::experimental::make_optional(gyroReading),
+    .mag   = std::experimental::nullopt
   };
 
   // Update the attitude estimate
-  AttitudeEstimate estimate = estimator.update(readings);
+  WorldEstimate estimate = estimator.update(meas);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();

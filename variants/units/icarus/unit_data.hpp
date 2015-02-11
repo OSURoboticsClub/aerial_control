@@ -3,7 +3,9 @@
 
 #include "system/rocket_system.hpp"
 #include "motor/esra_rocket_motor_mapper.hpp"
+#include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "communication/communicator.hpp"
 #include "input/offboard_input_source.hpp"
 #include "sensor/gyroscope.hpp"
@@ -18,7 +20,9 @@ struct UnitData {
   PWMDeviceGroup<1> servos;
   EsraRocketMotorMapper motorMapper;
 
-  DCMAttitudeEstimator estimator;
+  AtmosphericLocationEstimator location;
+  DCMAttitudeEstimator attitude;
+  WorldEstimator world;
   OffboardInputSource inputSource;
 
   RocketSystem system;
@@ -32,9 +36,11 @@ struct UnitData {
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range
       ),
       motorMapper(servos, communicator),
-      estimator(communicator),
+      location(communicator),
+      attitude(communicator),
+      world(location, attitude, communicator),
       inputSource(communicator),
-      system(gyro, accel, estimator, inputSource, motorMapper, communicator) {
+      system(gyro, accel, world, inputSource, motorMapper, communicator) {
   }
 };
 
