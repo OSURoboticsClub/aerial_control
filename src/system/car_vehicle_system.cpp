@@ -6,9 +6,10 @@
 
 CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
     PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
+    WorldEstimator& estimator,
     Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer), estimator(communicator),
+    gyroscope(gyroscope), accelerometer(accelerometer), estimator(estimator),
     inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
@@ -20,14 +21,15 @@ void CarVehicleSystem::update() {
   GyroscopeReading gyroReading = gyroscope.readGyro();
   AccelerometerReading accelReading = accelerometer.readAccel();
 
-  SensorReadingGroup readings {
-    .gyro = std::experimental::make_optional(gyroReading),
-    .accel = std::experimental::make_optional(accelReading),
-    .mag = std::experimental::nullopt
+  SensorMeasurements meas {
+    accel : std::experimental::make_optional(accelReading),
+    gps   : std::experimental::nullopt,
+    gyro  : std::experimental::make_optional(gyroReading),
+    mag   : std::experimental::nullopt
   };
 
-  // Update the attitude estimate
-  AttitudeEstimate estimate = estimator.update(readings);
+  // Update the world estimate
+  WorldEstimate world = estimator.update(meas);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
@@ -42,10 +44,10 @@ void CarVehicleSystem::update() {
       .yawVel = input.yaw,
       .throttle = input.throttle
     };
-    actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
+    actuatorSp = pipeline.run(world, sp, attVelController, attAccController);
   } else {
     // Run the zero controller
-    actuatorSp = zeroController.run(estimate, actuatorSp);
+    actuatorSp = zeroController.run(world, actuatorSp);
   }
 
   // Update motor outputs

@@ -43,7 +43,7 @@ public:
       Accelerometer& accelerometer,
       optional<GPS *> gps,
       optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
-      WorldEstimator& worldEstimator,
+      WorldEstimator& estimator,
       InputSource& inputSource,
       MotorMapper& motorMapper,
       Communicator& communicator);
@@ -58,7 +58,7 @@ private:
   optional<GPS *> gps;
   optional<Magnetometer *> magnetometer;
 
-  WorldEstimator& worldEstimator;
+  WorldEstimator& estimator;
   InputSource& inputSource;
 
   PositionController posController;

@@ -5,7 +5,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     Accelerometer& accelerometer,
     optional<GPS *> gps,
     optional<Magnetometer *> magnetometer,
-    WorldEstimator& worldEstimator,
+    WorldEstimator& estimator,
     InputSource& inputSource,
     MotorMapper& motorMapper,
     Communicator& communicator)
@@ -15,7 +15,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     accelerometer(accelerometer),
     gps(gps),
     magnetometer(magnetometer),
-    worldEstimator(worldEstimator),
+    estimator(estimator),
     inputSource(inputSource),
     motorMapper(motorMapper),
     mode(MultirotorControlMode::ANGULAR_POS) {
@@ -45,14 +45,14 @@ void MultirotorVehicleSystem::update() {
 
   // TODO: Currently copying all readings
   SensorMeasurements meas {
-    .gyro = std::experimental::make_optional(gyroReading),
-    .accel = std::experimental::make_optional(accelReading),
-    .mag = magReading,
-    .gps = gpsReading
+    accel : std::experimental::make_optional(accelReading),
+    gps   : gpsReading,
+    gyro  : std::experimental::make_optional(gyroReading),
+    mag   : magReading
   };
 
   // Update estimates
-  WorldEstimate world = worldEstimator.update(meas);
+  WorldEstimate world = estimator.update(meas);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();

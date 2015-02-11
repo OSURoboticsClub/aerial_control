@@ -8,12 +8,11 @@
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
-#include "estimator/dcm_attitude_estimator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/car_motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/accelerometer.hpp"
+#include "sensor/sensor_measurements.hpp"
 #include "system/vehicle_system.hpp"
 #include "variant/pwm_platform.hpp"
 
@@ -21,7 +20,7 @@ class CarVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
       PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
-      Communicator& communicator);
+      WorldEstimator& estimator, Communicator& communicator);
 
   void update() override;
 
@@ -31,7 +30,7 @@ private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
 
-  DCMAttitudeEstimator estimator;
+  WorldEstimator& estimator;
   OffboardInputSource inputSource;
   CarMotorMapper motorMapper;
 
