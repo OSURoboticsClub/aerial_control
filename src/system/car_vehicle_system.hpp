@@ -8,6 +8,8 @@
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
+#include "estimator/atmospheric_location_estimator.hpp"
+#include "estimator/dcm_attitude_estimator.hpp"
 #include "estimator/world_estimator.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/car_motor_mapper.hpp"
@@ -20,7 +22,7 @@ class CarVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
       PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
-      WorldEstimator& estimator, Communicator& communicator);
+      Communicator& communicator);
 
   void update() override;
 
@@ -30,7 +32,11 @@ private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
 
-  WorldEstimator& estimator;
+  // This should be allocated in unit_data.hpp, probably.
+  AtmosphericLocationEstimator locEstimator;
+  DCMAttitudeEstimator attEstimator;
+  WorldEstimator worldEstimator;
+
   OffboardInputSource inputSource;
   CarMotorMapper motorMapper;
 

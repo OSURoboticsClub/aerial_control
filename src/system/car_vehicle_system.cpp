@@ -6,10 +6,11 @@
 
 CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
     PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
-    WorldEstimator& estimator,
     Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer), estimator(estimator),
+    gyroscope(gyroscope), accelerometer(accelerometer),
+    locEstimator(communicator), attEstimator(communicator),
+    worldEstimator(locEstimator, attEstimator, communicator),
     inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
@@ -29,7 +30,7 @@ void CarVehicleSystem::update() {
   };
 
   // Update the world estimate
-  WorldEstimate world = estimator.update(meas);
+  WorldEstimate world = worldEstimator.update(meas);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
