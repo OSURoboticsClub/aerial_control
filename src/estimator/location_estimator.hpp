@@ -1,12 +1,12 @@
 #ifndef LOCATION_ESTIMATOR_HPP_
-#define LOCATION_ESTIMATOR_HPP__
+#define LOCATION_ESTIMATOR_HPP_
 
-#include "sensors/sensor_measurements.hpp"
+#include "sensor/sensor_measurements.hpp"
 
 struct LocationEstimate {
   float lat;
   float lon;
-  float altitude;
+  float alt;
 };
 
 class LocationEstimator {

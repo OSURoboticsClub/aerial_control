@@ -1,7 +1,7 @@
 #ifndef ATTITUDE_ESTIMATOR_HPP_
 #define ATTITUDE_ESTIMATOR_HPP_
 
-#include "sensors/sensor_measurements.hpp"
+#include "sensor/sensor_measurements.hpp"
 
 struct AttitudeEstimate {
   float roll;
