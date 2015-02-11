@@ -46,10 +46,10 @@ void MultirotorVehicleSystem::update() {
 
   // TODO: Currently copying all readings
   SensorMeasurements meas {
-    accel : std::experimental::make_optional(accelReading),
-    gps   : gpsReading,
-    gyro  : std::experimental::make_optional(gyroReading),
-    mag   : magReading
+    .accel = std::experimental::make_optional(accelReading),
+    .gps   = gpsReading,
+    .gyro  = std::experimental::make_optional(gyroReading),
+    .mag   = magReading
   };
 
   // Update estimates

@@ -19,10 +19,10 @@ void RocketSystem::update() {
   AccelerometerReading accelReading = accelerometer.readAccel();
 
   SensorMeasurements meas {
-    accel : std::experimental::make_optional(accelReading),
-    gps   : std::experimental::nullopt,
-    gyro  : std::experimental::make_optional(gyroReading),
-    mag   : std::experimental::nullopt
+    .accel = std::experimental::make_optional(accelReading),
+    .gps   = std::experimental::nullopt,
+    .gyro  = std::experimental::make_optional(gyroReading),
+    .mag   = std::experimental::nullopt
   };
 
   // Update the attitude estimate
