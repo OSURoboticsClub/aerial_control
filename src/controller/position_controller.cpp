@@ -10,12 +10,12 @@ PositionController::PositionController()
     altitudePid(10.0, 0.0, 0.0) {
 }
 
-AngularPositionSetpoint PositionController::run(const AttitudeEstimate& estimate, const PositionSetpoint& input) {
+AngularPositionSetpoint PositionController::run(const WorldEstimate& world, const PositionSetpoint& input) {
   // TODO(kyle): Transform from local x/y to global lat/long (need mag)
 
-  float rollPosSp = latPid.calculate(input.latitude, 0 /* TODO: estimate.latitude */, unit_config::DT);
-  float pitchPosSp = lonPid.calculate(input.longitude, 0 /* TODO: estimate.longitude */, unit_config::DT);
-  float throttleSp = altitudePid.calculate(input.altitude, 0 /* TODO: estimate.altitude */, unit_config::DT);
+  float rollPosSp = latPid.calculate(input.latitude, 0 /* TODO: world.loc.latitude */, unit_config::DT);
+  float pitchPosSp = lonPid.calculate(input.longitude, 0 /* TODO: world.loc.longitude */, unit_config::DT);
+  float throttleSp = altitudePid.calculate(input.altitude, 0 /* TODO: world.loc.altitude */, unit_config::DT);
 
   AngularPositionSetpoint setpoint {
     .rollPos = rollPosSp,

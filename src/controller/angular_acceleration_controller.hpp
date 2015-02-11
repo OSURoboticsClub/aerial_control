@@ -10,7 +10,7 @@ class AngularAccelerationController : public Controller<AngularAccelerationSetpo
 public:
   AngularAccelerationController();
 
-  ActuatorSetpoint run(const AttitudeEstimate& estimate, const AngularAccelerationSetpoint& input) override;
+  ActuatorSetpoint run(const WorldEstimate& world, const AngularAccelerationSetpoint& input) override;
 
 private:
   PIDController rollAccPid;
