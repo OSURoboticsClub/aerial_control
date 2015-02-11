@@ -14,6 +14,9 @@ public:
 
   void init() override;
   GPSReading readGPS() override;
+
+private:
+  GPSReading lastReading;
 };
 
 #endif

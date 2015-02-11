@@ -13,6 +13,9 @@ std::size_t USARTDevice<tx_size, rx_size>::readUntil(std::uint8_t stop) {
     if(b == stop) {
       std::size_t len = rxpos;
 
+      // TODO: Append a null character to facilitate `strtok`?
+      rxbuf[rxpos++] = '\0';
+
       // Reset rxpos to zero in anticipation of next read
       rxpos = 0;
 
