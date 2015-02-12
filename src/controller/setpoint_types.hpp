@@ -5,10 +5,10 @@
 // controllers.
 
 struct PositionSetpoint {
-  float latitude;
-  float longitude;
+  float lat;
+  float lon;
   float yawPos;
-  float altitude;
+  float alt;
 };
 
 struct AngularPositionSetpoint {

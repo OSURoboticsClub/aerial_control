@@ -65,10 +65,10 @@ void MultirotorVehicleSystem::update() {
     switch(mode) {
       case MultirotorControlMode::POSITION: {
         PositionSetpoint sp {
-          .latitude = input.roll,
-          .longitude = input.pitch,
+          .lat = input.roll,
+          .lon = input.pitch,
           .yawPos = input.yaw,
-          .altitude = input.throttle
+          .alt = input.throttle
         };
         actuatorSp = pipeline.run(world, sp, posController, attPosController, attVelController, attAccController);
         break;

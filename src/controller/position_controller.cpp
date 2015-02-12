@@ -11,15 +11,19 @@ PositionController::PositionController()
 }
 
 AngularPositionSetpoint PositionController::run(const WorldEstimate& world, const PositionSetpoint& input) {
-  // TODO(kyle): Transform from local x/y to global lat/long (need mag)
+  // TODO(kyle): Weird effects at the poles?
+  float globalRollPosSp = latPid.calculate(input.lat, world.loc.lat, unit_config::DT);
+  float globalPitchPosSp = lonPid.calculate(input.lon, world.loc.lon, unit_config::DT);
+  float throttleSp = altitudePid.calculate(input.alt, world.loc.alt, unit_config::DT);
 
-  float rollPosSp = latPid.calculate(input.latitude, 0 /* TODO: world.loc.latitude */, unit_config::DT);
-  float pitchPosSp = lonPid.calculate(input.longitude, 0 /* TODO: world.loc.longitude */, unit_config::DT);
-  float throttleSp = altitudePid.calculate(input.altitude, 0 /* TODO: world.loc.altitude */, unit_config::DT);
+  // TODO(kyle): Transform from global angular setpoints to local angular
+  // setpoints.
+  float bodyRollPosSp = 0.0f;
+  float bodyPitchPosSp = 0.0f;
 
   AngularPositionSetpoint setpoint {
-    .rollPos = rollPosSp,
-    .pitchPos = pitchPosSp,
+    .rollPos = bodyRollPosSp,
+    .pitchPos = bodyPitchPosSp,
     .yawPos = input.yawPos,
     .throttle = throttleSp
   };
