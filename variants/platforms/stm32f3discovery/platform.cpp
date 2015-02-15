@@ -4,8 +4,10 @@
 
 #include "drivers/l3gd20.hpp"
 #include "drivers/lsm303dlhc.hpp"
+#include "drivers/lsm303dlhc_mag.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
+#include "sensor/magnetometer.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
@@ -27,7 +29,8 @@ static const I2CConfig LSM303_CONFIG {
   0
 };
 
-static const i2caddr_t LSM303_I2C_ACC_ADDRESS = 0x19;
+static const i2caddr_t LSM303_I2C_ACC_ADDRESS = (0x32 >> 1);
+static const i2caddr_t LSM303_I2C_MAG_ADDRESS = (0x3c >> 1);
 
 Platform::Platform() {
 }
@@ -42,6 +45,12 @@ template <>
 Accelerometer& Platform::get() {
   static LSM303DLHC accel(&I2CD1, &LSM303_CONFIG, LSM303_I2C_ACC_ADDRESS);
   return accel;
+}
+
+template <>
+Magnetometer& Platform::get() {
+  static LSM303DLHCMag mag(&I2CD1, &LSM303_CONFIG, LSM303_I2C_MAG_ADDRESS);
+  return mag;
 }
 
 template <>
@@ -76,4 +85,5 @@ void Platform::init() {
 
   get<Gyroscope>().init();
   get<Accelerometer>().init();
+  get<Magnetometer>().init();
 }

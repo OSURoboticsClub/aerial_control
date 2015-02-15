@@ -3,14 +3,14 @@
 
 #include <array>
 
-struct gyroscope_reading_t {
+struct GyroscopeReading {
   std::array<float, 3> axes;
 };
 
 class Gyroscope {
 public:
   virtual void init() = 0;
-  virtual gyroscope_reading_t readGyro() = 0;
+  virtual GyroscopeReading readGyro() = 0;
 };
 
 #endif

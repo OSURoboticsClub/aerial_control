@@ -10,22 +10,22 @@ AngularPositionController::AngularPositionController()
     yawPosPid(unit_config::ANGPOS_Z_KP, unit_config::ANGPOS_Z_KI, unit_config::ANGPOS_Z_KD) {
 }
 
-angular_velocity_setpoint_t AngularPositionController::run(const attitude_estimate_t& estimate, const angular_position_setpoint_t& input) {
+AngularVelocitySetpoint AngularPositionController::run(const WorldEstimate& world, const AngularPositionSetpoint& input) {
   // Limit to maximum angles
-  float rollPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.roll_pos_sp));
-  float pitchPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.pitch_pos_sp));
+  float rollPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.rollPos));
+  float pitchPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.pitchPos));
 
   // Run PID controllers
-  float rollVelSp = rollPosPid.calculate(rollPosSp, estimate.roll, unit_config::DT);
-  float pitchVelSp = pitchPosPid.calculate(pitchPosSp, estimate.pitch, unit_config::DT);
-  float yawVelSp = yawPosPid.calculate(input.yaw_pos_sp, estimate.yaw, unit_config::DT);
+  float rollVelSp = rollPosPid.calculate(rollPosSp, world.att.roll, unit_config::DT);
+  float pitchVelSp = pitchPosPid.calculate(pitchPosSp, world.att.pitch, unit_config::DT);
+  float yawVelSp = yawPosPid.calculate(input.yawPos, world.att.yaw, unit_config::DT);
 
   // Output
-  angular_velocity_setpoint_t setpoint {
-    .roll_vel_sp = rollVelSp,
-    .pitch_vel_sp = pitchVelSp,
-    .yaw_vel_sp = yawVelSp,
-    .throttle_sp = input.throttle_sp
+  AngularVelocitySetpoint setpoint {
+    .rollVel = rollVelSp,
+    .pitchVel = pitchVelSp,
+    .yawVel = yawVelSp,
+    .throttle = input.throttle
   };
 
   return setpoint;

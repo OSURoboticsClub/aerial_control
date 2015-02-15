@@ -11,12 +11,12 @@ class OffboardInputSource : public InputSource, public MessageListener {
 public:
   OffboardInputSource(Communicator& communicator);
 
-  controller_input_t read() override;
+  ControllerInput read() override;
 
   void on(const protocol::message::offboard_attitude_control_message_t& m) override;
 
 private:
-  controller_input_t lastInput;
+  ControllerInput lastInput;
   systime_t lastInputTimestamp;
 };
 

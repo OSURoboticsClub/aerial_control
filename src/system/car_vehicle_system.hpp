@@ -8,12 +8,13 @@
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
+#include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/car_motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/accelerometer.hpp"
+#include "sensor/sensor_measurements.hpp"
 #include "system/vehicle_system.hpp"
 #include "variant/pwm_platform.hpp"
 
@@ -31,15 +32,19 @@ private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
 
-  DCMAttitudeEstimator estimator;
+  // This should be allocated in unit_data.hpp, probably.
+  AtmosphericLocationEstimator locEstimator;
+  DCMAttitudeEstimator attEstimator;
+  WorldEstimator worldEstimator;
+
   OffboardInputSource inputSource;
   CarMotorMapper motorMapper;
 
   AngularVelocityController attVelController;
   AngularAccelerationController attAccController;
-  ControllerPipeline<actuator_setpoint_t> pipeline;
+  ControllerPipeline<ActuatorSetpoint> pipeline;
 
-  ZeroController<actuator_setpoint_t> zeroController;
+  ZeroController<ActuatorSetpoint> zeroController;
 };
 
 #endif

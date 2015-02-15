@@ -8,7 +8,7 @@
  */
 class MotorMapper {
 public:
-  virtual void run(bool armed, actuator_setpoint_t& input) = 0;
+  virtual void run(bool armed, ActuatorSetpoint& input) = 0;
 };
 
 #endif

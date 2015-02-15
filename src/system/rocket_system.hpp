@@ -13,19 +13,20 @@
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/accelerometer.hpp"
+#include "sensor/sensor_measurements.hpp"
 #include "system/vehicle_system.hpp"
 
 enum class RocketStage {
-  LAUNCH,
-  FLY
+  DISABLED,
+  PAD,
+  ASCENT,
+  DESCENT
 };
 
 class RocketSystem : public VehicleSystem, public MessageListener {
 public:
   RocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
-      AttitudeEstimator& estimator, InputSource& inputSource,
+      WorldEstimator& estimator, InputSource& inputSource,
       MotorMapper& motorMapper, Communicator& communicator);
 
   void update() override;
@@ -36,19 +37,19 @@ private:
   Gyroscope& gyroscope;
   Accelerometer& accelerometer;
 
-  AttitudeEstimator& estimator;
+  WorldEstimator& estimator;
   InputSource& inputSource;
 
   PositionController posController;
   AngularVelocityController attVelController;
   RocketAngularAccelerationController attAccController;
-  ControllerPipeline<actuator_setpoint_t> pipeline;
+  ControllerPipeline<ActuatorSetpoint> pipeline;
 
-  ZeroController<actuator_setpoint_t> zeroController;
+  ZeroController<ActuatorSetpoint> zeroController;
 
   MotorMapper& motorMapper;
 
-  RocketStage mode;
+  RocketStage stage;
 };
 
 #endif

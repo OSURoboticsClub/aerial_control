@@ -12,7 +12,7 @@ void L3GD20::init() {
   writeRegister(l3gd20::SPI_AD_CTRL_REG4, (1 << 5) | (1 << 4));
 }
 
-gyroscope_reading_t L3GD20::readGyro() {
+GyroscopeReading L3GD20::readGyro() {
   txbuf[0] = l3gd20::SPI_RW | l3gd20::SPI_MS | l3gd20::SPI_AD_OUT_X_L;
   txbuf[1] = 0xFF;
   txbuf[2] = 0xFF;
@@ -21,11 +21,11 @@ gyroscope_reading_t L3GD20::readGyro() {
 
   // Swapped for board orientation
   std::array<int16_t, 3> raw;
-  raw[0] = (rxbuf[4] << 8) | rxbuf[3];
+  raw[0] = -((rxbuf[4] << 8) | rxbuf[3]);
   raw[1] = (rxbuf[2] << 8) | rxbuf[1];
   raw[2] = (rxbuf[6] << 8) | rxbuf[5];
 
-  gyroscope_reading_t reading;
+  GyroscopeReading reading;
 
   for(std::size_t i = 0; i < 3; i++) {
     reading.axes[i] = (float) raw[i] * l3gd20::SENSITIVITY_2000DPS * l3gd20::DPS_TO_RADS;

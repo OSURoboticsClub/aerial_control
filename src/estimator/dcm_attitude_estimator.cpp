@@ -1,6 +1,5 @@
 #include "estimator/dcm_attitude_estimator.hpp"
 
-#include "hal.h"
 #include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
@@ -10,83 +9,91 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
     attitudeMessageStream(communicator, 20) {
 }
 
-attitude_estimate_t DCMAttitudeEstimator::update(gyroscope_reading_t& gyroReading, accelerometer_reading_t& accelReading) {
-  Eigen::Vector3f gyro(gyroReading.axes.data());
-  Eigen::Vector3f accel(accelReading.axes.data());
-
-  // Calibration code
-  //static float calib[] = {0, 0, 0};
-  //static uint32_t calib_count = 0;
-  //for (int i=0; i<3; i++) {
-  //  calib_count++;
-  //  //calib[i] = (calib[i]*(calib_count-1) + accel(i))/calib_count;
-  //  calib[i] = calib[i]*0.95 + accel(i)*0.05;
-  //}
-
-  // Calculate accelerometer weight before normalization
-  float accelWeight = getAccelWeight(accel);
-
-  accel.normalize();
-
-  // Complementary filter
+AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   Eigen::Vector3f corr = Eigen::Vector3f::Zero();
-  corr += gyro * unit_config::DT * (1.0f - accelWeight);
-  corr += dcm.col(2).cross(-accel) * accelWeight;   // Proper acceleration at standstill is negative of gravitational acceleration.
 
+  // Assume zero weights until we have verified the presence of these sensors.
+  float accelWeight = 0.0f;
+  float magWeight = 0.0f;
+
+  // If an accelerometer is available, use the provided gravity vector to
+  // correct for drift in the DCM.
+  if(meas.accel) {
+    Eigen::Vector3f accel((*meas.accel).axes.data());
+
+    // Calculate accelerometer weight before normalization
+    accelWeight = getAccelWeight(accel);
+
+    accel.normalize();
+    corr += dcm.col(2).cross(-accel) * accelWeight;
+  }
+
+  // If a magnetometer is available, use the provided north vector to correct
+  // the yaw.
+  if(meas.mag) {
+    Eigen::Vector3f mag((*meas.mag).axes.data());
+
+    // TODO: Calculate mag weight?
+    magWeight = 0.001f;
+
+    // "Project" the magnetometer into the global xy plane.
+    Eigen::Vector3f magGlobal = dcm.transpose() * mag;
+    magGlobal(2) = 0.0f;
+
+    // Convert back to body coordinates.
+    Eigen::Vector3f magBody = dcm * magGlobal;
+
+    // Normalize because we only care about the prevailing direction.
+    magBody.normalize();
+
+    corr += dcm.col(0).cross(magBody - dcm.col(0)) * magWeight;
+  }
+
+  // If a gyroscope is available, integrate the provided rotational velocity and
+  // add it to the correction vector.
+  if(meas.gyro) {
+    Eigen::Vector3f gyro((*meas.gyro).axes.data());
+    corr += gyro * unit_config::DT * (1.0f - accelWeight - magWeight);
+  }
+
+  // Use small angle approximations to build a rotation matrix modelling the
+  // attitude change over the time step.
   Eigen::Matrix3f dcmStep;
   dcmStep <<      1.0f,  corr.z(), -corr.y(),
              -corr.z(),      1.0f,  corr.x(),
               corr.y(), -corr.x(),      1.0f;
 
+  // Rotate the DCM.
   dcm = dcmStep * dcm;
 
   orthonormalize();
 
-  attitude_estimate_t estimate {
-    // TODO: Are these trig functions safe at extreme angles?
-    .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
-    .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
-    .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
-    .roll_vel = gyro.x(),
-    .pitch_vel = gyro.y(),
-    .yaw_vel = gyro.z(),
-    .roll_acc = 0.0f,
-    .pitch_acc = 0.0f,
-    .yaw_acc = 0.0f
-  };
+  updateStream();
 
-  if(attitudeMessageStream.ready()) {
-    protocol::message::attitude_message_t m {
-      .dcm = {
-        // estimate.roll, estimate.pitch, estimate.yaw,
-        //calib[0], calib[1], calib[2],
-        dcm(0, 0), dcm(0, 1), dcm(0, 2),
-        dcm(1, 0), dcm(1, 1), dcm(1, 2),
-        dcm(2, 0), dcm(2, 1), dcm(2, 2)
-      }
-    };
-
-    attitudeMessageStream.publish(m);
-  }
-
-  return estimate;
+  return makeEstimate(meas);
 }
 
 void DCMAttitudeEstimator::orthonormalize() {
-  // Make the i and j vectors orthogonal
-  float error = dcm.row(0).dot(dcm.row(1));
+  // Orthogonalize i and j vectors
+  //
+  // We assume small angles. We calculate the magnitude of error as the
+  // projection of i on j and generate correction vectors i' and j' with
+  // magnitude error/2 and direction opposite j and i, respectively. Then we
+  // update i and j:
+  //
+  //   i = i + i'
+  //   j = j + j'
+  //
+  float error = dcm.row(0).dot(dcm.row(1));   // Magnitude of error
+  Eigen::Matrix3f corr = Eigen::Matrix3f::Zero();   // Generate correction vectors
+  corr.row(0) = (-error / 2) * dcm.row(1);   // i'
+  corr.row(1) = (-error / 2) * dcm.row(0);   // j'
 
-  Eigen::Matrix3f corr = Eigen::Matrix3f::Zero();
-  corr.row(0) = dcm.row(1) * (-error) / 2;
-  corr.row(1) = dcm.row(0) * (-error) / 2;
+  dcm.row(0) += corr.row(0);   // i = i + i'
+  dcm.row(1) += corr.row(1);   // j = j + j'
 
-  dcm.row(0) += corr.row(0);
-  dcm.row(1) += corr.row(1);
-
-  // Estimate k vector from corrected i and j vectors
-  dcm.row(2) = dcm.row(0).cross(dcm.row(1));
-
-  // Normalize all vectors
+  // Regenerate k from the corrected i and j and normalize the DCM.
+  dcm.row(2) = dcm.row(0).cross(dcm.row(1));   // k = i x j
   dcm.rowwise().normalize();
 }
 
@@ -104,4 +111,49 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   accelWeight = std::max(0.0f, accelWeight);
 
   return accelWeight;
+}
+
+AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& meas) {
+  AttitudeEstimate estimate = {
+    // TODO: Are these trig functions safe at extreme angles?
+    .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
+    .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
+    .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
+
+    // Velocities are set later if a gyro is available.
+    .rollVel = 0.0f,
+    .pitchVel = 0.0f,
+    .yawVel = 0.0f,
+
+    // TODO: Calculate accelerations.
+    .rollAcc = 0.0f,
+    .pitchAcc = 0.0f,
+    .yawAcc = 0.0f
+  };
+
+  // If a gyro is available then use the direct measurements for velocity
+  // calculation.
+  if(meas.gyro) {
+    estimate.rollVel = (*meas.gyro).axes[0];
+    estimate.pitchVel = (*meas.gyro).axes[1];
+    estimate.yawVel = (*meas.gyro).axes[2];
+  } else {
+    // TODO: Differentiate estimates or just ignore?
+  }
+
+  return estimate;
+}
+
+void DCMAttitudeEstimator::updateStream() {
+  if(attitudeMessageStream.ready()) {
+    protocol::message::attitude_message_t m {
+      .dcm = {
+        dcm(0, 0), dcm(0, 1), dcm(0, 2),
+        dcm(1, 0), dcm(1, 1), dcm(1, 2),
+        dcm(2, 0), dcm(2, 1), dcm(2, 2)
+      }
+    };
+
+    attitudeMessageStream.publish(m);
+  }
 }
