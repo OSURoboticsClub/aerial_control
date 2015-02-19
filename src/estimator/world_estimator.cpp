@@ -23,10 +23,10 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
   };
 
   if(worldMessageStream.ready()) {
-    protocol::message::log_message_t m;
-    sprintf(m.data, "world estimate test");
-
-    worldMessageStream.publish(m);
+    // protocol::message::log_message_t m;
+    // sprintf(m.data, "world estimate test");
+    //
+    // worldMessageStream.publish(m);
   }
 
   return estimate;
