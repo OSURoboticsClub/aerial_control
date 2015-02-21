@@ -5,7 +5,7 @@
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "motor/multirotor_quad_plus_motor_mapper.hpp"
+#include "motor/multirotor_quad_x_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
@@ -14,13 +14,13 @@
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
 
-static const float MOTOR_PWM_MIN = 0.53f;
-static const float MOTOR_PWM_MAX = 0.93f;
+static const float MOTOR_PWM_MIN = 0.532f;
+static const float MOTOR_PWM_MAX = 0.932f;
 static const float MOTOR_PWM_SAFE = 0.30f;
 
 struct UnitData {
   PWMDeviceGroup<4> motors;
-  MultirotorQuadPlusMotorMapper motorMapper;
+  MultirotorQuadXMotorMapper motorMapper;
 
   WorldEstimator world;
   AtmosphericLocationEstimator location;
