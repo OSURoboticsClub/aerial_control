@@ -6,7 +6,7 @@
 
 EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator)
   : servos(servos),
-    throttleStream(communicator, 10) {
+    throttleStream(communicator, 5) {
 }
 
 void EsraRocketMotorMapper::run(bool armed, ActuatorSetpoint& input) {
