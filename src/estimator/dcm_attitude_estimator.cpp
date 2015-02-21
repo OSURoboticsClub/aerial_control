@@ -6,7 +6,7 @@
 
 DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
   : dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 20) {
+    attitudeMessageStream(communicator, 5) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
