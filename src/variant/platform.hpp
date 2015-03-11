@@ -10,7 +10,10 @@ public:
   void init();
 
   template <typename T>
-  T& get(int idx=0);
+  T& get();
+
+  template <typename T>
+  T& getIdx(int idx);
 };
 
 #endif
