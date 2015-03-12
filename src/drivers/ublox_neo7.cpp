@@ -11,9 +11,9 @@ const char *NMEA_DELIMS = ",\0";
 
 struct GPGLLMessage {
   float lon;
-  char lon_dir;
+  char lonDir;
   float lat;
-  char lat_dir;
+  char latDir;
   float utc;
   char valid;
 };
@@ -48,13 +48,13 @@ GPSReading UBloxNEO7::readGPS() {
             message.lon = atof(token);
             break;
           case 1:
-            message.lon_dir = token[0];
+            message.lonDir = token[0];
             break;
           case 2:
             message.lat = atof(token);
             break;
           case 3:
-            message.lat_dir = token[0];
+            message.latDir = token[0];
             break;
           case 4:
             message.utc = atof(token);
