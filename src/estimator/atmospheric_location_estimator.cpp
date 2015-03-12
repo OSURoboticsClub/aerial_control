@@ -17,8 +17,8 @@ LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& 
 
 LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas) {
   // TODO(yoos)
-  loc.lat = 1.23;
-  loc.lon = 4.56;
+  loc.lat = (*meas.gps).lat;
+  loc.lon = (*meas.gps).lon;
   loc.alt = (*meas.bar).pressure;
 
   return loc;
