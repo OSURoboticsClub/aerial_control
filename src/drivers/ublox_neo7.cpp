@@ -67,8 +67,9 @@ GPSReading UBloxNEO7::readGPS() {
 
       return GPSReading {
         .valid = true,
-        .lat = message.lat,
-        .lon = message.lon
+        .lat = dmd2float(message.lat, message.latDir),
+        .lon = dmd2float(message.lon, message.lonDir),
+        .utc = message.utc
       };
     }
   } else {
@@ -76,7 +77,8 @@ GPSReading UBloxNEO7::readGPS() {
       return GPSReading {
         .valid = false,
         .lat = 0.0,
-        .lon = 0.0
+        .lon = 0.0,
+        .utc = 0.0
       };
   }
 }
