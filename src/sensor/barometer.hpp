@@ -5,6 +5,7 @@
 
 struct BarometerReading {
   float pressure;
+  float temperature;
 };
 
 class Barometer {

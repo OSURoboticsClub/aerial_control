@@ -73,7 +73,8 @@ BarometerReading MS5611::readBar() {
 
   // Pack data
   BarometerReading reading {
-    .pressure = pressure
+    .pressure = pressure,
+    .temperature = temperature
   };
 
   return reading;
