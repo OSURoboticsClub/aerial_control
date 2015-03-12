@@ -22,8 +22,6 @@ void UBloxNEO7::init() {
 }
 
 GPSReading UBloxNEO7::readGPS() {
-  GPSReading reading;
-
   // Read all available bytes until the newline character. NMEA dictates that
   // messages should end with a CRLF, but we'll only look for the LF.
   std::size_t len = readUntil(NMEA_LF);
@@ -67,11 +65,18 @@ GPSReading UBloxNEO7::readGPS() {
         };
       }
 
-      reading.lat = message.lat;
-      reading.lon = message.lon;
+      return GPSReading {
+        .valid = true,
+        .lat = message.lat,
+        .lon = message.lon
+      };
     }
   } else {
+    // TODO: Return previous message with old timestamp.
+      return GPSReading {
+        .valid = false,
+        .lat = 0.0,
+        .lon = 0.0
+      };
   }
-
-  return reading;
 }

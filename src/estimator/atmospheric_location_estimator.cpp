@@ -19,7 +19,7 @@ LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& 
 }
 
 LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas) {
-  if(meas.gps) {
+  if(meas.gps && (*meas.gps).valid) {
     loc.lat = (*meas.gps).lat;
     loc.lon = (*meas.gps).lon;
   }

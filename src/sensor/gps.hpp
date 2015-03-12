@@ -4,6 +4,7 @@
 #include <array>
 
 struct GPSReading {
+  bool valid;
   float lat, lon;
 };
 
