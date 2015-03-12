@@ -7,8 +7,7 @@
 #include "estimator/world_estimator.hpp"
 #include "motor/multirotor_quad_plus_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/accelerometer.hpp"
+#include "sensor/sensor_measurements.hpp"
 #include "system/rocket_system.hpp"
 #include "variant/platform.hpp"
 
@@ -39,8 +38,14 @@ struct UnitData {
       attitude(communicator),
       world(location, attitude, communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
-             world, inputSource, motorMapper, communicator) {
+      system(
+          platform.getIdx<Accelerometer>(0),
+          platform.getIdx<Accelerometer>(1),
+          platform.get<Barometer>(),
+          platform.get<GPS>(),
+          platform.get<Gyroscope>(),
+          platform.get<Magnetometer>(),
+          world, inputSource, motorMapper, communicator) {
   }
 };
 
