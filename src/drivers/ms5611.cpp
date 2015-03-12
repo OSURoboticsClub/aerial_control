@@ -2,76 +2,113 @@
 
 #include "unit_config.hpp"
 
+#include "chprintf.h"
+
 void MS5611::init() {
-//  // Reset device.
-//  txbuf[0] = mpu9250::PWR_MGMT_1;
-//  txbuf[1] = 0x80;
-//  exchange(2);
-//
-//  chThdSleepMilliseconds(100);   // TODO(yoos): Check whether or not datasheet specifies this holdoff.
-//
-//  // Set sample rate to 1 kHz.
-//  txbuf[0] = mpu9250::SMPLRT_DIV;
-//  txbuf[1] = 0x00;
-//  exchange(2);
-//
-//  // Set DLPF to 4 (20 Hz gyro bandwidth1 Hz accelerometer bandwidth)
-//  txbuf[0] = mpu9250::CONFIG;
-//  txbuf[1] = 0x04;
-//  exchange(2);
-//
-//  // Wake up device and set clock source to Gyro Z.
-//  txbuf[0] = mpu9250::PWR_MGMT_1;
-//  txbuf[1] = 0x03;
-//  exchange(2);
-//
-//  // Set gyro full range to 2000 dps. We first read in the current register
-//  // value so we can change what we need and leave everything else alone.
-//  // See DS p. 12.
-//  txbuf[0] = mpu9250::GYRO_CONFIG | (1<<7);
-//  exchange(2);
-//  chThdSleepMicroseconds(0);   // TODO(yoos): Without this, the GYRO_CONFIG register does not get set. This was not the case in the old C firmware. Why?
-//  txbuf[0] = mpu9250::GYRO_CONFIG;
-//  txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
-//  exchange(2);
-//
-//  // Set accelerometer full range to 4 g. See DS p. 13.
-//  txbuf[0] = mpu9250::ACCEL_CONFIG | (1<<7);
-//  exchange(2);
-//  txbuf[0] = mpu9250::ACCEL_CONFIG;
-//  txbuf[1] = (rxbuf[1] & ~0x18) | 0x08;
-//  exchange(2);
-//
-//  // Read once to clear out bad data?
-//  readGyro();
-//  readAccel();
+  // Reset device.
+  txbuf[0] = ms5611::CMD_RESET;
+  exchange(1);
+
+  // Wait for 2.8ms reload (DS p. 9)
+  chThdSleepMicroseconds(3000);
+
+  // Read factory data and setup
+  txbuf[0] = ms5611::CMD_PROM_SETUP | (1<<7);
+  exchange(3);
+  // TODO(yoos): health check
+
+  // Read calibration data
+  txbuf[0] = ms5611::CMD_PROM_C1;
+  exchange(3);
+  C1 = (rxbuf[1]<<8) | rxbuf[2];
+
+  txbuf[0] = ms5611::CMD_PROM_C1+2;
+  exchange(3);
+  C2 = (rxbuf[1]<<8) | rxbuf[2];
+
+  txbuf[0] = ms5611::CMD_PROM_C1+4;
+  exchange(3);
+  C3 = (rxbuf[1]<<8) | rxbuf[2];
+
+  txbuf[0] = ms5611::CMD_PROM_C1+6;
+  exchange(3);
+  C4 = (rxbuf[1]<<8) | rxbuf[2];
+
+  txbuf[0] = ms5611::CMD_PROM_C1+8;
+  exchange(3);
+  C5 = (rxbuf[1]<<8) | rxbuf[2];
+
+  txbuf[0] = ms5611::CMD_PROM_C1+10;
+  exchange(3);
+  C6 = (rxbuf[1]<<8) | rxbuf[2];
 }
 
 BarometerReading MS5611::readBar() {
-  BarometerReading reading;
-//
-//  // Poll gyro
-//  txbuf[0] = mpu9250::GYRO_XOUT_H | (1<<7);
-//  exchange(7);
-//
-//  // TODO(yoos): correct for thermal bias.
-//  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_X_OFFSET;
-//  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Y_OFFSET;
-//  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Z_OFFSET;
-//
-//  // Poll temp
-//  txbuf[0] = mpu9250::TEMP_OUT_H | (1<<7);
-//  exchange(3);
-//
-//  float temp = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 340 + 36.53;
-//
-//  // DEBUG
-//  //char dbg_buf[16];
-//  //for (int i=0; i<16; i++) {
-//  //  dbg_buf[i] = 0;
-//  //}
-//  //chsnprintf(dbg_buf, 12, "%0.6f\r\n", reading.axes[2]);
-//  //chnWriteTimeout((BaseChannel*)&SD3, (uint8_t*)dbg_buf, 12, MS2ST(20));
-//
+  // Read every 10 loops to leave time for the maximum 9.04 ms conversion time.
+  // This assumes DT = 1 ms. We flip-flop between reading pressure and
+  // temperature, sending the conversion command for the other measurement type
+  // at the end of each loop.
+  static int loop = 0;
+  static int which = 0;
+  if (loop == 0) {
+    txbuf[0] = ms5611::CMD_READ;
+    exchange(4);
+    uint32_t raw = (rxbuf[1]<<16) | (rxbuf[2]<<8) | rxbuf[3];
+
+    if (which == 0) {
+      D1 = raw;   // Pressure
+      txbuf[0] = ms5611::CMD_CONVERT_D2;   // Convert temperature
+      exchange(1);
+    }
+    else {
+      D2 = raw;   // Temperature
+      txbuf[0] = ms5611::CMD_CONVERT_D1;   // Convert pressure
+      exchange(1);
+
+      updatePT();   // Update temperature-compensated pressure
+    }
+    which = 1-which;
+  }
+  loop = (loop+1) % 10;
+
+  // Pack data
+  BarometerReading reading {
+    .pressure = pressure
+  };
+
   return reading;
+}
+
+void MS5611::updatePT(void) {
+  // Calculate temperature (-40 to 85 deg C with 0.01 deg resolution)
+  int32_t dT = D2 - (C5 << 8);   // Actual temp - Reference temp
+  int32_t TEMP = 2000 + ((dT * C6) >> 23);   // 100x actual temperature
+
+  // Calculate temperature compensation offsets
+  int64_t OFF = (C2 << 16) + ((C4 * dT) >> 7);   // Offset at actual temp
+  int64_t SENS = (C1 << 15) + ((C3 * dT) >> 8);   // Sensitivity at actual temp
+
+  // Second-order temperature compensation
+  int32_t T2 = 0;
+  int64_t OFF2 = 0;
+  int64_t SENS2 = 0;
+  if (TEMP < 20) {
+    T2 = (dT * dT) >> 31;
+    OFF2 = (5 * (TEMP - 2000) * (TEMP - 2000)) >> 1;
+    SENS2 = OFF2 >> 1;
+  }
+  if (TEMP < -15) {
+    OFF2 += 7 * (TEMP + 1500) * (TEMP + 1500);
+    SENS2 += (11 * (TEMP + 1500) * (TEMP + 1500)) >> 1;
+  }
+  TEMP -= T2;
+  OFF  -= OFF2;
+  SENS -= SENS2;
+
+  // Calculate pressure (10 to 1200 mbar with 0.01 mbar resolution)
+  int32_t P = (((D1 * SENS) >> 21) - OFF) >> 15;   // 100x temp-compensated pressure
+  chprintf((BaseSequentialStream*)&SD4, "PT: %d %d\r\n", P, TEMP);
+
+  pressure = P / 100;
+  temperature = TEMP / 100;
 }
