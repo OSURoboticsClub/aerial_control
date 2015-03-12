@@ -21,11 +21,11 @@ RocketSystem::RocketSystem(
 }
 
 void RocketSystem::update() {
-  static int time = 0;
-  if (time % 10 == 0) {
-    chprintf((BaseSequentialStream*)&SD4, "%d\r\n", chibios_rt::System::getTime()/200000);
-  }
-  time = (time+1)%10;
+  //static int time = 0;
+  //if (time % 1000 == 0) {
+  //  chprintf((BaseSequentialStream*)&SD4, "%d\r\n", chibios_rt::System::getTime()/200000);
+  //}
+  //time = (time+1) % 1000;
 
   // Poll the gyroscope and accelerometer
   AccelerometerReading accelReading = accel.readAccel();
