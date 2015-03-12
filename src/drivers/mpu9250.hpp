@@ -108,6 +108,7 @@ public:
   using SPIDevice::SPIDevice;
 
   void init() override;
+  bool healthy();
   GyroscopeReading readGyro() override;
   AccelerometerReading readAccel() override;
 
