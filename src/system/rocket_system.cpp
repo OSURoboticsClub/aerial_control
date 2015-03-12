@@ -1,13 +1,15 @@
 #include "system/rocket_system.hpp"
 
+#include "chprintf.h"
+
 RocketSystem::RocketSystem(
     Accelerometer& accel,
-    Accelerometer& accelH,
-    Barometer&     bar,
-    GPS&           gps,
-    Gyroscope&     gyr,
-    Magnetometer&  mag,
-    WorldEstimator& worldEstimator, InputSource& inputSource,
+    optional<Accelerometer *> accelH,
+    optional<Barometer *> bar,
+    optional<GPS *> gps,
+    Gyroscope& gyr,
+    optional<Magnetometer *> mag,
+    WorldEstimator& estimator, InputSource& inputSource,
     MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
@@ -19,19 +21,29 @@ RocketSystem::RocketSystem(
 }
 
 void RocketSystem::update() {
+  static int time = 0;
+  if (time % 10 == 0) {
+    chprintf((BaseSequentialStream*)&SD4, "%d\r\n", chibios_rt::System::getTime()/200000);
+  }
+  time = (time+1)%10;
+
   // Poll the gyroscope and accelerometer
-  GyroscopeReading gyrReading = gyr.readGyro();
   AccelerometerReading accelReading = accel.readAccel();
+  GyroscopeReading gyrReading = gyr.readGyro();
+  optional<AccelerometerReading> accelHReading;
+  optional<BarometerReading> barReading;
+  optional<GPSReading> gpsReading;
+  optional<MagnetometerReading> magReading;
 
   // TODO: poll barometer
 
   SensorMeasurements meas {
     .accel  = std::experimental::make_optional(accelReading),
-    .accelH = std::experimental::nullopt,
-    .bar    = std::experimental::nullopt,
-    .gps    = std::experimental::nullopt,
+    .accelH = accelHReading,
+    .bar    = barReading,
+    .gps    = gpsReading,
     .gyro   = std::experimental::make_optional(gyrReading),
-    .mag    = std::experimental::nullopt
+    .mag    = magReading
   };
 
   // Update the attitude estimate
