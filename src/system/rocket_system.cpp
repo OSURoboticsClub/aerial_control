@@ -23,7 +23,7 @@ RocketSystem::RocketSystem(
 void RocketSystem::update() {
   //static int time = 0;
   //if (time % 1000 == 0) {
-  //  chprintf((BaseSequentialStream*)&SD4, "%d\r\n", chibios_rt::System::getTime()/200000);
+  //  chprintf((BaseSequentialStream*)&SD4, "%d\r\n", RTT2MS(chibios_rt::System::getTime()));
   //}
   //time = (time+1) % 1000;
 
@@ -37,7 +37,7 @@ void RocketSystem::update() {
 
   if (accelH) accelHReading = (*accelH)->readAccel();
   if (bar)    barReading    = (*bar)->readBar();
-  //if (gps)    gpsReading    = (*gps)->readGPS();
+  if (gps)    gpsReading    = (*gps)->readGPS();
   //if (mag)    magReading    = (*mag)->readMag();
 
   SensorMeasurements meas {
