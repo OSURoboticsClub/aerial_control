@@ -66,6 +66,7 @@ GPSReading UBloxNEO7::readGPS() {
       }
 
       return GPSReading {
+        .valid = true,
         .lat = message.lat,
         .lon = message.lon
       };
@@ -73,6 +74,7 @@ GPSReading UBloxNEO7::readGPS() {
   } else {
     // TODO: Return previous message with old timestamp.
       return GPSReading {
+        .valid = false,
         .lat = 0.0,
         .lon = 0.0
       };
