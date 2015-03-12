@@ -35,7 +35,10 @@ void RocketSystem::update() {
   optional<GPSReading> gpsReading;
   optional<MagnetometerReading> magReading;
 
-  // TODO: poll barometer
+  if (accelH) accelHReading = (*accelH)->readAccel();
+  if (bar)    barReading    = (*bar)->readBar();
+  //if (gps)    gpsReading    = (*gps)->readGPS();
+  //if (mag)    magReading    = (*mag)->readMag();
 
   SensorMeasurements meas {
     .accel  = std::experimental::make_optional(accelReading),
