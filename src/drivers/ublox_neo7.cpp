@@ -45,16 +45,16 @@ GPSReading UBloxNEO7::readGPS() {
 
         switch(position++) {
           case 0:
-            message.lon = atof(token);
-            break;
-          case 1:
-            message.lonDir = token[0];
-            break;
-          case 2:
             message.lat = atof(token);
             break;
-          case 3:
+          case 1:
             message.latDir = token[0];
+            break;
+          case 2:
+            message.lon = atof(token);
+            break;
+          case 3:
+            message.lonDir = token[0];
             break;
           case 4:
             message.utc = atof(token);
