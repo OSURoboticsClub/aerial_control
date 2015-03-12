@@ -1,0 +1,37 @@
+PREFIX = arm-none-eabi
+
+CC = $(PREFIX)-gcc
+CXX = $(PREFIX)-g++
+LD = $(PREFIX)-g++
+AR = $(PREFIX)-ar
+AS = $(PREFIX)-as
+OBJCOPY = $(PREFIX)-objcopy
+OBJDUMP = $(PREFIX)-objdump
+GDB = $(PREFIX)-gdb
+SIZE = $(PREFIX)-size
+
+FPFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ARCHFLAGS += -mcpu=cortex-m4 -mthumb -mno-thumb-interwork
+ARCHFLAGS += $(FPFLAGS)
+
+CFLAGS += -O2 -g
+CFLAGS += -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
+CFLAGS += -fomit-frame-pointer -falign-functions=16 -ffunction-sections
+CFLAGS += -fdata-sections -fno-common -fsingle-precision-constant
+CFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=TRUE -DTHUMB_PRESENT -DTHUMB
+CFLAGS += -DEIGEN_NO_DEBUG=1
+
+CXXFLAGS += $(CFLAGS)
+CXXFLAGS += -Wreorder
+CXXFLAGS += -std=c++14 -fno-rtti -fno-exceptions
+
+LDLIBS += -lm
+LDFLAGS += -nostartfiles
+LDFLAGS += -T$(LINKSCRIPT-y)
+LDFLAGS += -Wl,--no-warn-mismatch,--gc-sections
+
+!cc = |> $(CC) -c $(ARCHFLAGS) $(CFLAGS) $(INCLUDES) $(INCLUDES-y) %f -o %o |> %B.o
+!cxx = |> $(CXX) -c $(ARCHFLAGS) $(CXXFLAGS) $(INCLUDES) $(INCLUDES-y) %f -o %o |> %B.o
+!ld = |> $(LD) %f $(ARCHFLAGS) $(LDLIBS) $(LDFLAGS) -o %o |>
+!hex = |> $(OBJCOPY) -O ihex %f %o |> %B.hex
+!bin = |> $(OBJCOPY) -O binary %f %o |> %B.bin

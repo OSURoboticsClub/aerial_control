@@ -1,4 +1,6 @@
-[submodule "ChibiOS-RT"]
-	path = ChibiOS-RT
-	url = https://github.com/ChibiOS/ChibiOS-RT
-	branch = stable_2.6.x
+[submodule "include/protocol"]
+	path = include/protocol
+	url = https://github.com/OSURoboticsClub/aerial_protocol
+[submodule "ChibiOS"]
+	path = ChibiOS
+	url = https://github.com/ChibiOS/ChibiOS

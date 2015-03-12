@@ -1,0 +1,57 @@
+CHIBIOS = ChibiOS
+
+# ChibiOS files
+CSRCS += $(CHIBIOS)/os/kernel/src/*.c
+CSRCS += $(CHIBIOS)/os/hal/src/*.c
+CSRCS += $(CHIBIOS)/os/various/chprintf.c
+CSRCS += $(CHIBIOS)/os/various/memstreams.c
+CXXSRCS += $(CHIBIOS)/os/various/cpp_wrappers/ch.cpp
+
+INCLUDES += -I$(CHIBIOS)/os/kernel/include
+INCLUDES += -I$(CHIBIOS)/os/hal/include
+INCLUDES += -I$(CHIBIOS)/os/various
+INCLUDES += -I$(CHIBIOS)/os/various/cpp_wrappers
+
+# Control files
+CSRCS += src/stubs.c
+CXXSRCS += src/*.cpp
+CXXSRCS += src/communication/*.cpp
+CXXSRCS += src/controller/*.cpp
+CXXSRCS += src/drivers/*.cpp
+CXXSRCS += src/estimator/*.cpp
+CXXSRCS += src/input/*.cpp
+CXXSRCS += src/motor/*.cpp
+CXXSRCS += src/sensor/*.cpp
+CXXSRCS += src/system/*.cpp
+
+INCLUDES += -Isrc
+
+INCLUDES += -Iinclude
+INCLUDES += -Iinclude/protocol/include
+
+# Platforms
+include variants/platforms/stm32f3discovery/Tupfile
+include variants/platforms/stm32f4discovery/Tupfile
+include variants/platforms/aerial_v3/Tupfile
+include variants/platforms/aerial_v4/Tupfile
+include variants/platforms/rocket_v0.1/Tupfile
+
+# Units
+include variants/units/apollo/Tupfile
+include variants/units/helios/Tupfile
+include variants/units/hera/Tupfile
+include variants/units/hestia/Tupfile
+include variants/units/icarus/Tupfile
+include variants/units/speed/Tupfile
+include variants/units/zephyrus/Tupfile
+include variants/units/zeus/Tupfile
+
+include_rules
+
+# Rules
+: foreach $(CSRCS) $(CSRCS-y) |> !cc |>
+: foreach $(CXXSRCS) $(CXXSRCS-y) |> !cxx |>
+: *.o |> !ld |> osuar_control.elf
+
+: osuar_control.elf |> !hex |>
+: osuar_control.elf |> !bin |>

@@ -1,16 +1,14 @@
 #ifndef MOTOR_MAPPER_HPP_
 #define MOTOR_MAPPER_HPP_
 
-#include <controller/setpoint_types.hpp>
+#include "controller/setpoint_types.hpp"
 
+/**
+ * Maps roll/pitch/yaw setpoints to hardware controllers.
+ */
 class MotorMapper {
 public:
-  virtual void init() =0;
-
-  /**
-   * Maps roll/pitch/yaw setpoints to motor output values.
-   */
-  virtual void run(actuator_setpoint_t& input) =0;
+  virtual void run(bool armed, ActuatorSetpoint& input) = 0;
 };
 
 #endif

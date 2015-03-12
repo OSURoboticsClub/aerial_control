@@ -1,0 +1,51 @@
+# Board
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/boards/ST_STM32F4_DISCOVERY/board.c
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/boards/ST_STM32F4_DISCOVERY
+
+# Platform
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/stm32_dma.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/hal_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/adc_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/ext_lld_isr.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/can_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/ext_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/mac_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/sdc_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/GPIOv2/pal_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/I2Cv1/i2c_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/OTGv1/usb_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/RTCv2/rtc_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/SPIv1/spi_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/TIMv1/gpt_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/TIMv1/icu_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/TIMv1/pwm_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/USARTv1/serial_lld.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/hal/platforms/STM32/USARTv1/uart_lld.c
+
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32F4xx
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/GPIOv2
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/I2Cv1
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/OTGv1
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/RTCv2
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/SPIv1
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/TIMv1
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/hal/platforms/STM32/USARTv1
+
+# Port
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/ports/GCC/ARMCMx/crt0.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/vectors.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/ports/GCC/ARMCMx/chcore.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/ports/GCC/ARMCMx/chcore_v7m.c
+CSRCS-@(PLATFORM_AERIAL_V3) += $(CHIBIOS)/os/ports/common/ARMCMx/nvic.c
+
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/ports/common/ARMCMx/CMSIS/include
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/ports/common/ARMCMx
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/ports/GCC/ARMCMx
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx
+
+LINKSCRIPT-@(PLATFORM_AERIAL_V3) = $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F405xG.ld
+
+# Control platform
+CXXSRCS-@(PLATFORM_AERIAL_V3) += $(TUP_CWD)/*.cpp
+INCLUDES-@(PLATFORM_AERIAL_V3) += -I$(TUP_CWD)

@@ -1,0 +1,2 @@
+CXXSRCS-@(UNIT_HERA) += $(TUP_CWD)/*.cpp
+INCLUDES-@(UNIT_HERA) += -I$(TUP_CWD)

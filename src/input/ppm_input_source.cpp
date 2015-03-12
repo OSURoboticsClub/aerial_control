@@ -47,12 +47,13 @@ void PPMInputSource::trigger() {
   lastFrameStart = frameStart;
 }
 
-controller_input_t PPMInputSource::read() {
-  controller_input_t input = {
-    .roll_sp = 0.0f,
-    .pitch_sp = 0.0f,
-    .yaw_sp = 0.0f,
-    .throttle_sp = 0.0f
+ControllerInput PPMInputSource::read() {
+  ControllerInput input = {
+    .valid = state == PPMState::SYNCED,
+    .roll = channelBuffer[CHANNEL_ROLL],
+    .pitch = channelBuffer[CHANNEL_PITCH],
+    .yaw = channelBuffer[CHANNEL_YAW],
+    .throttle = channelBuffer[CHANNEL_THROTTLE],
   };
 
   return input;

@@ -1,25 +1,42 @@
 #ifndef SETPOINT_TYPES_HPP_
 #define SETPOINT_TYPES_HPP_
 
-struct angular_position_setpoint_t {
-  float roll_pos_sp;
-  float pitch_pos_sp;
-  float yaw_pos_sp;
-  float throttle_sp;
+// Setpoint types collected here to prevent circular dependencies between
+// controllers.
+
+struct PositionSetpoint {
+  float lat;
+  float lon;
+  float yawPos;
+  float alt;
 };
 
-struct angular_velocity_setpoint_t {
-  float roll_vel_sp;
-  float pitch_vel_sp;
-  float yaw_vel_sp;
-  float throttle_sp;
+struct AngularPositionSetpoint {
+  float rollPos;
+  float pitchPos;
+  float yawPos;
+  float throttle;
 };
 
-struct actuator_setpoint_t {
-  float roll_sp;
-  float pitch_sp;
-  float yaw_sp;
-  float throttle_sp;
+struct AngularVelocitySetpoint {
+  float rollVel;
+  float pitchVel;
+  float yawVel;
+  float throttle;
+};
+
+struct AngularAccelerationSetpoint {
+  float rollAcc;
+  float pitchAcc;
+  float yawAcc;
+  float throttle;
+};
+
+struct ActuatorSetpoint {
+  float roll;
+  float pitch;
+  float yaw;
+  float throttle;
 };
 
 #endif

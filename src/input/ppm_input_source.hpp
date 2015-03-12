@@ -24,13 +24,18 @@ public:
   PPMInputSource();
 
   void trigger();
-  controller_input_t read() override;
+  ControllerInput read() override;
 
 private:
   constexpr static int MAX_CHANNELS = 12;
   constexpr static int MIN_START_WIDTH = 2500;
   constexpr static int MIN_CHANNEL_WIDTH = 800;
   constexpr static int MAX_CHANNEL_WIDTH = 2200;
+
+  constexpr static int CHANNEL_ROLL = 2;
+  constexpr static int CHANNEL_PITCH = 3;
+  constexpr static int CHANNEL_YAW = 1;
+  constexpr static int CHANNEL_THROTTLE = 0;
 
   /**
    * The current decoder state.
