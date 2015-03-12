@@ -1,11 +1,16 @@
 #include "system/rocket_system.hpp"
 
 RocketSystem::RocketSystem(
-    Gyroscope& gyroscope, Accelerometer& accelerometer,
+    Accelerometer& accel,
+    Accelerometer& accelH,
+    Barometer&     bar,
+    GPS&           gps,
+    Gyroscope&     gyr,
+    Magnetometer&  mag,
     WorldEstimator& worldEstimator, InputSource& inputSource,
     MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer),
+    accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), stage(RocketStage::DISABLED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
@@ -15,14 +20,18 @@ RocketSystem::RocketSystem(
 
 void RocketSystem::update() {
   // Poll the gyroscope and accelerometer
-  GyroscopeReading gyroReading = gyroscope.readGyro();
-  AccelerometerReading accelReading = accelerometer.readAccel();
+  GyroscopeReading gyrReading = gyr.readGyro();
+  AccelerometerReading accelReading = accel.readAccel();
+
+  // TODO: poll barometer
 
   SensorMeasurements meas {
-    .accel = std::experimental::make_optional(accelReading),
-    .gps   = std::experimental::nullopt,
-    .gyro  = std::experimental::make_optional(gyroReading),
-    .mag   = std::experimental::nullopt
+    .accel  = std::experimental::make_optional(accelReading),
+    .accelH = std::experimental::nullopt,
+    .bar    = std::experimental::nullopt,
+    .gps    = std::experimental::nullopt,
+    .gyro   = std::experimental::make_optional(gyrReading),
+    .mag    = std::experimental::nullopt
   };
 
   // Update the attitude estimate

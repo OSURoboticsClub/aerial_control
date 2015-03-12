@@ -25,7 +25,13 @@ enum class RocketStage {
 
 class RocketSystem : public VehicleSystem, public MessageListener {
 public:
-  RocketSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
+  RocketSystem(
+      Accelerometer& accel,
+      Accelerometer& accelH,
+      Barometer& bar,
+      GPS& gps,
+      Gyroscope& gyr,
+      Magnetometer& mag,
       WorldEstimator& estimator, InputSource& inputSource,
       MotorMapper& motorMapper, Communicator& communicator);
 
@@ -34,8 +40,12 @@ public:
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
-  Gyroscope& gyroscope;
-  Accelerometer& accelerometer;
+  Accelerometer& accel;
+  Accelerometer& accelH;
+  Barometer& bar;
+  GPS& gps;
+  Gyroscope& gyr;
+  Magnetometer& mag;
 
   WorldEstimator& estimator;
   InputSource& inputSource;
