@@ -8,6 +8,7 @@
 #include "drivers/spi_device.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/accelerometer.hpp"
+#include "sensor/magnetometer.hpp"
 
 namespace mpu9250 {
 
@@ -103,13 +104,14 @@ const std::uint8_t WHO_AM_I           = 0x75;   // R
 }
 
 // TODO(yoos): Inherit magnetometer
-class MPU9250 : protected SPIDevice<8, 8>, public Gyroscope, public Accelerometer {
+class MPU9250 : protected SPIDevice<8, 8>, public Gyroscope, public Accelerometer, public Magnetometer {
 public:
   using SPIDevice::SPIDevice;
 
   void init() override;
   GyroscopeReading readGyro() override;
   AccelerometerReading readAccel() override;
+  MagnetometerReading readMag() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

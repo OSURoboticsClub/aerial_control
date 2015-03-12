@@ -7,7 +7,7 @@
 MultirotorTriMotorMapper::MultirotorTriMotorMapper(PWMDeviceGroup<3>& motors, PWMDeviceGroup<1>& servos, Communicator& communicator)
   : motors(motors),
     servos(servos),
-    throttleStream(communicator, 10) {
+    throttleStream(communicator, 5) {
 }
 
 void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {

@@ -11,9 +11,9 @@ const char *NMEA_DELIMS = ",\0";
 
 struct GPGLLMessage {
   float lon;
-  char lon_dir;
+  char lonDir;
   float lat;
-  char lat_dir;
+  char latDir;
   float utc;
   char valid;
 };
@@ -22,8 +22,6 @@ void UBloxNEO7::init() {
 }
 
 GPSReading UBloxNEO7::readGPS() {
-  GPSReading reading;
-
   // Read all available bytes until the newline character. NMEA dictates that
   // messages should end with a CRLF, but we'll only look for the LF.
   std::size_t len = readUntil(NMEA_LF);
@@ -47,16 +45,16 @@ GPSReading UBloxNEO7::readGPS() {
 
         switch(position++) {
           case 0:
-            message.lon = atof(token);
-            break;
-          case 1:
-            message.lon_dir = token[0];
-            break;
-          case 2:
             message.lat = atof(token);
             break;
+          case 1:
+            message.latDir = token[0];
+            break;
+          case 2:
+            message.lon = atof(token);
+            break;
           case 3:
-            message.lat_dir = token[0];
+            message.lonDir = token[0];
             break;
           case 4:
             message.utc = atof(token);
@@ -67,11 +65,20 @@ GPSReading UBloxNEO7::readGPS() {
         };
       }
 
-      reading.lat = message.lat;
-      reading.lon = message.lon;
+      return GPSReading {
+        .valid = true,
+        .lat = dmd2float(message.lat, message.latDir),
+        .lon = dmd2float(message.lon, message.lonDir),
+        .utc = message.utc
+      };
     }
   } else {
+    // TODO: Return previous message with old timestamp.
+      return GPSReading {
+        .valid = false,
+        .lat = 0.0,
+        .lon = 0.0,
+        .utc = 0.0
+      };
   }
-
-  return reading;
 }
