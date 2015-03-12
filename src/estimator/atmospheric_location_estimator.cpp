@@ -9,32 +9,30 @@ AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communi
 }
 
 LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& meas) {
+  makeEstimate(meas);
   updateStream();
 
-  return makeEstimate(meas);
+  return loc;
 }
 
 LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas) {
   // TODO(yoos)
-  LocationEstimate estimate = {
-    .lat = 1.23,
-    .lon = 4.56,
-    .alt = 1.2345
-  };
+  loc.lat = 1.23;
+  loc.lon = 4.56;
+  loc.alt = (*meas.bar).pressure;
 
-  return estimate;
+  return loc;
 }
 
 void AtmosphericLocationEstimator::updateStream() {
   if(locationMessageStream.ready()) {
     // TODO(yoos): Implement location message.
-    //protocol::message::location_message_t m {
-    //  .lat = 0,
-    //  .lon = 0,
-    //  .alt = 0
-    //  }
-    //};
+    protocol::message::location_message_t m {
+      .lat = loc.lat,
+      .lon = loc.lon,
+      .alt = loc.alt
+    };
 
-    //attitudeMessageStream.publish(m);
+    locationMessageStream.publish(m);
   }
 }
