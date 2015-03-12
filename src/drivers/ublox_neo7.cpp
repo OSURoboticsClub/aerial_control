@@ -19,6 +19,13 @@ struct GPGLLMessage {
 };
 
 void UBloxNEO7::init() {
+  // TODO(yoos): Turn off default (1Hz?!) sentences and poll at 10Hz.
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GGA,0,0,0,0,0,0*5A\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,RMC,0,0,0,0,0,0*47\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
 }
 
 GPSReading UBloxNEO7::readGPS() {
@@ -26,9 +33,16 @@ GPSReading UBloxNEO7::readGPS() {
   // messages should end with a CRLF, but we'll only look for the LF.
   std::size_t len = readUntil(NMEA_LF);
 
+  //static int loop = 0;
+  //if (loop % 100 == 0) {
+  //  chprintf((BaseSequentialStream*)&SD6, "$PUBX,00*33\r\n");
+  //}
+  //loop = (loop+1) % 100;
+
   // Check if a full line is ready to be processed
   if(len > 0) {
     char *start = reinterpret_cast<char *>(rxbuf.data());
+    //chprintf((BaseSequentialStream*)&SD4, "%s", rxbuf.data());
 
     // Skip over the leading "$"
     start += 1;
