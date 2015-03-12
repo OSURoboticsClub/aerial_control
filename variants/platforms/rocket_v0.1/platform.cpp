@@ -6,7 +6,6 @@
 #include "drivers/mpu9250.hpp"
 #include "drivers/ms5611.hpp"
 #include "drivers/ublox_neo7.hpp"
-#include "sensor/sensor_measurements.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
