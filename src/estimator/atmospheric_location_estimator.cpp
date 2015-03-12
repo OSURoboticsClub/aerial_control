@@ -16,17 +16,22 @@ LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& 
 }
 
 LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas) {
-  // TODO(yoos)
-  loc.lat = 1.23;
-  loc.lon = 4.56;
-  loc.alt = (*meas.bar).pressure;
+  if(meas.gps) {
+    loc.lat = (*meas.gps).lat;
+    loc.lon = (*meas.gps).lat;
+  }
+
+  if(meas.bar) {
+    // TODO: Mix GPS and barometer readings to get an accuration altitude?
+    // TODO: Pressure != altitude.
+    loc.alt = (*meas.bar).pressure;
+  }
 
   return loc;
 }
 
 void AtmosphericLocationEstimator::updateStream() {
   if(locationMessageStream.ready()) {
-    // TODO(yoos): Implement location message.
     protocol::message::location_message_t m {
       .lat = loc.lat,
       .lon = loc.lon,
