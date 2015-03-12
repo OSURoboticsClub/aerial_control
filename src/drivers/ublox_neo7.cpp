@@ -9,6 +9,21 @@
 const char NMEA_LF = '\n';
 const char *NMEA_DELIMS = ",\0";
 
+static Direction directionForChar(char d) {
+  switch(d) {
+    case 'N':
+      return Direction::NORTH;
+    case 'E':
+      return Direction::EAST;
+    case 'S':
+      return Direction::SOUTH;
+    case 'W':
+      return Direction::WEST;
+    default:
+      return Direction::INVALID;
+  }
+}
+
 struct GPGLLMessage {
   float lon;
   char lonDir;
@@ -68,7 +83,9 @@ GPSReading UBloxNEO7::readGPS() {
       return GPSReading {
         .valid = true,
         .lat = message.lat,
-        .lon = message.lon
+        .latDir = directionForChar(message.latDir),
+        .lon = message.lon,
+        .lonDir = directionForChar(message.lonDir)
       };
     }
   } else {
@@ -76,7 +93,9 @@ GPSReading UBloxNEO7::readGPS() {
       return GPSReading {
         .valid = false,
         .lat = 0.0,
-        .lon = 0.0
+        .latDir = Direction::INVALID,
+        .lon = 0.0,
+        .lonDir = Direction::INVALID
       };
   }
 }

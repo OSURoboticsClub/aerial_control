@@ -3,9 +3,20 @@
 
 #include <array>
 
+enum class Direction {
+  NORTH,
+  EAST,
+  SOUTH,
+  WEST,
+  INVALID
+};
+
 struct GPSReading {
   bool valid;
-  float lat, lon;
+  float lat;
+  Direction latDir;
+  float lon;
+  Direction lonDir;
 };
 
 class GPS {
