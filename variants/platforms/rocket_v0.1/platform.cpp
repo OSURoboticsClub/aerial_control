@@ -54,8 +54,8 @@ MPU9250& Platform::get() {
 
 template <>
 MS5611& Platform::get() {
-  static MS5611 mag(&SPID1, &MS5611_CONFIG);
-  return mag;
+  static MS5611 bar(&SPID1, &MS5611_CONFIG);
+  return bar;
 }
 
 template <>
