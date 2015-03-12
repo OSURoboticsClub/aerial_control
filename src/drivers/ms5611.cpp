@@ -108,7 +108,7 @@ void MS5611::updatePT(void) {
 
   // Calculate pressure (10 to 1200 mbar with 0.01 mbar resolution)
   int32_t P = (((D1 * SENS) >> 21) - OFF) >> 15;   // 100x temp-compensated pressure
-  chprintf((BaseSequentialStream*)&SD4, "PT: %d %d\r\n", P, TEMP);
+  //chprintf((BaseSequentialStream*)&SD4, "PT: %d %d\r\n", P, TEMP);
 
   pressure = P / 100;
   temperature = TEMP / 100;
