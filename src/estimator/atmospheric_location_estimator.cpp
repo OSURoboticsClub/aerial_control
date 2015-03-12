@@ -7,7 +7,7 @@
 // TODO: Initial location is not valid. Maybe we should be able to mark the
 // estimate as invalid until a GPS fix is found?
 AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communicator)
-  : loc{0.0, 0.0, 0.0}
+  : loc{0.0, 0.0, 0.0},
     locationMessageStream(communicator, 5) {
 }
 
