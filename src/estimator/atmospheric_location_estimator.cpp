@@ -4,8 +4,11 @@
 
 #include "unit_config.hpp"
 
+// TODO: Initial location is not valid. Maybe we should be able to mark the
+// estimate as invalid until a GPS fix is found?
 AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communicator)
-  : locationMessageStream(communicator, 5) {
+  : loc{0.0, 0.0, 0.0}
+    locationMessageStream(communicator, 5) {
 }
 
 LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& meas) {
