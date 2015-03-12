@@ -4,8 +4,11 @@
 
 #include "unit_config.hpp"
 
+// TODO: Initial location is not valid. Maybe we should be able to mark the
+// estimate as invalid until a GPS fix is found?
 AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communicator)
-  : locationMessageStream(communicator, 5) {
+  : loc{0.0, 0.0, 0.0}
+    locationMessageStream(communicator, 5) {
 }
 
 LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& meas) {
@@ -16,17 +19,22 @@ LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& 
 }
 
 LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas) {
-  // TODO(yoos)
-  loc.lat = (*meas.gps).lat;
-  loc.lon = (*meas.gps).lon;
-  loc.alt = (*meas.bar).pressure;
+  if(meas.gps) {
+    loc.lat = (*meas.gps).lat;
+    loc.lon = (*meas.gps).lon;
+  }
+
+  // TODO: Mix GPS and barometer readings to get an accuration altitude?
+  // TODO: Pressure != altitude.
+  if(meas.bar) {
+    loc.alt = (*meas.bar).pressure;
+  }
 
   return loc;
 }
 
 void AtmosphericLocationEstimator::updateStream() {
   if(locationMessageStream.ready()) {
-    // TODO(yoos): Implement location message.
     protocol::message::location_message_t m {
       .lat = loc.lat,
       .lon = loc.lon,
