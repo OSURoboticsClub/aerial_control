@@ -19,6 +19,9 @@ void EsraPayloadMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   if(throttleStream.ready()) {
     protocol::message::motor_throttle_message_t msg;
     msg.throttles[0] = outputs[0];
+    msg.throttles[1] = 0;
+    msg.throttles[2] = 0;
+    msg.throttles[3] = 0;
     throttleStream.publish(msg);
   }
 }
