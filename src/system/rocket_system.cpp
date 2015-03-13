@@ -10,11 +10,12 @@ RocketSystem::RocketSystem(
     Gyroscope& gyr,
     optional<Magnetometer *> mag,
     WorldEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator)
+    MotorMapper& motorMapper, Communicator& communicator,
+    PWMPlatform& pwmPlatform)
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper) {
+    motorMapper(motorMapper), pwmPlatform(pwmPlatform) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -148,18 +149,20 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
+  BlinkLED(0,1,0,1);   // Green 1 Hz
   // Proceed directly to PRE_ARM for now.
   return RocketState::PRE_ARM;
 }
 
 RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
+  BlinkLED(0,1,0,4);   // Green 4 Hz
   // Verify sensor health and gps lock
-  bool accHealth = accel.isHealthy();
-  bool gyrHealth = gyr.isHealthy();
+  bool accHealth  = accel.isHealthy();
+  bool gyrHealth  = gyr.isHealthy();
   bool accHHealth = (accelH) ? (*accelH)->isHealthy() : true;
-  bool barHealth = (bar) ? (*bar)->isHealthy() : true;
-  bool gpsHealth = (gps) ? (*gps)->isHealthy() : true;
-  bool magHealth = (mag) ? (*mag)->isHealthy() : true;
+  bool barHealth  = (bar) ? (*bar)->isHealthy() : true;
+  bool gpsHealth  = (gps) ? (*gps)->isHealthy() : true;
+  bool magHealth  = (mag) ? (*mag)->isHealthy() : true;
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (accHealth && gyrHealth &&
@@ -167,20 +170,22 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
       isArmed()) {
     return RocketState::ARMED;
   }
+
   return RocketState::PRE_ARM;
 }
 
 RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
+  SetLED(0,1,0);   // Green
   static int count = 10;
   count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
 
   // Again verify sensor health and gps lock
-  bool accHealth = accel.isHealthy();
-  bool gyrHealth = gyr.isHealthy();
+  bool accHealth  = accel.isHealthy();
+  bool gyrHealth  = gyr.isHealthy();
   bool accHHealth = (accelH) ? (*accelH)->isHealthy() : true;
-  bool barHealth = (bar) ? (*bar)->isHealthy() : true;
-  bool gpsHealth = (gps) ? (*gps)->isHealthy() : true;
-  bool magHealth = (mag) ? (*mag)->isHealthy() : true;
+  bool barHealth  = (bar) ? (*bar)->isHealthy() : true;
+  bool gpsHealth  = (gps) ? (*gps)->isHealthy() : true;
+  bool magHealth  = (mag) ? (*mag)->isHealthy() : true;
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(accHealth && gyrHealth &&
@@ -198,17 +203,69 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
 }
 
 RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
+  SetLED(0,0,1);   // Blue
+
   return RocketState::FLIGHT;
 }
 
 RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
+  BlinkLED(0,0,1,1);   // Blue 1 Hz
   return RocketState::APOGEE;
 }
 
 RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
+  SetLED(1,1,0);   // Yellow
   return RocketState::DESCENT;
 }
 
 RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
+  BlinkLED(1,1,1,2);   // White 2 Hz
   return RocketState::RECOVERY;
+}
+
+void RocketSystem::SetLED(float r, float g, float b) {
+  pwmPlatform.set(9, r);
+  pwmPlatform.set(10, g);
+  pwmPlatform.set(11, b);
+}
+
+void RocketSystem::BlinkLED(float r, float g, float b, float freq) {
+  static int count = 0;
+  int period = 1000 / freq;
+  if (count % period < period/2) {
+    SetLED(r,g,b);
+  }
+  else {
+    SetLED(0,0,0);
+  }
+  count = (count+1) % period;
+}
+
+void RocketSystem::RGBLED(float freq) {
+  float dc = 0.0;
+  int dir = 1;
+  while(true) {
+    if (dc >= 1.0) {
+      dir = -1;
+    }
+    else if (dc <= 0.0) {
+      dir = 1;
+    }
+    dc += dir * 0.02;
+
+    float dc_ = dc;
+    float dir_ = dir;
+    for (int i=0; i<3; i++) {
+      dc_ += dir_ * 0.666;
+      if (dc_ > 1.0) {
+        dc_ = 2.0 - dc_;
+        dir_ = -1;
+      }
+      else if (dc_ < 0.0) {
+        dc_ = 0.0 - dc_;
+        dir_ = 1;
+      }
+      pwmPlatform.set(5+i, dc_*0.05);
+    }
+  }
 }

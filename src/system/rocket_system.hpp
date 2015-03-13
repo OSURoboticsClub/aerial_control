@@ -18,6 +18,7 @@
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
+#include "variant/pwm_platform.hpp"
 
 // World estimation
 #include "estimator/world_estimator.hpp"
@@ -45,7 +46,8 @@ public:
       Gyroscope& gyr,
       optional<Magnetometer *> mag,
       WorldEstimator& estimator, InputSource& inputSource,
-      MotorMapper& motorMapper, Communicator& communicator);
+      MotorMapper& motorMapper, Communicator& communicator,
+      PWMPlatform& pwmPlatform);
 
   void update() override;
 
@@ -70,6 +72,7 @@ private:
   ZeroController<ActuatorSetpoint> zeroController;
 
   MotorMapper& motorMapper;
+  PWMPlatform& pwmPlatform;
 
   /**
    * For now, we proceed directly to PRE_ARM.
@@ -99,12 +102,28 @@ private:
   /**
    * Begin onboard data logging.
    * NOTE(yoos): Unfortunately, we do not have onboard logging yet.
+   *
+   * Detect apogee based mainly on four measurements:
+   *
+   *   1. Pressure rate of change
+   *   2. Net acceleration magnitude
+   *   3. Non-roll rotation rate magnitude
+   *   4. Orientation
+   *
+   * 
    */
   RocketState FlightState(SensorMeasurements meas, WorldEstimate est);
 
   RocketState ApogeeState(SensorMeasurements meas, WorldEstimate est);
   RocketState DescentState(SensorMeasurements meas, WorldEstimate est);
   RocketState RecoveryState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * RGB LED stuff.
+   */
+  void SetLED(float r, float g, float b);
+  void BlinkLED(float r, float g, float b, float freq);
+  void RGBLED(float freq);
 };
 
 #endif
