@@ -149,14 +149,14 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(0,1,0,1);   // Green 1 Hz
+  PulseLED(1,0,0,1);   // Green 1 Hz
 
   // Proceed directly to PRE_ARM for now.
   return RocketState::PRE_ARM;
 }
 
 RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(0,1,0,4);   // Green 4 Hz
+  PulseLED(1,0,0,4);   // Green 4 Hz
 
   // Verify sensor health and gps lock
   bool accHealth  = accel.isHealthy();
@@ -177,7 +177,7 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
-  SetLED(0,1,0);   // Green
+  SetLED(1,0,0);   // Green
 
   static int count = 10;
   count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
@@ -208,6 +208,10 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
 RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(0,0,1);   // Blue
 
+  if ((*meas.bar).pressure < 0.30) {
+    return RocketState::APOGEE;
+  }
+
   return RocketState::FLIGHT;
 }
 
@@ -218,13 +222,13 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
-  SetLED(1,1,0);   // Yellow
+  SetLED(1,0,1);   // Yellow
 
   return RocketState::DESCENT;
 }
 
 RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(1,1,1,2);   // White 2 Hz
+  PulseLED(1,0,1,2);   // White 2 Hz
 
   return RocketState::RECOVERY;
 }
