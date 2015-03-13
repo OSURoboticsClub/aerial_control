@@ -123,7 +123,7 @@ private:
    */
   void SetLED(float r, float g, float b);
   void BlinkLED(float r, float g, float b, float freq);
-  void FadeLED(float r, float g, float b, float freq);
+  void PulseLED(float r, float g, float b, float freq);
   void RGBLED(float freq);
 };
 

@@ -149,14 +149,14 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
-  FadeLED(0,1,0,1);   // Green 1 Hz
+  PulseLED(0,1,0,1);   // Green 1 Hz
 
   // Proceed directly to PRE_ARM for now.
   return RocketState::PRE_ARM;
 }
 
 RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
-  FadeLED(0,1,0,4);   // Green 4 Hz
+  PulseLED(0,1,0,4);   // Green 4 Hz
 
   // Verify sensor health and gps lock
   bool accHealth  = accel.isHealthy();
@@ -212,7 +212,7 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
-  FadeLED(0,0,1,1);   // Blue 1 Hz
+  PulseLED(0,0,1,1);   // Blue 1 Hz
 
   return RocketState::APOGEE;
 }
@@ -224,7 +224,7 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 }
 
 RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
-  FadeLED(1,1,1,2);   // White 2 Hz
+  PulseLED(1,1,1,2);   // White 2 Hz
 
   return RocketState::RECOVERY;
 }
@@ -246,7 +246,7 @@ void RocketSystem::BlinkLED(float r, float g, float b, float freq) { static int 
   count = (count+1) % period;
 }
 
-void RocketSystem::FadeLED(float r, float g, float b, float freq) {
+void RocketSystem::PulseLED(float r, float g, float b, float freq) {
   int period = 1000 / freq;
   static int count = 0;
   float dc = ((float) abs(period/2 - count)) / (period/2);
