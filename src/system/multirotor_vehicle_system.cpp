@@ -110,6 +110,20 @@ void MultirotorVehicleSystem::update() {
   motorMapper.run(isArmed(), actuatorSp);
 }
 
+bool MultirotorVehicleSystem::healthy() {
+  bool healthy = gyroscope.healthy() && accelerometer.healthy();
+
+  if(gps) {
+    healthy &= (*gps)->healthy();
+  }
+
+  if(magnetometer) {
+    healthy &= (*magnetometer)->healthy();
+  }
+
+  return healthy;
+}
+
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }

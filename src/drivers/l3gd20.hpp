@@ -15,53 +15,37 @@ const float SENSITIVITY_500DPS          = 0.0175F;
 const float SENSITIVITY_2000DPS         = 0.070F;
 const float DPS_TO_RADS                 = 0.017453293F;
 
-const std::uint8_t SPI_DI               = 0xFF;
-const std::uint8_t SPI_DI_0             = 0x01;
-const std::uint8_t SPI_DI_1             = 0x02;
-const std::uint8_t SPI_DI_2             = 0x04;
-const std::uint8_t SPI_DI_3             = 0x08;
-const std::uint8_t SPI_DI_4             = 0x10;
-const std::uint8_t SPI_DI_5             = 0x20;
-const std::uint8_t SPI_DI_6             = 0x40;
-const std::uint8_t SPI_DI_7             = 0x80;
-
-const std::uint8_t SPI_AD               = 0x3F;
-const std::uint8_t SPI_AD_0             = 0x01;
-const std::uint8_t SPI_AD_1             = 0x02;
-const std::uint8_t SPI_AD_2             = 0x04;
-const std::uint8_t SPI_AD_3             = 0x08;
-const std::uint8_t SPI_AD_4             = 0x10;
-const std::uint8_t SPI_AD_5             = 0x20;
+const std::uint8_t WHO_AM_I             = 0xD4;
 
 const std::uint8_t SPI_MS               = 0x40;
 const std::uint8_t SPI_RW               = 0x80;
 
-const std::uint8_t SPI_AD_WHO_AM_I      = 0x0F;
-const std::uint8_t SPI_AD_CTRL_REG1     = 0x20;
-const std::uint8_t SPI_AD_CTRL_REG2     = 0x21;
-const std::uint8_t SPI_AD_CTRL_REG3     = 0x22;
-const std::uint8_t SPI_AD_CTRL_REG4     = 0x23;
-const std::uint8_t SPI_AD_CTRL_REG5     = 0x24;
-const std::uint8_t SPI_AD_REFERENCE     = 0x25;
-const std::uint8_t SPI_AD_OUT_TEMP      = 0x26;
-const std::uint8_t SPI_AD_STATUS_REG    = 0x27;
-const std::uint8_t SPI_AD_OUT_X_L       = 0x28;
-const std::uint8_t SPI_AD_OUT_X_H       = 0x29;
-const std::uint8_t SPI_AD_OUT_Y_L       = 0x2A;
-const std::uint8_t SPI_AD_OUT_Y_H       = 0x2B;
-const std::uint8_t SPI_AD_OUT_Z_L       = 0x2C;
-const std::uint8_t SPI_AD_OUT_Z_H       = 0x2D;
-const std::uint8_t SPI_AD_FIFO_CTRL_REG = 0x2E;
-const std::uint8_t SPI_AD_FIFO_SRC_REG  = 0x2F;
-const std::uint8_t SPI_AD_INT1_CFG      = 0x30;
-const std::uint8_t SPI_AD_INT1_SRC      = 0x31;
-const std::uint8_t SPI_AD_INT1_TSH_XH   = 0x32;
-const std::uint8_t SPI_AD_INT1_TSH_XL   = 0x33;
-const std::uint8_t SPI_AD_INT1_TSH_YH   = 0x34;
-const std::uint8_t SPI_AD_INT1_TSH_YL   = 0x35;
-const std::uint8_t SPI_AD_INT1_TSH_ZH   = 0x36;
-const std::uint8_t SPI_AD_INT1_TSH_ZL   = 0x37;
-const std::uint8_t SPI_AD_INT1_DURATION = 0x38;
+const std::uint8_t REG_WHO_AM_I      = 0x0F;
+const std::uint8_t REG_CTRL_REG1     = 0x20;
+const std::uint8_t REG_CTRL_REG2     = 0x21;
+const std::uint8_t REG_CTRL_REG3     = 0x22;
+const std::uint8_t REG_CTRL_REG4     = 0x23;
+const std::uint8_t REG_CTRL_REG5     = 0x24;
+const std::uint8_t REG_REFERENCE     = 0x25;
+const std::uint8_t REG_OUT_TEMP      = 0x26;
+const std::uint8_t REG_STATUS_REG    = 0x27;
+const std::uint8_t REG_OUT_X_L       = 0x28;
+const std::uint8_t REG_OUT_X_H       = 0x29;
+const std::uint8_t REG_OUT_Y_L       = 0x2A;
+const std::uint8_t REG_OUT_Y_H       = 0x2B;
+const std::uint8_t REG_OUT_Z_L       = 0x2C;
+const std::uint8_t REG_OUT_Z_H       = 0x2D;
+const std::uint8_t REG_FIFO_CTRL_REG = 0x2E;
+const std::uint8_t REG_FIFO_SRC_REG  = 0x2F;
+const std::uint8_t REG_INT1_CFG      = 0x30;
+const std::uint8_t REG_INT1_SRC      = 0x31;
+const std::uint8_t REG_INT1_TSH_XH   = 0x32;
+const std::uint8_t REG_INT1_TSH_XL   = 0x33;
+const std::uint8_t REG_INT1_TSH_YH   = 0x34;
+const std::uint8_t REG_INT1_TSH_YL   = 0x35;
+const std::uint8_t REG_INT1_TSH_ZH   = 0x36;
+const std::uint8_t REG_INT1_TSH_ZL   = 0x37;
+const std::uint8_t REG_INT1_DURATION = 0x38;
 
 }
 
@@ -72,6 +56,7 @@ public:
   void init() override;
   bool isHealthy() override;
   GyroscopeReading readGyro() override;
+  bool healthy();
 
 private:
   uint8_t readRegister(uint8_t reg);

@@ -51,3 +51,7 @@ void LSM303DLHC::writeRegister(uint8_t reg, uint8_t val) {
 
   exchange(2, 0);
 }
+
+bool LSM303DLHC::healthy() {
+  return true;
+}

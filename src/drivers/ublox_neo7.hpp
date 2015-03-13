@@ -15,6 +15,7 @@ public:
   void init() override;
   bool isHealthy() override;
   GPSReading readGPS() override;
+  bool healthy();
 };
 
 #endif

@@ -101,3 +101,7 @@ MagnetometerReading MPU9250::readMag() {
 
   return reading;
 }
+
+bool MPU9250::healthy() {
+  return true;
+}

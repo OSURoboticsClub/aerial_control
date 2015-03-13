@@ -50,6 +50,7 @@ public:
   void init() override;
   bool isHealthy() override;
   AccelerometerReading readAccel() override;
+  bool healthy();
 
 private:
   uint8_t readRegister(uint8_t reg);

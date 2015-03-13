@@ -3,17 +3,20 @@
 
 #include <array>
 
+#include "sensor/sensor.hpp"
+
 struct GPSReading {
   bool valid;
   float lat, lon;
   float utc;
 };
 
-class GPS {
+class GPS : public Sensor {
 public:
   virtual void init() = 0;
   virtual bool isHealthy() = 0;
   virtual GPSReading readGPS() = 0;
+  virtual bool healthy() = 0;
 
   float dmd2float(float dm, char dir) {
     float deg = (int) (dm / 100);

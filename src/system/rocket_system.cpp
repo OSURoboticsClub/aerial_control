@@ -144,6 +144,28 @@ void RocketSystem::update() {
   motorMapper.run(isArmed(), actuatorSp);
 }
 
+bool RocketSystem::healthy() {
+  bool healthy = accel.healthy() && gyr.healthy();
+
+  if(accelH) {
+    healthy &= (*accelH)->healthy();
+  }
+
+  if(bar) {
+    healthy &= (*bar)->healthy();
+  }
+
+  if(gps) {
+    healthy &= (*gps)->healthy();
+  }
+
+  if(mag) {
+    healthy &= (*mag)->healthy();
+  }
+
+  return healthy;
+}
+
 void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }

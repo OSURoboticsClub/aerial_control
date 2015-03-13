@@ -101,3 +101,7 @@ GPSReading UBloxNEO7::readGPS() {
       };
   }
 }
+
+bool UBloxNEO7::healthy() {
+  return true;
+}

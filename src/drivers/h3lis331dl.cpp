@@ -79,3 +79,7 @@ AccelerometerReading H3LIS331DL::readAccel() {
 //
   return reading;
 }
+
+bool H3LIS331DL::healthy() {
+  return true;
+}

@@ -54,3 +54,7 @@ void LSM303DLHCMag::writeRegister(uint8_t reg, uint8_t val) {
 
   exchange(2, 0);
 }
+
+bool LSM303DLHCMag::healthy() {
+  return true;
+}
