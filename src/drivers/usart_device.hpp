@@ -14,8 +14,8 @@ public:
 
 protected:
   /**
-   * Continue appending to the internal buffer until the `stop` byte is
-   * encountered.
+   * While data is available in the serial buffer, continue appending to the
+   * internal buffer until the `stop` byte is encountered. Does not block.
    *
    * Returns the number of bytes available if the the `stop` byte was found.
    * Otherwise, return 0.

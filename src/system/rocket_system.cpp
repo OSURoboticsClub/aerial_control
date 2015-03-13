@@ -1,11 +1,18 @@
 #include "system/rocket_system.hpp"
 
+#include "chprintf.h"
+
 RocketSystem::RocketSystem(
-    Gyroscope& gyroscope, Accelerometer& accelerometer,
-    WorldEstimator& worldEstimator, InputSource& inputSource,
+    Accelerometer& accel,
+    optional<Accelerometer *> accelH,
+    optional<Barometer *> bar,
+    optional<GPS *> gps,
+    Gyroscope& gyr,
+    optional<Magnetometer *> mag,
+    WorldEstimator& estimator, InputSource& inputSource,
     MotorMapper& motorMapper, Communicator& communicator)
   : VehicleSystem(communicator), MessageListener(communicator),
-    gyroscope(gyroscope), accelerometer(accelerometer),
+    accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), stage(RocketStage::DISABLED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
@@ -14,15 +21,32 @@ RocketSystem::RocketSystem(
 }
 
 void RocketSystem::update() {
+  //static int time = 0;
+  //if (time % 1000 == 0) {
+  //  chprintf((BaseSequentialStream*)&SD4, "%d\r\n", RTT2MS(chibios_rt::System::getTime()));
+  //}
+  //time = (time+1) % 1000;
+
   // Poll the gyroscope and accelerometer
-  GyroscopeReading gyroReading = gyroscope.readGyro();
-  AccelerometerReading accelReading = accelerometer.readAccel();
+  AccelerometerReading accelReading = accel.readAccel();
+  GyroscopeReading gyrReading = gyr.readGyro();
+  optional<AccelerometerReading> accelHReading;
+  optional<BarometerReading> barReading;
+  optional<GPSReading> gpsReading;
+  optional<MagnetometerReading> magReading;
+
+  if (accelH) accelHReading = (*accelH)->readAccel();
+  if (bar)    barReading    = (*bar)->readBar();
+  if (gps)    gpsReading    = (*gps)->readGPS();
+  //if (mag)    magReading    = (*mag)->readMag();
 
   SensorMeasurements meas {
-    .accel = std::experimental::make_optional(accelReading),
-    .gps   = std::experimental::nullopt,
-    .gyro  = std::experimental::make_optional(gyroReading),
-    .mag   = std::experimental::nullopt
+    .accel  = std::experimental::make_optional(accelReading),
+    .accelH = accelHReading,
+    .bar    = barReading,
+    .gps    = gpsReading,
+    .gyro   = std::experimental::make_optional(gyrReading),
+    .mag    = magReading
   };
 
   // Update the attitude estimate

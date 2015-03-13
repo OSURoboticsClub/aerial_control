@@ -11,6 +11,9 @@ public:
 
   template <typename T>
   T& get();
+
+  template <typename T>
+  T& getIdx(int idx);
 };
 
 #endif

@@ -19,6 +19,7 @@ private:
    */
   void updateStream();
 
+  LocationEstimate loc;
   RateLimitedStream locationMessageStream;
 };
 

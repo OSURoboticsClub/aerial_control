@@ -23,10 +23,12 @@ void CarVehicleSystem::update() {
   AccelerometerReading accelReading = accelerometer.readAccel();
 
   SensorMeasurements meas {
-    .accel = std::experimental::make_optional(accelReading),
-    .gps   = std::experimental::nullopt,
-    .gyro  = std::experimental::make_optional(gyroReading),
-    .mag   = std::experimental::nullopt
+    .accel  = std::experimental::make_optional(accelReading),
+    .accelH = std::experimental::nullopt,
+    .bar    = std::experimental::nullopt,
+    .gps    = std::experimental::nullopt,
+    .gyro   = std::experimental::make_optional(gyroReading),
+    .mag    = std::experimental::nullopt
   };
 
   // Update the world estimate

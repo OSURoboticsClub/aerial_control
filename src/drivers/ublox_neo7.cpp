@@ -11,26 +11,38 @@ const char *NMEA_DELIMS = ",\0";
 
 struct GPGLLMessage {
   float lon;
-  char lon_dir;
+  char lonDir;
   float lat;
-  char lat_dir;
+  char latDir;
   float utc;
   char valid;
 };
 
 void UBloxNEO7::init() {
+  // TODO(yoos): Turn off default (1Hz?!) sentences and poll at 10Hz.
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GGA,0,0,0,0,0,0*5A\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,RMC,0,0,0,0,0,0*47\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n");
+  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
 }
 
 GPSReading UBloxNEO7::readGPS() {
-  GPSReading reading;
-
   // Read all available bytes until the newline character. NMEA dictates that
   // messages should end with a CRLF, but we'll only look for the LF.
   std::size_t len = readUntil(NMEA_LF);
 
+  //static int loop = 0;
+  //if (loop % 100 == 0) {
+  //  chprintf((BaseSequentialStream*)&SD6, "$PUBX,00*33\r\n");
+  //}
+  //loop = (loop+1) % 100;
+
   // Check if a full line is ready to be processed
   if(len > 0) {
     char *start = reinterpret_cast<char *>(rxbuf.data());
+    //chprintf((BaseSequentialStream*)&SD4, "%s", rxbuf.data());
 
     // Skip over the leading "$"
     start += 1;
@@ -42,21 +54,19 @@ GPSReading UBloxNEO7::readGPS() {
       GPGLLMessage message;
       int position = 0;
 
-      while(token != nullptr) {
-        token = std::strtok(nullptr, NMEA_DELIMS);
-
+      while((token = std::strtok(nullptr, NMEA_DELIMS)) != nullptr) {
         switch(position++) {
           case 0:
-            message.lon = atof(token);
-            break;
-          case 1:
-            message.lon_dir = token[0];
-            break;
-          case 2:
             message.lat = atof(token);
             break;
+          case 1:
+            message.latDir = token[0];
+            break;
+          case 2:
+            message.lon = atof(token);
+            break;
           case 3:
-            message.lat_dir = token[0];
+            message.lonDir = token[0];
             break;
           case 4:
             message.utc = atof(token);
@@ -67,11 +77,23 @@ GPSReading UBloxNEO7::readGPS() {
         };
       }
 
-      reading.lat = message.lat;
-      reading.lon = message.lon;
+      return GPSReading {
+        // Make sure we got all parts of the message. If fields are omitted in
+        // the message then `strtok` will skip over repeated delimiters and the
+        // above loop will complete before all delimiters were found.
+        .valid = message.valid && position == 7,
+        .lat = dmd2float(message.lat, message.latDir),
+        .lon = dmd2float(message.lon, message.lonDir),
+        .utc = message.utc
+      };
     }
   } else {
+    // TODO: Return previous message with old timestamp.
+      return GPSReading {
+        .valid = false,
+        .lat = 0.0,
+        .lon = 0.0,
+        .utc = 0.0
+      };
   }
-
-  return reading;
 }

@@ -92,3 +92,12 @@ AccelerometerReading MPU9250::readAccel() {
 
   return reading;
 }
+
+MagnetometerReading MPU9250::readMag() {
+  MagnetometerReading reading;
+
+  // Get data
+  // TODO(yoos)
+
+  return reading;
+}
