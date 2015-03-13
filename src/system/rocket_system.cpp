@@ -159,12 +159,12 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
   PulseLED(1,0,0,4);   // Green 4 Hz
 
   // Verify sensor health and gps lock
-  bool accHealth  = accel.isHealthy();
-  bool gyrHealth  = gyr.isHealthy();
-  bool accHHealth = (accelH) ? (*accelH)->isHealthy() : true;
-  bool barHealth  = (bar) ? (*bar)->isHealthy() : true;
-  bool gpsHealth  = (gps) ? (*gps)->isHealthy() : true;
-  bool magHealth  = (mag) ? (*mag)->isHealthy() : true;
+  bool accHealth  = accel.healthy();
+  bool gyrHealth  = gyr.healthy();
+  bool accHHealth = (accelH) ? (*accelH)->healthy() : true;
+  bool barHealth  = (bar) ? (*bar)->healthy() : true;
+  bool gpsHealth  = (gps) ? (*gps)->healthy() : true;
+  bool magHealth  = (mag) ? (*mag)->healthy() : true;
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (accHealth && gyrHealth &&
@@ -183,12 +183,12 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
   count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
 
   // Again verify sensor health and gps lock
-  bool accHealth  = accel.isHealthy();
-  bool gyrHealth  = gyr.isHealthy();
-  bool accHHealth = (accelH) ? (*accelH)->isHealthy() : true;
-  bool barHealth  = (bar) ? (*bar)->isHealthy() : true;
-  bool gpsHealth  = (gps) ? (*gps)->isHealthy() : true;
-  bool magHealth  = (mag) ? (*mag)->isHealthy() : true;
+  bool accHealth  = accel.healthy();
+  bool gyrHealth  = gyr.healthy();
+  bool accHHealth = (accelH) ? (*accelH)->healthy() : true;
+  bool barHealth  = (bar) ? (*bar)->healthy() : true;
+  bool gpsHealth  = (gps) ? (*gps)->healthy() : true;
+  bool magHealth  = (mag) ? (*mag)->healthy() : true;
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(accHealth && gyrHealth &&
