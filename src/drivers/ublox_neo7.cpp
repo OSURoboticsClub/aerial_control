@@ -80,7 +80,10 @@ GPSReading UBloxNEO7::readGPS() {
       }
 
       return GPSReading {
-        .valid = message.valid,
+        // Make sure we got all parts of the message. If fields are omitted in
+        // the message then `strtok` will skip over repeated delimiters and the
+        // above loop will complete before all delimiters were found.
+        .valid = message.valid && position == 6,
         .lat = dmd2float(message.lat, message.latDir),
         .lon = dmd2float(message.lon, message.lonDir),
         .utc = message.utc
