@@ -12,6 +12,7 @@ struct GPSReading {
 class GPS {
 public:
   virtual void init() = 0;
+  virtual bool isHealthy() = 0;
   virtual GPSReading readGPS() = 0;
 
   float dmd2float(float dm, char dir) {

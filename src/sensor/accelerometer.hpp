@@ -10,6 +10,7 @@ struct AccelerometerReading {
 class Accelerometer {
 public:
   virtual void init() = 0;
+  virtual bool isHealthy() = 0;
   virtual AccelerometerReading readAccel() = 0;
 };
 

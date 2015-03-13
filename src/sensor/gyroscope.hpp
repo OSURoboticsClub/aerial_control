@@ -10,6 +10,7 @@ struct GyroscopeReading {
 class Gyroscope {
 public:
   virtual void init() = 0;
+  virtual bool isHealthy() = 0;
   virtual GyroscopeReading readGyro() = 0;
 };
 

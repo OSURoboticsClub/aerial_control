@@ -10,6 +10,7 @@ struct MagnetometerReading {
 class Magnetometer {
 public:
   virtual void init() = 0;
+  virtual bool isHealthy() = 0;
   virtual MagnetometerReading readMag() = 0;
 };
 
