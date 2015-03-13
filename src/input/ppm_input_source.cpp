@@ -6,6 +6,7 @@ PPMInputSource::PPMInputSource()
     lastFrameStart(0) {
   icuInit();
   // icuStart(&ICUD1, ); // TODO
+  // icuEnable(&ICUD1);
 }
 
 void PPMInputSource::trigger() {
