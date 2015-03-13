@@ -66,7 +66,7 @@ GPSReading UBloxNEO7::readGPS() {
       }
 
       return GPSReading {
-        .valid = true,
+        .valid = message.valid,
         .lat = dmd2float(message.lat, message.latDir),
         .lon = dmd2float(message.lon, message.lonDir),
         .utc = message.utc
