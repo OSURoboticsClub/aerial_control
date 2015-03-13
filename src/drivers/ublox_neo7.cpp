@@ -40,9 +40,7 @@ GPSReading UBloxNEO7::readGPS() {
       GPGLLMessage message;
       int position = 0;
 
-      while(token != nullptr) {
-        token = std::strtok(nullptr, NMEA_DELIMS);
-
+      while((token = std::strtok(nullptr, NMEA_DELIMS)) != nullptr) {
         switch(position++) {
           case 0:
             message.lat = atof(token);
@@ -69,7 +67,7 @@ GPSReading UBloxNEO7::readGPS() {
         // Make sure we got all parts of the message. If fields are omitted in
         // the message then `strtok` will skip over repeated delimiters and the
         // above loop will complete before all delimiters were found.
-        .valid = message.valid && position == 6,
+        .valid = message.valid && position == 7,
         .lat = dmd2float(message.lat, message.latDir),
         .lon = dmd2float(message.lon, message.lonDir),
         .utc = message.utc
