@@ -45,6 +45,7 @@ public:
       MotorMapper& motorMapper, Communicator& communicator);
 
   void update() override;
+  bool healthy();
 
   void on(const protocol::message::set_arm_state_message_t& m) override;
 

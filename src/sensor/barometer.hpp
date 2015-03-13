@@ -3,12 +3,14 @@
 
 #include <array>
 
+#include "sensor/sensor.hpp"
+
 struct BarometerReading {
   float pressure;
   float temperature;
 };
 
-class Barometer {
+class Barometer : public Sensor {
 public:
   virtual void init() = 0;
   virtual BarometerReading readBar() = 0;

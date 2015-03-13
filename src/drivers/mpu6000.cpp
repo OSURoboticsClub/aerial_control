@@ -47,13 +47,6 @@ void MPU6000::init() {
   readAccel();
 }
 
-bool MPU6000::healthy() {
-  // TODO: What is `expected`?
-  /* return readRegister(mpu6000::REG_WHO_AM_I & ~(1 << 0) & ~(1 << 7)) == expected; */
-
-  return true;
-}
-
 GyroscopeReading MPU6000::readGyro() {
   GyroscopeReading reading;
 
@@ -94,4 +87,11 @@ AccelerometerReading MPU6000::readAccel() {
   reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 2048.0 + unit_config::ACC_Z_OFFSET;
 
   return reading;
+}
+
+bool MPU6000::healthy() {
+  // TODO: What is `expected`?
+  /* return readRegister(mpu6000::REG_WHO_AM_I & ~(1 << 0) & ~(1 << 7)) == expected; */
+
+  return true;
 }

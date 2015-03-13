@@ -113,3 +113,7 @@ void MS5611::updatePT(void) {
   pressure = P / 100;
   temperature = TEMP / 100;
 }
+
+bool MS5611::healthy() {
+  return true;
+}

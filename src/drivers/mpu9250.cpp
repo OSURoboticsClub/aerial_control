@@ -47,10 +47,6 @@ void MPU9250::init() {
   readAccel();
 }
 
-bool MPU9250::healthy() {
-  return true;
-}
-
 GyroscopeReading MPU9250::readGyro() {
   GyroscopeReading reading;
 
@@ -100,4 +96,8 @@ MagnetometerReading MPU9250::readMag() {
   // TODO(yoos)
 
   return reading;
+}
+
+bool MPU9250::healthy() {
+  return true;
 }

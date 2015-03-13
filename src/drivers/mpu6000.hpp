@@ -106,9 +106,9 @@ public:
   using SPIDevice::SPIDevice;
 
   void init() override;
-  bool healthy();
   GyroscopeReading readGyro() override;
   AccelerometerReading readAccel() override;
+  bool healthy();
 
 private:
   uint8_t readRegister(uint8_t reg);
