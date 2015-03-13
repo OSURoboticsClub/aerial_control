@@ -25,11 +25,14 @@
 // Sensors
 #include "sensor/sensor_measurements.hpp"
 
-enum class RocketStage {
-  DISABLED,
-  PAD,
-  ASCENT,
-  DESCENT
+enum class RocketState {
+  DISARMED,
+  PRE_ARM,
+  ARMED,
+  FLIGHT,
+  APOGEE,
+  DESCENT,
+  RECOVERY
 };
 
 class RocketSystem : public VehicleSystem, public MessageListener {
@@ -68,7 +71,40 @@ private:
 
   MotorMapper& motorMapper;
 
-  RocketStage stage;
+  /**
+   * For now, we proceed directly to PRE_ARM.
+   */
+  RocketState DisarmedState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * Full data stream to ground station begins here.
+   * Sensor calibration should be performed, hopefully with physical access to
+   * the board.
+   *
+   * Proceed to ARMED on meeting all of the following conditions:
+   *
+   *   1. Sensor health checks passed
+   *   2. GPS lock
+   *   3. Software arm signal received from GS
+   */
+  RocketState PreArmState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * Sensor calibration should be finished.
+   *
+   * Proceed to FLIGHT if X accel exceeds 1.1g.
+   */
+  RocketState ArmedState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * Begin onboard data logging.
+   * NOTE(yoos): Unfortunately, we do not have onboard logging yet.
+   */
+  RocketState FlightState(SensorMeasurements meas, WorldEstimate est);
+
+  RocketState ApogeeState(SensorMeasurements meas, WorldEstimate est);
+  RocketState DescentState(SensorMeasurements meas, WorldEstimate est);
+  RocketState RecoveryState(SensorMeasurements meas, WorldEstimate est);
 };
 
 #endif

@@ -14,7 +14,7 @@ RocketSystem::RocketSystem(
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), stage(RocketStage::DISABLED) {
+    motorMapper(motorMapper) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -49,7 +49,7 @@ void RocketSystem::update() {
     .mag    = magReading
   };
 
-  // Update the attitude estimate
+  // Update the world estimate
   WorldEstimate estimate = estimator.update(meas);
 
   // Poll for controller input
@@ -62,54 +62,82 @@ void RocketSystem::update() {
   // Run the controllers
   ActuatorSetpoint actuatorSp;
 
-  // Run the controller pipeline as determined by the subclass
-  switch(stage) {
-    case RocketStage::DISABLED:
-      {
-        // If armed, proceed to pad prep.
-        if (isArmed()) {
-          stage = RocketStage::PAD;
-        }
-        break;
-      }
-    case RocketStage::PAD:
-      {
-        // Set fins to neutral
-        ActuatorSetpoint sp {
-          .roll     = 0.5f,
-          .pitch    = 0.0f,
-          .yaw      = 0.0f,
-          .throttle = 0.0f
-        };
-        actuatorSp = sp;
-
-        // If acceleration moving average exceeds 2g (should occur around 0.44s
-        // according to sim), proceed to ascent.
-        if (accel < -2.0f) {
-          stage = RocketStage::ASCENT;
-        }
-        break;
-      }
-    case RocketStage::ASCENT:
-      {
-        AngularVelocitySetpoint sp {
-          .rollVel  = 0.0f,
-          .pitchVel = 0.0f,
-          .yawVel   = 0.0f,
-          .throttle  = 0.0f
-        };
-        actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
-
-        // If deviated more than 30 deg past vertical, proceed to descent.
-        // TODO
-        break;
-      }
-    case RocketStage::DESCENT:
-      {
-        setArmed(false);
-        break;
-      }
+  // Run state machine
+  static RocketState state = RocketState::DISARMED;
+  switch (state) {
+  case RocketState::DISARMED:
+    state = DisarmedState(meas, estimate);
+    break;
+  case RocketState::PRE_ARM:
+    state = PreArmState(meas, estimate);
+    break;
+  case RocketState::ARMED:
+    state = ArmedState(meas, estimate);
+    break;
+  case RocketState::FLIGHT:
+    state = FlightState(meas, estimate);
+    break;
+  case RocketState::APOGEE:
+    state = ApogeeState(meas, estimate);
+    break;
+  case RocketState::DESCENT:
+    state = DescentState(meas, estimate);
+    break;
+  case RocketState::RECOVERY:
+    state = RecoveryState(meas, estimate);
+    break;
+  default:
+    break;
   }
+
+  // Run the controller pipeline as determined by the subclass
+  //switch(state) {
+  //  case RocketState::DISARMED:
+  //    {
+  //      // If armed, proceed to pad prep.
+  //      if (isArmed()) {
+  //        state = RocketState::PAD;
+  //      }
+  //      break;
+  //    }
+  //  case RocketState::PAD:
+  //    {
+  //      // Set fins to neutral
+  //      ActuatorSetpoint sp {
+  //        .roll     = 0.5f,
+  //        .pitch    = 0.0f,
+  //        .yaw      = 0.0f,
+  //        .throttle = 0.0f
+  //      };
+  //      actuatorSp = sp;
+
+  //      // If acceleration moving average exceeds 2g (should occur around 0.44s
+  //      // according to sim), proceed to ascent.
+  //      if (accel < -2.0f) {
+  //        state = RocketState::ASCENT;
+  //      }
+  //      break;
+  //    }
+  //  case RocketState::ASCENT:
+  //    {
+  //      AngularVelocitySetpoint sp {
+  //        .rollVel  = 0.0f,
+  //        .pitchVel = 0.0f,
+  //        .yawVel   = 0.0f,
+  //        .throttle  = 0.0f
+  //      };
+  //      actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
+
+  //      // If deviated more than 30 deg past vertical, proceed to descent.
+  //      // TODO
+  //      break;
+  //    }
+  //  case RocketState::DESCENT:
+  //    {
+  //      setArmed(false);
+  //      break;
+  //    }
+  //}
 
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
@@ -117,4 +145,70 @@ void RocketSystem::update() {
 
 void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
+}
+
+RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
+  // Proceed directly to PRE_ARM for now.
+  return RocketState::PRE_ARM;
+}
+
+RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
+  // Verify sensor health and gps lock
+  bool accHealth = accel.isHealthy();
+  bool gyrHealth = gyr.isHealthy();
+  bool accHHealth = (accelH) ? (*accelH)->isHealthy() : true;
+  bool barHealth = (bar) ? (*bar)->isHealthy() : true;
+  bool gpsHealth = (gps) ? (*gps)->isHealthy() : true;
+  bool magHealth = (mag) ? (*mag)->isHealthy() : true;
+
+  // Proceed to ARMED if all sensors are healthy and GS arm signal received.
+  if (accHealth && gyrHealth &&
+      accHHealth && barHealth && gpsHealth && magHealth &&
+      isArmed()) {
+    return RocketState::ARMED;
+  }
+  return RocketState::PRE_ARM;
+}
+
+RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
+  static int count = 10;
+  count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
+
+  // Again verify sensor health and gps lock
+  bool accHealth = accel.isHealthy();
+  bool gyrHealth = gyr.isHealthy();
+  bool accHHealth = (accelH) ? (*accelH)->isHealthy() : true;
+  bool barHealth = (bar) ? (*bar)->isHealthy() : true;
+  bool gpsHealth = (gps) ? (*gps)->isHealthy() : true;
+  bool magHealth = (mag) ? (*mag)->isHealthy() : true;
+
+  // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
+  if (!(accHealth && gyrHealth &&
+        accHHealth && barHealth && gpsHealth && magHealth &&
+        isArmed())) {
+    return RocketState::PRE_ARM;
+  }
+
+  // Proceed to FLIGHT on 1.1g sense on X axis.
+  if (count == 0) {
+    return RocketState::FLIGHT;
+  }
+
+  return RocketState::ARMED;
+}
+
+RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
+  return RocketState::FLIGHT;
+}
+
+RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
+  return RocketState::APOGEE;
+}
+
+RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
+  return RocketState::DESCENT;
+}
+
+RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
+  return RocketState::RECOVERY;
 }
