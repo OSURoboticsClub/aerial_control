@@ -114,8 +114,8 @@ void MS5611::updatePT(void) {
   int32_t P = (((D1 * SENS) >> 21) - OFF) >> 15;   // 100x temp-compensated pressure
   //chprintf((BaseSequentialStream*)&SD4, "PT: %d %d\r\n", P, TEMP);
 
-  pressure = P / 100;
-  temperature = TEMP / 100;
+  pressure = P / 100.;
+  temperature = TEMP / 100.;
 }
 
 bool MS5611::healthy() {
