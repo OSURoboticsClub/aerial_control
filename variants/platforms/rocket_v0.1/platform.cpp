@@ -17,7 +17,7 @@ static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
   GPIOC,
   15,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
 };
 
 // MPU9250 SPI configuration
@@ -25,7 +25,7 @@ static const SPIConfig MPU9250_CONFIG {
   NULL,
   GPIOC,
   14,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
 };
 
 // MS5611 SPI configuration
@@ -34,7 +34,7 @@ static const SPIConfig MS5611_CONFIG {
   NULL,
   GPIOC,
   13,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
 };
 
 Platform::Platform() {
