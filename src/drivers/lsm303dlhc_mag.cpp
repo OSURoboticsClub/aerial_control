@@ -15,6 +15,10 @@ void LSM303DLHCMag::init() {
   writeRegister(lsm303dlhc_mag::I2C_MR_REG_M, 0x00);
 }
 
+bool LSM303DLHCMag::isHealthy() {
+  return false;   // TODO
+}
+
 MagnetometerReading LSM303DLHCMag::readMag() {
   txbuf[0] = lsm303dlhc_mag::I2C_OUT_X_H_M;
 

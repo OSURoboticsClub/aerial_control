@@ -48,6 +48,7 @@ public:
   using I2CDevice::I2CDevice;
 
   void init() override;
+  bool isHealthy() override;
   AccelerometerReading readAccel() override;
 
 private:

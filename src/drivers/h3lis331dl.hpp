@@ -14,6 +14,7 @@ public:
   using SPIDevice::SPIDevice;
 
   void init() override;
+  bool isHealthy() override;
   AccelerometerReading readAccel() override;
 
 private:

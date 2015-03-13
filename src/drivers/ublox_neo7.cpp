@@ -28,6 +28,10 @@ void UBloxNEO7::init() {
   //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
 }
 
+bool UBloxNEO7::isHealthy() {
+  return false;   // TODO
+}
+
 GPSReading UBloxNEO7::readGPS() {
   // Read all available bytes until the newline character. NMEA dictates that
   // messages should end with a CRLF, but we'll only look for the LF.

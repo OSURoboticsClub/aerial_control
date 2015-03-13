@@ -70,6 +70,7 @@ public:
   using SPIDevice::SPIDevice;
 
   void init() override;
+  bool isHealthy() override;
   GyroscopeReading readGyro() override;
 
 private:

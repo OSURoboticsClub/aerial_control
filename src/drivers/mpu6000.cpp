@@ -47,6 +47,10 @@ void MPU6000::init() {
   readAccel();
 }
 
+bool MPU6000::isHealthy() {
+  return false;   // TODO
+}
+
 GyroscopeReading MPU6000::readGyro() {
   GyroscopeReading reading;
 
