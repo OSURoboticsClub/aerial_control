@@ -37,7 +37,7 @@ private:
    */
   void updatePT(void);
 
-  uint32_t C1, C2, C3, C4, C5, C6;   // These are really 16-bit values, but we'll just make them 32 bits wide so we can bit shift conveniently.
+  uint64_t C1, C2, C3, C4, C5, C6;   // These are really 16-bit values, but we'll just make them 64 bits wide so we can bit shift conveniently.
   uint32_t D1, D2;
   float pressure, temperature;
 };
