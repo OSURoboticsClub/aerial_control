@@ -91,55 +91,6 @@ void RocketSystem::update() {
     break;
   }
 
-  // Run the controller pipeline as determined by the subclass
-  //switch(state) {
-  //  case RocketState::DISARMED:
-  //    {
-  //      // If armed, proceed to pad prep.
-  //      if (isArmed()) {
-  //        state = RocketState::PAD;
-  //      }
-  //      break;
-  //    }
-  //  case RocketState::PAD:
-  //    {
-  //      // Set fins to neutral
-  //      ActuatorSetpoint sp {
-  //        .roll     = 0.5f,
-  //        .pitch    = 0.0f,
-  //        .yaw      = 0.0f,
-  //        .throttle = 0.0f
-  //      };
-  //      actuatorSp = sp;
-
-  //      // If acceleration moving average exceeds 2g (should occur around 0.44s
-  //      // according to sim), proceed to ascent.
-  //      if (accel < -2.0f) {
-  //        state = RocketState::ASCENT;
-  //      }
-  //      break;
-  //    }
-  //  case RocketState::ASCENT:
-  //    {
-  //      AngularVelocitySetpoint sp {
-  //        .rollVel  = 0.0f,
-  //        .pitchVel = 0.0f,
-  //        .yawVel   = 0.0f,
-  //        .throttle  = 0.0f
-  //      };
-  //      actuatorSp = pipeline.run(estimate, sp, attVelController, attAccController);
-
-  //      // If deviated more than 30 deg past vertical, proceed to descent.
-  //      // TODO
-  //      break;
-  //    }
-  //  case RocketState::DESCENT:
-  //    {
-  //      setArmed(false);
-  //      break;
-  //    }
-  //}
-
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
 }
@@ -180,18 +131,8 @@ RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
 RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(1,0,0,4);   // Green 4 Hz
 
-  // Verify sensor health and gps lock
-  bool accHealth  = accel.healthy();
-  bool gyrHealth  = gyr.healthy();
-  bool accHHealth = (accelH) ? (*accelH)->healthy() : true;
-  bool barHealth  = (bar) ? (*bar)->healthy() : true;
-  bool gpsHealth  = (gps) ? (*gps)->healthy() : true;
-  bool magHealth  = (mag) ? (*mag)->healthy() : true;
-
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
-  if (accHealth && gyrHealth &&
-      accHHealth && barHealth && gpsHealth && magHealth &&
-      isArmed()) {
+  if (healthy() && isArmed()) {
     return RocketState::ARMED;
   }
 
@@ -204,18 +145,8 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
   static int count = 10;
   count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
 
-  // Again verify sensor health and gps lock
-  bool accHealth  = accel.healthy();
-  bool gyrHealth  = gyr.healthy();
-  bool accHHealth = (accelH) ? (*accelH)->healthy() : true;
-  bool barHealth  = (bar) ? (*bar)->healthy() : true;
-  bool gpsHealth  = (gps) ? (*gps)->healthy() : true;
-  bool magHealth  = (mag) ? (*mag)->healthy() : true;
-
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
-  if (!(accHealth && gyrHealth &&
-        accHHealth && barHealth && gpsHealth && magHealth &&
-        isArmed())) {
+  if (!(healthy() && isArmed())) {
     return RocketState::PRE_ARM;
   }
 
@@ -230,7 +161,7 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
 RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(0,0,1);   // Blue
 
-  if ((*meas.bar).pressure < 0.30) {
+  if ((*meas.bar).pressure < 400.) {
     return RocketState::APOGEE;
   }
 

@@ -111,12 +111,29 @@ private:
    *   3. Non-roll rotation rate magnitude
    *   4. Orientation
    *
-   * 
+   * We first determine possible apogee based on the altitude rate of change,
+   * which is estimated from the barometer and GPS.
+   *
+   * We then 
    */
   RocketState FlightState(SensorMeasurements meas, WorldEstimate est);
 
+  /**
+   * Deploy drogue chute. If magnitude of net proper acceleration does not
+   * change within 5 seconds, deploy main.
+   */
   RocketState ApogeeState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * Deploy main chute at 1500' AGL.
+   */
   RocketState DescentState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * Turn off all telemetry (maybe?) except GPS.
+   *
+   * Try to conserve power.
+   */
   RocketState RecoveryState(SensorMeasurements meas, WorldEstimate est);
 
   /**
@@ -126,6 +143,12 @@ private:
   void BlinkLED(float r, float g, float b, float freq);
   void PulseLED(float r, float g, float b, float freq);
   void RGBLED(float freq);
+
+  /**
+   * Per-launch calibration
+   */
+  float ground_pressure;
+  float velocity;
 };
 
 #endif
