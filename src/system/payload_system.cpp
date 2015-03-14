@@ -245,12 +245,10 @@ PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate e
     if (est.loc.dAlt < -40.0) {
       return PayloadState::APOGEE;
     }
-    // Check for near-zero altitude change towards end of ascent. This is the ideal case.
-    else if (est.loc.dAlt < 2.0) {
-      // Check we are not just undergoing a subsonic transition
-      if ((*meas.accel).axes[0] > -1.0) {
-        return PayloadState::APOGEE;
-      }
+    // Check for near-zero altitude change towards end of ascent (ideal case)
+    // and that we are not just undergoing a subsonic transition.
+    else if ((*meas.accel).axes[0] > -1.0) {
+      return PayloadState::APOGEE;
     }
   }
 

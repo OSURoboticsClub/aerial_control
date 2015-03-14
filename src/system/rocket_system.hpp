@@ -9,8 +9,6 @@
 #include "communication/message_listener.hpp"
 
 // Control
-#include "controller/angular_velocity_controller.hpp"
-#include "controller/rocket_angular_acceleration_controller.hpp"
 #include "controller/position_controller.hpp"
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
@@ -70,8 +68,6 @@ private:
   InputSource& inputSource;
 
   PositionController posController;
-  AngularVelocityController attVelController;
-  RocketAngularAccelerationController attAccController;
   ControllerPipeline<ActuatorSetpoint> pipeline;
 
   ZeroController<ActuatorSetpoint> zeroController;
@@ -80,6 +76,7 @@ private:
   Platform& platform;
 
   RateLimitedStream imuStream;
+  RateLimitedStream systemStream;
 
   void updateStreams(SensorMeasurements meas, WorldEstimate est);
 
@@ -159,6 +156,12 @@ private:
   void BlinkLED(float r, float g, float b, float freq);
   void PulseLED(float r, float g, float b, float freq);
   void RGBLED(float freq);
+
+  /**
+   * In-class global vars
+   */
+  RocketState state;
+  float motorDC;
 
   /**
    * Per-launch calibration

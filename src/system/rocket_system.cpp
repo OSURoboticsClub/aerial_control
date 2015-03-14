@@ -16,7 +16,9 @@ RocketSystem::RocketSystem(
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
-    imuStream(communicator, 100) {
+    imuStream(communicator, 100),
+    systemStream(communicator, 5),
+    state(RocketState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -65,7 +67,6 @@ void RocketSystem::update() {
   ActuatorSetpoint actuatorSp;
 
   // Run state machine
-  static RocketState state = RocketState::DISARMED;
   switch (state) {
   case RocketState::DISARMED:
     state = DisarmedState(meas, estimate);
@@ -142,6 +143,42 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
 
     imuStream.publish(m);
   }
+
+  if (systemStream.ready()) {
+    uint8_t stateNum = 0;
+    switch (state) {
+    case RocketState::DISARMED:
+      stateNum = 0;
+      break;
+    case RocketState::PRE_ARM:
+      stateNum = 1;
+      break;
+    case RocketState::ARMED:
+      stateNum = 2;
+      break;
+    case RocketState::FLIGHT:
+      stateNum = 3;
+      break;
+    case RocketState::APOGEE:
+      stateNum = 4;
+      break;
+    case RocketState::DESCENT:
+      stateNum = 6;
+      break;
+    case RocketState::RECOVERY:
+      stateNum = 7;
+      break;
+    default:
+      break;
+    }
+
+    protocol::message::system_message_t m {
+      .state = stateNum,
+      .motorDC = motorDC
+    };
+
+    systemStream.publish(m);
+  }
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
@@ -197,17 +234,15 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   }
 
   // Apogee occurs after motor cutoff
-  if (!powered) {
+  if (!powered && est.loc.dAlt < 2.0) {
     // If falling faster than -40m/s, definitely deploy.
     if (est.loc.dAlt < -40.0) {
       return RocketState::APOGEE;
     }
-    // Check for near-zero altitude change towards end of ascent. This is the ideal case.
-    else if (est.loc.dAlt < 2.0) {
-      // Check we are not just undergoing a subsonic transition
-      if ((*meas.accel).axes[0] > -1.0) {
-        return RocketState::APOGEE;
-      }
+    // Check for near-zero altitude change towards end of ascent (ideal case)
+    // and that we are not just undergoing a subsonic transition.
+    else if ((*meas.accel).axes[0] > -1.0) {
+      return RocketState::APOGEE;
     }
   }
 
@@ -257,12 +292,20 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
   }
 
   // Stay for at least 1 s
+  static int count = 1000;
   if (sTime < 1.0) {}
   // Enter recovery if altitude is unchanging and rotation rate is zero
   else if (est.loc.dAlt > -2.0 &&
-      fabs((*meas.gyro).axes[0] < 0.1) &&
-      fabs((*meas.gyro).axes[1] < 0.1) &&
-      fabs((*meas.gyro).axes[2] < 0.1)) {
+      fabs((*meas.gyro).axes[0] < 0.05) &&
+      fabs((*meas.gyro).axes[1] < 0.05) &&
+      fabs((*meas.gyro).axes[2] < 0.05)) {
+    count -= 1;
+  }
+  else {
+    count = 1000;
+  }
+
+  if (count == 0) {
     return RocketState::RECOVERY;
   }
 
@@ -305,31 +348,3 @@ void RocketSystem::PulseLED(float r, float g, float b, float freq) {
   count = (count+1) % period;
 }
 
-void RocketSystem::RGBLED(float freq) {
-  float dc = 0.0;
-  int dir = 1;
-  while(true) {
-    if (dc >= 1.0) {
-      dir = -1;
-    }
-    else if (dc <= 0.0) {
-      dir = 1;
-    }
-    dc += dir * 0.02;
-
-    float dc_ = dc;
-    float dir_ = dir;
-    for (int i=0; i<3; i++) {
-      dc_ += dir_ * 0.666;
-      if (dc_ > 1.0) {
-        dc_ = 2.0 - dc_;
-        dir_ = -1;
-      }
-      else if (dc_ < 0.0) {
-        dc_ = 0.0 - dc_;
-        dir_ = 1;
-      }
-      platform.get<PWMPlatform>().set(5+i, dc_*0.05);
-    }
-  }
-}
