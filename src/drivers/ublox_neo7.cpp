@@ -46,7 +46,7 @@ GPSReading UBloxNEO7::readGPS() {
   // Check if a full line is ready to be processed
   if(len > 0) {
     char *start = reinterpret_cast<char *>(rxbuf.data());
-    //chprintf((BaseSequentialStream*)&SD4, "%s", rxbuf.data());
+    chprintf((BaseSequentialStream*)&SD4, "%s", rxbuf.data());
 
     // Skip over the leading "$"
     start += 1;

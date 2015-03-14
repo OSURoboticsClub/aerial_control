@@ -15,7 +15,8 @@ RocketSystem::RocketSystem(
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), platform(platform) {
+    motorMapper(motorMapper), platform(platform),
+    imuStream(communicator, 10) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -91,6 +92,9 @@ void RocketSystem::update() {
     break;
   }
 
+  // Update streams
+  updateStreams(meas, estimate);
+
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
 }
@@ -119,6 +123,25 @@ bool RocketSystem::healthy() {
 
 void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
+}
+
+void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
+  if (imuStream.ready()) {
+    protocol::message::imu_message_t m {
+      .gyro = {
+        (*meas.gyro).axes[0],
+        (*meas.gyro).axes[1],
+        (*meas.gyro).axes[2]
+      },
+      .accel = {
+        (*meas.accel).axes[0],
+        (*meas.accel).axes[1],
+        (*meas.accel).axes[2]
+      }
+    };
+
+    imuStream.publish(m);
+  }
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
@@ -236,9 +259,9 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 
   // Enter recovery if altitude is unchanging and rotation rate is zero
   if (est.loc.dAlt > -2.0 &&
-      fabs((*meas.gyro).axes[0] < 0.01) &&
-      fabs((*meas.gyro).axes[1] < 0.01) &&
-      fabs((*meas.gyro).axes[2] < 0.01)) {
+      fabs((*meas.gyro).axes[0] < 0.1) &&
+      fabs((*meas.gyro).axes[1] < 0.1) &&
+      fabs((*meas.gyro).axes[2] < 0.1)) {
     return RocketState::RECOVERY;
   }
 

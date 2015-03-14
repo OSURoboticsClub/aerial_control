@@ -79,6 +79,10 @@ private:
   MotorMapper& motorMapper;
   Platform& platform;
 
+  RateLimitedStream imuStream;
+
+  void updateStreams(SensorMeasurements meas, WorldEstimate est);
+
   /**
    * For now, we proceed directly to PRE_ARM.
    */
