@@ -259,9 +259,6 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
 
-  // Fire drogue pyro
-  platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, true);
-
   // Count continuous time under drogue
   // TODO(yoos): We might still see this if partially deployed and spinning
   // around..
@@ -300,10 +297,20 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
     ActuatorSetpoint actuatorSp {0,0,0,motorDC};
     motorMapper.run(true, actuatorSp);   // Assumed armed
   }
-  else {
+  else if (sTime < 7.0) {
     motorDC = 0.0;
     ActuatorSetpoint actuatorSp {0,0,0,motorDC};
     motorMapper.run(true, actuatorSp);   // Assumed armed
+  }
+  else if (sTime < 10.0) {
+    // Fire drogue pyro
+    platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, true);
+    if ((*meas.accel).axes[0] < -10.0) {   // Large negative acceleration due to proper drogue deployment
+      return PayloadState::DESCENT;
+    }
+  }
+  else {
+    // We would deploy main here, but payload avionics doesn't have room.
     return PayloadState::DESCENT;
   }
 

@@ -140,6 +140,8 @@ private:
 
   /**
    * Perform zero-g maneuver.
+   *
+   * Fire drogue after 6+1 seconds.
    */
   PayloadState ZeroGState(SensorMeasurements meas, WorldEstimate est);
 
