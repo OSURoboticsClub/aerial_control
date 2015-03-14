@@ -7,6 +7,8 @@ struct LocationEstimate {
   float lat;
   float lon;
   float alt;
+  float dAlt;
+  std::array<float, 3> jerk;
 };
 
 class LocationEstimator {

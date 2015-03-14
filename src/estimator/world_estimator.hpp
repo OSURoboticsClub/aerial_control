@@ -5,10 +5,12 @@
 #include "communication/rate_limited_stream.hpp"
 #include "estimator/location_estimator.hpp"
 #include "estimator/attitude_estimator.hpp"
+#include "sensor/sensor_measurements.hpp"
 
 #include "util/optional.hpp"
 
 struct WorldEstimate {
+  SensorMeasurements sensors;
   LocationEstimate loc;
   AttitudeEstimate att;
 };
