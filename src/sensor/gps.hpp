@@ -14,7 +14,6 @@ struct GPSReading {
 class GPS : public Sensor {
 public:
   virtual void init() = 0;
-  virtual bool isHealthy() = 0;
   virtual GPSReading readGPS() = 0;
   virtual bool healthy() = 0;
 

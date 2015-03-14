@@ -21,15 +21,11 @@ struct GPGLLMessage {
 void UBloxNEO7::init() {
   // TODO(yoos): Turn off default (1Hz?!) sentences and poll at 10Hz.
   //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n");
-  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GGA,0,0,0,0,0,0*5A\r\n");
-  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n");
-  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,RMC,0,0,0,0,0,0*47\r\n");
-  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n");
-  //chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
-}
-
-bool UBloxNEO7::isHealthy() {
-  return false;   // TODO
+  chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GGA,0,0,0,0,0,0*5A\r\n");
+  chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n");
+  chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,RMC,0,0,0,0,0,0*47\r\n");
+  chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n");
+  chprintf((BaseSequentialStream*)&SD6, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
 }
 
 GPSReading UBloxNEO7::readGPS() {

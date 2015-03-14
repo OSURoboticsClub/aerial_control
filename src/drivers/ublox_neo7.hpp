@@ -13,7 +13,6 @@ public:
   using USARTDevice::USARTDevice;
 
   void init() override;
-  bool isHealthy() override;
   GPSReading readGPS() override;
   bool healthy();
 };
