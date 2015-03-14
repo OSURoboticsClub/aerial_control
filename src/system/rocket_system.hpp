@@ -18,7 +18,7 @@
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
-#include "variant/pwm_platform.hpp"
+#include "variant/platform.hpp"
 
 // World estimation
 #include "estimator/world_estimator.hpp"
@@ -47,7 +47,7 @@ public:
       optional<Magnetometer *> mag,
       WorldEstimator& estimator, InputSource& inputSource,
       MotorMapper& motorMapper, Communicator& communicator,
-      PWMPlatform& pwmPlatform);
+      Platform& platform);
 
   void update() override;
   bool healthy();
@@ -73,7 +73,7 @@ private:
   ZeroController<ActuatorSetpoint> zeroController;
 
   MotorMapper& motorMapper;
-  PWMPlatform& pwmPlatform;
+  Platform& platform;
 
   /**
    * For now, we proceed directly to PRE_ARM.

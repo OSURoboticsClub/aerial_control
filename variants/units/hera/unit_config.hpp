@@ -57,6 +57,11 @@ const float ANGACC_Z_KP = 1.0;
 const float ANGACC_Z_KI = 0.0;
 const float ANGACC_Z_KD = 0.0;
 
+// Pin configuration
+const int PIN_MAIN_CH   = 1;   // PA5
+const int PIN_DROGUE_CH = 2;   // PC4
+const int PIN_EXT_TEMP_THERM_CH = 1;   // PC1
+
 }
 
 #endif // UNIT_CONFIG_HPP_

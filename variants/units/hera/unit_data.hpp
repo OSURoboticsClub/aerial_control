@@ -47,7 +47,7 @@ struct UnitData {
           platform.get<Gyroscope>(),
           std::experimental::make_optional(&platform.get<Magnetometer>()),
           world, inputSource, motorMapper, communicator,
-          platform.get<PWMPlatform>()) {
+          platform) {
   }
 };
 

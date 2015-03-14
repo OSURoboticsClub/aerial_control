@@ -11,11 +11,11 @@ RocketSystem::RocketSystem(
     optional<Magnetometer *> mag,
     WorldEstimator& estimator, InputSource& inputSource,
     MotorMapper& motorMapper, Communicator& communicator,
-    PWMPlatform& pwmPlatform)
+    Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
-    motorMapper(motorMapper), pwmPlatform(pwmPlatform) {
+    motorMapper(motorMapper), platform(platform) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -188,6 +188,8 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
 RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(0,0,1,1);   // Blue 1 Hz
 
+  
+
   return RocketState::APOGEE;
 }
 
@@ -204,9 +206,9 @@ RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate e
 }
 
 void RocketSystem::SetLED(float r, float g, float b) {
-  pwmPlatform.set(9, r);
-  pwmPlatform.set(10, g);
-  pwmPlatform.set(11, b);
+  platform.get<PWMPlatform>().set(9, r);
+  platform.get<PWMPlatform>().set(10, g);
+  platform.get<PWMPlatform>().set(11, b);
 }
 
 void RocketSystem::BlinkLED(float r, float g, float b, float freq) { static int count = 0;
@@ -252,7 +254,7 @@ void RocketSystem::RGBLED(float freq) {
         dc_ = 0.0 - dc_;
         dir_ = 1;
       }
-      pwmPlatform.set(5+i, dc_*0.05);
+      platform.get<PWMPlatform>().set(5+i, dc_*0.05);
     }
   }
 }
