@@ -16,7 +16,7 @@ RocketSystem::RocketSystem(
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
-    imuStream(communicator, 10) {
+    imuStream(communicator, 100) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -250,15 +250,16 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
 RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(1,0,1);   // Violet
   static float sTime = 0.0;   // State time
-  if (sTime < 1.0) return RocketState::DESCENT;   // Stay for at least 1s.
 
   // Deploy main at 1500' (457.2m) AGL.
   if (est.loc.alt < (groundAltitude + 457.2)) {
     platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
   }
 
+  // Stay for at least 1 s
+  if (sTime < 1.0) {}
   // Enter recovery if altitude is unchanging and rotation rate is zero
-  if (est.loc.dAlt > -2.0 &&
+  else if (est.loc.dAlt > -2.0 &&
       fabs((*meas.gyro).axes[0] < 0.1) &&
       fabs((*meas.gyro).axes[1] < 0.1) &&
       fabs((*meas.gyro).axes[2] < 0.1)) {
@@ -270,7 +271,7 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 }
 
 RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(1,0,1,2);   // White 2 Hz
+  PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off
     platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, false);
