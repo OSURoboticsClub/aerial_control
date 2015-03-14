@@ -112,9 +112,17 @@ private:
    *   4. Orientation
    *
    * We first determine possible apogee based on the altitude rate of change,
-   * which is estimated from the barometer and GPS.
+   * which is estimated from the barometer and GPS. (Currently, only the
+   * barometer is used for altitude.)
    *
-   * We then 
+   * We check for the motor cutoff acceleration drop to negative. If we sense
+   * we are falling faster than -40 m/s, we transition to APOGEE. Otherwise, we
+   * check for the ideal case of zero altitude change and that we are not
+   * observing a false apogee during a subsonic transition.
+   *
+   * We do not track powered and coasting portions of flight in separate states
+   * because a mach transition may happen at an unknowable time, and it's
+   * probably easier to track state variables this way.
    */
   RocketState FlightState(SensorMeasurements meas, WorldEstimate est);
 

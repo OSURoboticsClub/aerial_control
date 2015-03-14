@@ -160,9 +160,26 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
 
 RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(0,0,1);   // Blue
+  static bool powered = true;   // First time we enter, we are in powered flight.
 
-  if ((*meas.bar).pressure < 400.) {
-    return RocketState::APOGEE;
+  // Check for motor cutoff.
+  if (powered && (*meas.accel).axes[0] < 0.5) {
+    powered = false;
+  }
+
+  // Apogee occurs after motor cutoff
+  if (!powered) {
+    // If falling faster than -40m/s, definitely deploy.
+    if (est.loc.dAlt < -40.0) {
+      return RocketState::APOGEE;
+    }
+    // Check for zero altitude change. This is the ideal case.
+    else if (est.loc.dAlt < 0.0) {
+      // Check we are not just undergoing a subsonic transition
+      if (!((*meas.accel).axes[0] > -1.0)) {
+        return RocketState::APOGEE;
+      }
+    }
   }
 
   return RocketState::FLIGHT;
