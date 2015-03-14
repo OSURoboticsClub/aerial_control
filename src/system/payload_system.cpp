@@ -16,7 +16,9 @@ PayloadSystem::PayloadSystem(
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
-    imuStream(communicator, 100) {
+    imuStream(communicator, 100),
+    systemStream(communicator, 5),
+    state(PayloadState::DISARMED), motorDC(0.0) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -65,7 +67,6 @@ void PayloadSystem::update() {
   //ActuatorSetpoint actuatorSp;
 
   // Run state machine
-  static PayloadState state = PayloadState::DISARMED;
   switch (state) {
   case PayloadState::DISARMED:
     state = DisarmedState(meas, estimate);
@@ -81,6 +82,9 @@ void PayloadSystem::update() {
     break;
   case PayloadState::APOGEE:
     state = ApogeeState(meas, estimate);
+    break;
+  case PayloadState::ZERO_G:
+    state = ZeroGState(meas, estimate);
     break;
   case PayloadState::DESCENT:
     state = DescentState(meas, estimate);
@@ -141,6 +145,45 @@ void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
     };
 
     imuStream.publish(m);
+  }
+
+  if (systemStream.ready()) {
+    uint8_t stateNum = 0;
+    switch (state) {
+    case PayloadState::DISARMED:
+      stateNum = 0;
+      break;
+    case PayloadState::PRE_ARM:
+      stateNum = 1;
+      break;
+    case PayloadState::ARMED:
+      stateNum = 2;
+      break;
+    case PayloadState::FLIGHT:
+      stateNum = 3;
+      break;
+    case PayloadState::APOGEE:
+      stateNum = 4;
+      break;
+    case PayloadState::ZERO_G:
+      stateNum = 5;
+      break;
+    case PayloadState::DESCENT:
+      stateNum = 6;
+      break;
+    case PayloadState::RECOVERY:
+      stateNum = 7;
+      break;
+    default:
+      break;
+    }
+
+    protocol::message::system_message_t m {
+      .state = stateNum,
+      .motorDC = motorDC
+    };
+
+    systemStream.publish(m);
   }
 }
 
@@ -225,44 +268,72 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   // TODO(yoos): We might still see this if partially deployed and spinning
   // around..
   static float drogueTime = 0.0;
-  if ((*meas.accel).axes[0] > 0.3) {
+  if ((*meas.accel).axes[0] < -0.3) {
     drogueTime += unit_config::DT;
   }
   else {
     drogueTime = 0.0;
   }
 
-  // Check for successful drogue deployment. If failure detected, deploy main.
-  if (sTime < 10.0) {   // TODO(yoos): Is it safe to wait this long?
+  // Wait until successful drogue deployment or 5 seconds max.
+  if (sTime < 5.0) {
     if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
-      return PayloadState::DESCENT;
+      return PayloadState::ZERO_G;
     }
   }
   else {
-    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
-    return PayloadState::DESCENT;
+    return PayloadState::ZERO_G;
   }
 
   sTime += unit_config::DT;
   return PayloadState::APOGEE;
 }
 
+PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate est) {
+  RGBLED(2);   // Rainbows!
+  static float sTime = 0.0;   // State time
+
+  // Run zero-g maneuver for 6 s.
+  if (sTime < 6.0) {
+    if ((*meas.accel).axes[0] < 0.0 &&
+        motorDC < 1.0) {
+      motorDC += 0.01;
+    }
+    ActuatorSetpoint actuatorSp {0,0,0,motorDC};
+    motorMapper.run(true, actuatorSp);   // Assumed armed
+  }
+  else {
+    motorDC = 0.0;
+    ActuatorSetpoint actuatorSp {0,0,0,motorDC};
+    motorMapper.run(true, actuatorSp);   // Assumed armed
+    return PayloadState::DESCENT;
+  }
+
+  sTime += unit_config::DT;
+  return PayloadState::ZERO_G;
+}
+
 PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(1,0,1);   // Violet
   static float sTime = 0.0;   // State time
 
-  // Deploy main at 1500' (457.2m) AGL.
-  if (est.loc.alt < (groundAltitude + 457.2)) {
-    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
-  }
+  // Payload does not control its own main.
 
   // Stay for at least 1 s
+  static int count = 1000;
   if (sTime < 1.0) {}
   // Enter recovery if altitude is unchanging and rotation rate is zero
   else if (est.loc.dAlt > -2.0 &&
-      fabs((*meas.gyro).axes[0] < 0.1) &&
-      fabs((*meas.gyro).axes[1] < 0.1) &&
-      fabs((*meas.gyro).axes[2] < 0.1)) {
+      fabs((*meas.gyro).axes[0] < 0.05) &&
+      fabs((*meas.gyro).axes[1] < 0.05) &&
+      fabs((*meas.gyro).axes[2] < 0.05)) {
+    count -= 1;
+  }
+  else {
+    count = 1000;
+  }
+
+  if (count == 0) {
     return PayloadState::RECOVERY;
   }
 
@@ -274,8 +345,7 @@ PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off
-    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, false);
-    platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, false);
+  platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, false);
 
   return PayloadState::RECOVERY;
 }
@@ -306,30 +376,28 @@ void PayloadSystem::PulseLED(float r, float g, float b, float freq) {
 }
 
 void PayloadSystem::RGBLED(float freq) {
-  float dc = 0.0;
-  int dir = 1;
-  while(true) {
-    if (dc >= 1.0) {
-      dir = -1;
-    }
-    else if (dc <= 0.0) {
-      dir = 1;
-    }
-    dc += dir * 0.02;
+  static float dc = 0.0;
+  static int dir = 1;
+  if (dc >= 1.0) {
+    dir = -1;
+  }
+  else if (dc <= 0.0) {
+    dir = 1;
+  }
+  dc += dir * (2*freq * unit_config::DT);
 
-    float dc_ = dc;
-    float dir_ = dir;
-    for (int i=0; i<3; i++) {
-      dc_ += dir_ * 0.666;
-      if (dc_ > 1.0) {
-        dc_ = 2.0 - dc_;
-        dir_ = -1;
-      }
-      else if (dc_ < 0.0) {
-        dc_ = 0.0 - dc_;
-        dir_ = 1;
-      }
-      platform.get<PWMPlatform>().set(5+i, dc_*0.05);
+  float dc_ = dc;
+  float dir_ = dir;
+  for (int i=0; i<3; i++) {
+    dc_ += dir_ * 0.666;
+    if (dc_ > 1.0) {
+      dc_ = 2.0 - dc_;
+      dir_ = -1;
     }
+    else if (dc_ < 0.0) {
+      dc_ = 0.0 - dc_;
+      dir_ = 1;
+    }
+    platform.get<PWMPlatform>().set(9+i, dc_);
   }
 }

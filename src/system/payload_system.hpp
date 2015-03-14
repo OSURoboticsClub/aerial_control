@@ -34,6 +34,7 @@ enum class PayloadState {
   ARMED,
   FLIGHT,
   APOGEE,
+  ZERO_G,
   DESCENT,
   RECOVERY
 };
@@ -76,6 +77,7 @@ private:
   Platform& platform;
 
   RateLimitedStream imuStream;
+  RateLimitedStream systemStream;
 
   void updateStreams(SensorMeasurements meas, WorldEstimate est);
 
@@ -137,6 +139,11 @@ private:
   PayloadState ApogeeState(SensorMeasurements meas, WorldEstimate est);
 
   /**
+   * Perform zero-g maneuver.
+   */
+  PayloadState ZeroGState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
    * Deploy main chute at 1500' AGL.
    */
   PayloadState DescentState(SensorMeasurements meas, WorldEstimate est);
@@ -155,6 +162,12 @@ private:
   void BlinkLED(float r, float g, float b, float freq);
   void PulseLED(float r, float g, float b, float freq);
   void RGBLED(float freq);
+
+  /**
+   * In-class global vars
+   */
+  PayloadState state;
+  float motorDC;
 
   /**
    * Per-launch calibration
