@@ -18,6 +18,10 @@
 #include "input/input_source.hpp"
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
+
+// Platform
+#include "variant/digital_platform.hpp"
+#include "variant/pwm_platform.hpp"
 #include "variant/platform.hpp"
 
 // World estimation
@@ -155,7 +159,7 @@ private:
   /**
    * Per-launch calibration
    */
-  float ground_pressure;
+  float groundAltitude;
   float velocity;
 };
 

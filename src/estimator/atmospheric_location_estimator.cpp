@@ -30,20 +30,24 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
     loc.lon = (*meas.gps).lon;
   }
 
+  // Altitude
+  static float lastAlt = 0.0;
   if(meas.bar) {
-    loc.alt = (pow((1000./(*meas.bar).pressure), 1/5.257) - 1) * ((*meas.bar).temperature + 273.15) / 0.0065;
-
-    // Altitude rate of change
-    static float lastAlt = 0.0;
-    loc.dAlt = (loc.alt - lastAlt) * 20.;   // 50 Hz altimetry
-    lastAlt = 0.05*loc.alt + 0.95*lastAlt;   // Moving average
-
-    // Jerk
-    static float lastAcc[3];
-    for (int i=0; i<3; i++) {
-      loc.jerk[i] = ((*meas.accel).axes[i]) - lastAcc[i];
-      lastAcc[i] = (*meas.accel).axes[i];
+    lastAlt = loc.alt;
+    if ((*meas.bar).pressure > 12) {
+      float newAlt = (pow((1000./(*meas.bar).pressure), 1/5.257) - 1) * ((*meas.bar).temperature + 273.15) / 0.0065;
+      loc.alt = 0.02*newAlt + 0.98*loc.alt;   // Moving average
     }
+
+    // Rate of change
+    loc.dAlt = (loc.alt - lastAlt) * 20.;   // 50 Hz altimetry
+  }
+
+  // Jerk
+  static float lastAcc[3];
+  for (int i=0; i<3; i++) {
+    loc.jerk[i] = ((*meas.accel).axes[i]) - lastAcc[i];
+    lastAcc[i] = (*meas.accel).axes[i];
   }
 
   return loc;

@@ -122,14 +122,18 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(1,0,0,1);   // Green 1 Hz
+  PulseLED(1,0,0,1);   // Red 1 Hz
 
   // Proceed directly to PRE_ARM for now.
   return RocketState::PRE_ARM;
 }
 
 RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(1,0,0,4);   // Green 4 Hz
+  PulseLED(1,0,0,4);   // Red 4 Hz
+
+  // Calibrate
+  groundAltitude = est.loc.alt;
+  // TODO(yoos): run sensor calibration here
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (healthy() && isArmed()) {
@@ -140,7 +144,7 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
-  SetLED(1,0,0);   // Green
+  SetLED(1,0,0);   // Red
 
   static int count = 10;
   count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
@@ -162,9 +166,11 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   SetLED(0,0,1);   // Blue
   static bool powered = true;   // First time we enter, we are in powered flight.
 
-  // Check for motor cutoff.
-  if (powered && (*meas.accel).axes[0] < 0.5) {
-    powered = false;
+  // Check for motor cutoff. We should see negative acceleration due to drag.
+  static int count = 100;
+  if (powered) {
+    count = ((*meas.accel).axes[0] < 0.0) ? (count-1) : 100;
+    powered = (count == 0) ? false : true;
   }
 
   // Apogee occurs after motor cutoff
@@ -173,10 +179,10 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
     if (est.loc.dAlt < -40.0) {
       return RocketState::APOGEE;
     }
-    // Check for zero altitude change. This is the ideal case.
-    else if (est.loc.dAlt < 0.0) {
+    // Check for near-zero altitude change towards end of ascent. This is the ideal case.
+    else if (est.loc.dAlt < 2.0) {
       // Check we are not just undergoing a subsonic transition
-      if (!((*meas.accel).axes[0] > -1.0)) {
+      if ((*meas.accel).axes[0] > -1.0) {
         return RocketState::APOGEE;
       }
     }
@@ -186,21 +192,66 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
-  PulseLED(0,0,1,1);   // Blue 1 Hz
+  PulseLED(0,0,1,2);   // Blue 2 Hz
+  static float sTime = 0.0;   // State time
 
-  
+  // Fire drogue pyro
+  platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, true);
 
+  // Count continuous time under drogue
+  // TODO(yoos): We might still see this if partially deployed and spinning
+  // around..
+  static float drogueTime = 0.0;
+  if ((*meas.accel).axes[0] > 0.3) {
+    drogueTime += unit_config::DT;
+  }
+  else {
+    drogueTime = 0.0;
+  }
+
+  // Check for successful drogue deployment. If failure detected, deploy main.
+  if (sTime < 10.0) {   // TODO(yoos): Is it safe to wait this long?
+    if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
+      return RocketState::DESCENT;
+    }
+  }
+  else {
+    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
+    return RocketState::DESCENT;
+  }
+
+  sTime += unit_config::DT;
   return RocketState::APOGEE;
 }
 
 RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
-  SetLED(1,0,1);   // Yellow
+  SetLED(1,0,1);   // Violet
+  static float sTime = 0.0;   // State time
+  if (sTime < 1.0) return RocketState::DESCENT;   // Stay for at least 1s.
 
+  // Deploy main at 1500' (457.2m) AGL.
+  if (est.loc.alt < (groundAltitude + 457.2)) {
+    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
+  }
+
+  // Enter recovery if altitude is unchanging and rotation rate is zero
+  if (est.loc.dAlt > -2.0 &&
+      fabs((*meas.gyro).axes[0] < 0.01) &&
+      fabs((*meas.gyro).axes[1] < 0.01) &&
+      fabs((*meas.gyro).axes[2] < 0.01)) {
+    return RocketState::RECOVERY;
+  }
+
+  sTime += unit_config::DT;
   return RocketState::DESCENT;
 }
 
 RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(1,0,1,2);   // White 2 Hz
+
+  // Turn things off
+    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, false);
+    platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, false);
 
   return RocketState::RECOVERY;
 }

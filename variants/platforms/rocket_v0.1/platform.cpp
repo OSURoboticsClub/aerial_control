@@ -6,6 +6,7 @@
 #include "drivers/mpu9250.hpp"
 #include "drivers/ms5611.hpp"
 #include "drivers/ublox_neo7.hpp"
+#include "variant/digital_platform.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
@@ -74,6 +75,12 @@ template <> Gyroscope&    Platform::get() { return get<MPU9250>(); }
 template <> Magnetometer& Platform::get() { return get<MPU9250>(); }
 
 template <>
+DigitalPlatform& Platform::get() {
+  static DigitalPlatform digitalPlatform;
+  return digitalPlatform;
+}
+
+template <>
 I2CPlatform& Platform::get() {
   static I2CPlatform i2cPlatform;
   return i2cPlatform;
@@ -98,6 +105,7 @@ USARTPlatform& Platform::get() {
 }
 
 void Platform::init() {
+  get<DigitalPlatform>();
   get<I2CPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
