@@ -275,6 +275,7 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
     if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
       return PayloadState::ZERO_G;
     }
+    // TODO: What if payload doesn't separate?
   }
   else {
     return PayloadState::ZERO_G;
