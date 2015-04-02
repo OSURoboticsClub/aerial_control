@@ -289,6 +289,10 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   RGBLED(2);   // Rainbows!
   static float sTime = 0.0;   // State time
 
+  // Release shuttle
+  platform.get<DigitalPlatform>().set(unit_config::PIN_SHUTTLE1_CH, true);
+  platform.get<DigitalPlatform>().set(unit_config::PIN_SHUTTLE2_CH, true);
+
   // Run zero-g maneuver for 6 s.
   if (sTime < 6.0) {
     if ((*meas.accel).axes[0] < 0.0 &&
