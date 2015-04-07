@@ -1,6 +1,9 @@
 #ifndef UNIT_CONFIG_HPP_
 #define UNIT_CONFIG_HPP_
 
+// Hack until we update to ChibiOS 3.0
+#define ST2MS(n) ((((uint64_t ((n) - 1)) * 1000) / CH_FREQUENCY) + 1)
+
 namespace unit_config {
 
 const float DT = 0.001;
