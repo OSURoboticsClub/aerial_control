@@ -1,4 +1,5 @@
 #include "system/rocket_system.hpp"
+#include "util/time.hpp"
 
 #include "ch.hpp"
 #include "chprintf.h"

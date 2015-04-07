@@ -1,4 +1,5 @@
 #include "estimator/atmospheric_location_estimator.hpp"
+#include "util/time.hpp"
 
 #include "ch.hpp"
 #include "protocol/messages.hpp"
