@@ -365,9 +365,9 @@ PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate
 }
 
 void PayloadSystem::SetLED(float r, float g, float b) {
-  platform.get<PWMPlatform>().set(9, r);
-  platform.get<PWMPlatform>().set(10, g);
-  platform.get<PWMPlatform>().set(11, b);
+  platform.get<PWMPlatform>().set(9,  0.1*r);
+  platform.get<PWMPlatform>().set(10, 0.1*g);
+  platform.get<PWMPlatform>().set(11, 0.1*b);
 }
 
 void PayloadSystem::BlinkLED(float r, float g, float b, float freq) { static int count = 0;
