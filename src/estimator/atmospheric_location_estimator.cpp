@@ -1,5 +1,6 @@
 #include "estimator/atmospheric_location_estimator.hpp"
 
+#include "ch.hpp"
 #include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
@@ -56,6 +57,7 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
 void AtmosphericLocationEstimator::updateStream() {
   if(locationMessageStream.ready()) {
     protocol::message::location_message_t m {
+      .time = ST2MS(chibios_rt::System::getTime()),
       .lat = loc.lat,
       .lon = loc.lon,
       .alt = loc.alt

@@ -1,5 +1,6 @@
 #include "system/rocket_system.hpp"
 
+#include "ch.hpp"
 #include "chprintf.h"
 
 RocketSystem::RocketSystem(
@@ -129,6 +130,7 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
 void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
   if (imuStream.ready()) {
     protocol::message::imu_message_t m {
+      .time = ST2MS(chibios_rt::System::getTime()),
       .gyro = {
         (*meas.gyro).axes[0],
         (*meas.gyro).axes[1],
@@ -173,6 +175,7 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
     }
 
     protocol::message::system_message_t m {
+      .time = ST2MS(chibios_rt::System::getTime()),
       .state = stateNum,
       .motorDC = motorDC
     };

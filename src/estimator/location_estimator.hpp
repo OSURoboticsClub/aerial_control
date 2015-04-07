@@ -4,6 +4,7 @@
 #include "sensor/sensor_measurements.hpp"
 
 struct LocationEstimate {
+  uint32_t time;
   float lat;
   float lon;
   float alt;
