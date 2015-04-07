@@ -57,10 +57,21 @@ const float ANGACC_Z_KP = 1.0;
 const float ANGACC_Z_KI = 0.0;
 const float ANGACC_Z_KD = 0.0;
 
-// Pin configuration
-const uint8_t PIN_MAIN_CH   = 1;   // PA5
-const uint8_t PIN_DROGUE_CH = 2;   // PC4
-const uint8_t PIN_EXT_TEMP_THERM_CH = 1;   // PC1
+// PWM pin config
+const uint8_t PIN_FIN_SWITCH_CH = 5;   // PB7
+const uint8_t PIN_MOTOR_CH = 7;   // PB9
+
+// ADC pin config
+const uint8_t PIN_ESC_TEMP_THERM_CH = 0;   // PC0
+
+// Digital pin config
+const uint8_t PIN_SHUTTLE2_CH = 0;   // PA4
+const uint8_t PIN_DROGUE_CH = 1;   // PA5
+const uint8_t PIN_SHUTTLE1_CH = 3;   // PC5
+
+// Unused config
+// TODO(yoos): This is a hack to make rocket and payload build.
+const uint8_t PIN_MAIN_CH = 255;
 
 }
 
