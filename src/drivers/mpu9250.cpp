@@ -103,5 +103,16 @@ MagnetometerReading MPU9250::readMag() {
 }
 
 bool MPU9250::healthy() {
-  return true;
+  // Check WHO_AM_I
+  txbuf[0] = mpu9250::WHO_AM_I | (1<<7);
+  txbuf[1] = 0x00;
+  exchange(2);
+
+  if (rxbuf[1] == 0x68) {
+    return true;
+  }
+
+  // TODO(yoos): check gyr/acc self-test registers
+
+  return false;
 }
