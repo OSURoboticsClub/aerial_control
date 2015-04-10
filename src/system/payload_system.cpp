@@ -18,7 +18,7 @@ PayloadSystem::PayloadSystem(
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
-    imuStream(communicator, 100),
+    imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
     systemStream(communicator, 5),
     state(PayloadState::DISARMED), motorDC(0.0) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
