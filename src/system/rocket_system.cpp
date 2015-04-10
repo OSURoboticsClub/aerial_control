@@ -18,7 +18,7 @@ RocketSystem::RocketSystem(
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
-    imuStream(communicator, 100),
+    imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
     systemStream(communicator, 5),
     state(RocketState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
@@ -103,14 +103,16 @@ void RocketSystem::update() {
 }
 
 bool RocketSystem::healthy() {
-  bool healthy = accel.healthy() && gyr.healthy();
+  // TODO(yoos): Most of the health checks here are disabled due to a broken av
+  // bay SPI bus. Reenable on next hardware revision.
+  bool healthy = true;//accel.healthy() && gyr.healthy();
 
   if(accelH) {
-    healthy &= (*accelH)->healthy();
+    //healthy &= (*accelH)->healthy();
   }
 
   if(bar) {
-    healthy &= (*bar)->healthy();
+    //healthy &= (*bar)->healthy();
   }
 
   if(gps) {
@@ -118,7 +120,7 @@ bool RocketSystem::healthy() {
   }
 
   if(mag) {
-    healthy &= (*mag)->healthy();
+    //healthy &= (*mag)->healthy();
   }
 
   return healthy;
