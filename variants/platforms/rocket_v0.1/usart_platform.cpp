@@ -27,6 +27,11 @@ static const SerialConfig UART6_CONFIG {
 };
 
 USARTPlatform::USARTPlatform() {
+  // Force RX high on startup to prevent XBee from entering SPI mode
+  palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);   // RX
+  palSetPad(GPIOA, 3);
+  chThdSleepMilliseconds(500);
+
   // UART2
   sdStart(&SD2, &UART2_CONFIG);
   palSetPadMode(GPIOA, 2, PAL_MODE_ALTERNATE(7));   // TX
