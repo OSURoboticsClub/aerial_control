@@ -15,9 +15,9 @@
 // H3LIS331DL SPI configuration
 static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
-  GPIOC,
-  15,
-  SPI_CR1_BR_1 | SPI_CR1_BR_0   // 42000000/2^3 = 5250000
+  GPIOA,
+  4,
+  SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0   // 42000000/2^3 = 5250000
 };
 
 // MPU9250 SPI configuration
@@ -25,7 +25,7 @@ static const SPIConfig MPU9250_CONFIG {
   NULL,
   GPIOC,
   14,
-  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
+  SPI_CR1_BR_2   // 42000000/2^2 = 10500000
 };
 
 // MS5611 SPI configuration
@@ -33,7 +33,7 @@ static const SPIConfig MS5611_CONFIG {
   NULL,
   GPIOC,
   13,
-  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
+  SPI_CR1_BR_2   // 42000000/2^2 = 10500000
 };
 
 Platform::Platform() {
@@ -41,7 +41,7 @@ Platform::Platform() {
 
 template <>
 H3LIS331DL& Platform::get() {
-  static H3LIS331DL acc(&SPID1, &H3LIS331DL_CONFIG);
+  static H3LIS331DL acc(&SPID2, &H3LIS331DL_CONFIG);
   return acc;
 }
 
@@ -107,7 +107,7 @@ void Platform::init() {
   get<I2CPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
-  get<USARTPlatform>();
+  get<USARTPlatform>();   // Do this last so the 500ms delay hack doesn't mess with other stuff.
 
   // Initialize sensors
   get<H3LIS331DL>().init();
