@@ -5,7 +5,7 @@
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "motor/esra_payload_motor_mapper.hpp"
+#include "motor/esra_rocket_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/rocket_system.hpp"
@@ -18,7 +18,7 @@ static const float MOTOR_PWM_SAFE = 0.30f;
 
 struct UnitData {
   PWMDeviceGroup<1> motors;
-  EsraPayloadMotorMapper motorMapper;
+  EsraRocketMotorMapper motorMapper;
 
   WorldEstimator world;
   AtmosphericLocationEstimator location;
