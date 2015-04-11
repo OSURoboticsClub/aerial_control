@@ -151,7 +151,7 @@ AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& me
 void DCMAttitudeEstimator::updateStream() {
   if(attitudeMessageStream.ready()) {
     protocol::message::attitude_message_t m {
-      .time = chibios_rt::System::getTime(),
+      .time = ST2MS(chibios_rt::System::getTime()),
       .dcm = {
         dcm(0, 0), dcm(0, 1), dcm(0, 2),
         dcm(1, 0), dcm(1, 1), dcm(1, 2),
