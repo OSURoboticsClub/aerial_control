@@ -1,4 +1,5 @@
 #include "motor/esra_payload_motor_mapper.hpp"
+#include "util/time.hpp"
 
 #include <array>
 #include <cstddef>
@@ -18,6 +19,7 @@ void EsraPayloadMotorMapper::run(bool armed, ActuatorSetpoint& input) {
 
   if(throttleStream.ready()) {
     protocol::message::motor_throttle_message_t msg;
+    msg.time = ST2MS(chibios_rt::System::getTime()),
     msg.throttles[0] = outputs[0];
     msg.throttles[1] = 0;
     msg.throttles[2] = 0;
