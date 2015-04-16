@@ -294,8 +294,8 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   static float sTime = 0.0;   // State time
 
   // Release shuttle
-  platform.get<DigitalPlatform>().set(unit_config::PIN_SHUTTLE1_CH, true);
-  platform.get<DigitalPlatform>().set(unit_config::PIN_SHUTTLE2_CH, true);
+  platform.get<DigitalPlatform>().set(PIN_SHUTTLE1_CH, true);
+  platform.get<DigitalPlatform>().set(PIN_SHUTTLE2_CH, true);
 
   // Run zero-g maneuver for 6 s.
   if (sTime < 6.0) {
@@ -313,7 +313,7 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   }
   else if (sTime < 10.0) {
     // Fire drogue pyro
-    platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, true);
+    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
     if ((*meas.accel).axes[0] < -10.0) {   // Large negative acceleration due to proper drogue deployment
       return PayloadState::DESCENT;
     }
@@ -359,7 +359,7 @@ PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off
-  platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, false);
+  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
 
   return PayloadState::RECOVERY;
 }

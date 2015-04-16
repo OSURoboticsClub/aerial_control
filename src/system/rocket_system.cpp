@@ -260,7 +260,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   static float sTime = 0.0;   // State time
 
   // Fire drogue pyro
-  platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, true);
+  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
 
   // Count continuous time under drogue
   // TODO(yoos): We might still see this if partially deployed and spinning
@@ -280,7 +280,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
     }
   }
   else {
-    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
+    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
     return RocketState::DESCENT;
   }
 
@@ -294,7 +294,7 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 
   // Deploy main at 1500' (457.2m) AGL.
   if (est.loc.alt < (groundAltitude + 457.2)) {
-    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, true);
+    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
   }
 
   // Stay for at least 1 s
@@ -323,8 +323,8 @@ RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate e
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off
-    platform.get<DigitalPlatform>().set(unit_config::PIN_MAIN_CH, false);
-    platform.get<DigitalPlatform>().set(unit_config::PIN_DROGUE_CH, false);
+    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, false);
+    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
 
   return RocketState::RECOVERY;
 }
