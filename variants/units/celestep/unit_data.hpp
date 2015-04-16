@@ -8,7 +8,7 @@
 #include "motor/esra_payload_motor_mapper.hpp"
 #include "input/offboard_input_source.hpp"
 #include "sensor/sensor_measurements.hpp"
-#include "system/rocket_system.hpp"
+#include "system/payload_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
 
@@ -25,7 +25,7 @@ struct UnitData {
   DCMAttitudeEstimator attitude;
   OffboardInputSource inputSource;
 
-  RocketSystem system;
+  PayloadSystem system;
 
   UnitData(Platform& platform, Communicator& communicator)
     : motors(platform.get<PWMPlatform>(),

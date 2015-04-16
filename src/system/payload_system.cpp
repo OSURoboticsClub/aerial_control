@@ -1,10 +1,10 @@
-#include "system/rocket_system.hpp"
+#include "system/payload_system.hpp"
 #include "util/time.hpp"
 
 #include "ch.hpp"
 #include "chprintf.h"
 
-RocketSystem::RocketSystem(
+PayloadSystem::PayloadSystem(
     Accelerometer& accel,
     optional<Accelerometer *> accelH,
     optional<Barometer *> bar,
@@ -20,13 +20,13 @@ RocketSystem::RocketSystem(
     motorMapper(motorMapper), platform(platform),
     imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
     systemStream(communicator, 5),
-    state(RocketState::DISARMED) {
+    state(PayloadState::DISARMED), motorDC(0.0) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
 }
 
-void RocketSystem::update() {
+void PayloadSystem::update() {
   //static int time = 0;
   //if (time % 1000 == 0) {
   //  chprintf((BaseSequentialStream*)&SD4, "%d\r\n", RTT2MS(chibios_rt::System::getTime()));
@@ -66,29 +66,32 @@ void RocketSystem::update() {
   accel = 0.5*accel + 0.5*accelReading.axes[0];
 
   // Run the controllers
-  ActuatorSetpoint actuatorSp;
+  //ActuatorSetpoint actuatorSp;
 
   // Run state machine
   switch (state) {
-  case RocketState::DISARMED:
+  case PayloadState::DISARMED:
     state = DisarmedState(meas, estimate);
     break;
-  case RocketState::PRE_ARM:
+  case PayloadState::PRE_ARM:
     state = PreArmState(meas, estimate);
     break;
-  case RocketState::ARMED:
+  case PayloadState::ARMED:
     state = ArmedState(meas, estimate);
     break;
-  case RocketState::FLIGHT:
+  case PayloadState::FLIGHT:
     state = FlightState(meas, estimate);
     break;
-  case RocketState::APOGEE:
+  case PayloadState::APOGEE:
     state = ApogeeState(meas, estimate);
     break;
-  case RocketState::DESCENT:
+  case PayloadState::ZERO_G:
+    state = ZeroGState(meas, estimate);
+    break;
+  case PayloadState::DESCENT:
     state = DescentState(meas, estimate);
     break;
-  case RocketState::RECOVERY:
+  case PayloadState::RECOVERY:
     state = RecoveryState(meas, estimate);
     break;
   default:
@@ -99,20 +102,18 @@ void RocketSystem::update() {
   updateStreams(meas, estimate);
 
   // Update motor outputs
-  motorMapper.run(isArmed(), actuatorSp);
+  //motorMapper.run(isArmed(), actuatorSp);
 }
 
-bool RocketSystem::healthy() {
-  // TODO(yoos): Most of the health checks here are disabled due to a broken av
-  // bay SPI bus. Reenable on next hardware revision.
-  bool healthy = true;//accel.healthy() && gyr.healthy();
+bool PayloadSystem::healthy() {
+  bool healthy = accel.healthy() && gyr.healthy();
 
   if(accelH) {
-    //healthy &= (*accelH)->healthy();
+    healthy &= (*accelH)->healthy();
   }
 
   if(bar) {
-    //healthy &= (*bar)->healthy();
+    healthy &= (*bar)->healthy();
   }
 
   if(gps) {
@@ -120,17 +121,17 @@ bool RocketSystem::healthy() {
   }
 
   if(mag) {
-    //healthy &= (*mag)->healthy();
+    healthy &= (*mag)->healthy();
   }
 
   return healthy;
 }
 
-void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
+void PayloadSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }
 
-void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
+void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
   if (imuStream.ready()) {
     protocol::message::imu_message_t m {
       .time = ST2MS(chibios_rt::System::getTime()),
@@ -152,25 +153,28 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
   if (systemStream.ready()) {
     uint8_t stateNum = 0;
     switch (state) {
-    case RocketState::DISARMED:
+    case PayloadState::DISARMED:
       stateNum = 0;
       break;
-    case RocketState::PRE_ARM:
+    case PayloadState::PRE_ARM:
       stateNum = 1;
       break;
-    case RocketState::ARMED:
+    case PayloadState::ARMED:
       stateNum = 2;
       break;
-    case RocketState::FLIGHT:
+    case PayloadState::FLIGHT:
       stateNum = 3;
       break;
-    case RocketState::APOGEE:
+    case PayloadState::APOGEE:
       stateNum = 4;
       break;
-    case RocketState::DESCENT:
+    case PayloadState::ZERO_G:
+      stateNum = 5;
+      break;
+    case PayloadState::DESCENT:
       stateNum = 6;
       break;
-    case RocketState::RECOVERY:
+    case PayloadState::RECOVERY:
       stateNum = 7;
       break;
     default:
@@ -187,14 +191,14 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
   }
 }
 
-RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(1,0,0,1);   // Red 1 Hz
 
   // Proceed directly to PRE_ARM for now.
-  return RocketState::PRE_ARM;
+  return PayloadState::PRE_ARM;
 }
 
-RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(1,0,0,4);   // Red 4 Hz
 
   // Calibrate
@@ -203,13 +207,13 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (healthy() && isArmed()) {
-    return RocketState::ARMED;
+    return PayloadState::ARMED;
   }
 
-  return RocketState::PRE_ARM;
+  return PayloadState::PRE_ARM;
 }
 
-RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(1,0,0);   // Red
 
   static int count = 10;
@@ -217,18 +221,18 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(healthy() && isArmed())) {
-    return RocketState::PRE_ARM;
+    return PayloadState::PRE_ARM;
   }
 
   // Proceed to FLIGHT on 1.1g sense on X axis.
   if (count == 0) {
-    return RocketState::FLIGHT;
+    return PayloadState::FLIGHT;
   }
 
-  return RocketState::ARMED;
+  return PayloadState::ARMED;
 }
 
-RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(0,0,1);   // Blue
   static bool powered = true;   // First time we enter, we are in powered flight.
 
@@ -240,62 +244,94 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   }
 
   // Apogee occurs after motor cutoff
-  if (!powered && est.loc.dAlt < 2.0) {
+  if (!powered) {
     // If falling faster than -40m/s, definitely deploy.
     if (est.loc.dAlt < -40.0) {
-      return RocketState::APOGEE;
+      return PayloadState::APOGEE;
     }
     // Check for near-zero altitude change towards end of ascent (ideal case)
     // and that we are not just undergoing a subsonic transition.
     else if ((*meas.accel).axes[0] > -1.0) {
-      return RocketState::APOGEE;
+      return PayloadState::APOGEE;
     }
   }
 
-  return RocketState::FLIGHT;
+  return PayloadState::FLIGHT;
 }
 
-RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
-
-  // Fire drogue pyro
-  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
 
   // Count continuous time under drogue
   // TODO(yoos): We might still see this if partially deployed and spinning
   // around..
   static float drogueTime = 0.0;
-  if ((*meas.accel).axes[0] > 0.3) {
+  if ((*meas.accel).axes[0] < -0.3) {
     drogueTime += unit_config::DT;
   }
   else {
     drogueTime = 0.0;
   }
 
-  // Check for successful drogue deployment. If failure detected, deploy main.
-  if (sTime < 10.0) {   // TODO(yoos): Is it safe to wait this long?
+  // Wait until successful drogue deployment or 5 seconds max.
+  if (sTime < 5.0) {
     if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
-      return RocketState::DESCENT;
+      return PayloadState::ZERO_G;
     }
+    // TODO: What if payload doesn't separate?
   }
   else {
-    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
-    return RocketState::DESCENT;
+    return PayloadState::ZERO_G;
   }
 
   sTime += unit_config::DT;
-  return RocketState::APOGEE;
+  return PayloadState::APOGEE;
 }
 
-RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate est) {
+  RGBLED(2);   // Rainbows!
+  static float sTime = 0.0;   // State time
+
+  // Release shuttle
+  platform.get<DigitalPlatform>().set(PIN_SHUTTLE1_CH, true);
+  platform.get<DigitalPlatform>().set(PIN_SHUTTLE2_CH, true);
+
+  // Run zero-g maneuver for 6 s.
+  if (sTime < 6.0) {
+    if ((*meas.accel).axes[0] < 0.0 &&
+        motorDC < 1.0) {
+      motorDC += 0.01;
+    }
+    ActuatorSetpoint actuatorSp {0,0,0,motorDC};
+    motorMapper.run(true, actuatorSp);   // Assumed armed
+  }
+  else if (sTime < 7.0) {
+    motorDC = 0.0;
+    ActuatorSetpoint actuatorSp {0,0,0,motorDC};
+    motorMapper.run(true, actuatorSp);   // Assumed armed
+  }
+  else if (sTime < 10.0) {
+    // Fire drogue pyro
+    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
+    if ((*meas.accel).axes[0] < -10.0) {   // Large negative acceleration due to proper drogue deployment
+      return PayloadState::DESCENT;
+    }
+  }
+  else {
+    // We would deploy main here, but payload avionics doesn't have room.
+    return PayloadState::DESCENT;
+  }
+
+  sTime += unit_config::DT;
+  return PayloadState::ZERO_G;
+}
+
+PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
   SetLED(1,0,1);   // Violet
   static float sTime = 0.0;   // State time
 
-  // Deploy main at 1500' (457.2m) AGL.
-  if (est.loc.alt < (groundAltitude + 457.2)) {
-    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
-  }
+  // Payload does not control its own main.
 
   // Stay for at least 1 s
   static int count = 1000;
@@ -312,30 +348,29 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
   }
 
   if (count == 0) {
-    return RocketState::RECOVERY;
+    return PayloadState::RECOVERY;
   }
 
   sTime += unit_config::DT;
-  return RocketState::DESCENT;
+  return PayloadState::DESCENT;
 }
 
-RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off
-    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, false);
-    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
+  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
 
-  return RocketState::RECOVERY;
+  return PayloadState::RECOVERY;
 }
 
-void RocketSystem::SetLED(float r, float g, float b) {
+void PayloadSystem::SetLED(float r, float g, float b) {
   platform.get<PWMPlatform>().set(9,  0.1*r);
   platform.get<PWMPlatform>().set(10, 0.1*g);
   platform.get<PWMPlatform>().set(11, 0.1*b);
 }
 
-void RocketSystem::BlinkLED(float r, float g, float b, float freq) { static int count = 0;
+void PayloadSystem::BlinkLED(float r, float g, float b, float freq) { static int count = 0;
   int period = 1000 / freq;
   if (count % period < period/2) {
     SetLED(r,g,b);
@@ -346,7 +381,7 @@ void RocketSystem::BlinkLED(float r, float g, float b, float freq) { static int 
   count = (count+1) % period;
 }
 
-void RocketSystem::PulseLED(float r, float g, float b, float freq) {
+void PayloadSystem::PulseLED(float r, float g, float b, float freq) {
   int period = 1000 / freq;
   static int count = 0;
   float dc = ((float) abs(period/2 - count)) / (period/2);
@@ -354,3 +389,29 @@ void RocketSystem::PulseLED(float r, float g, float b, float freq) {
   count = (count+1) % period;
 }
 
+void PayloadSystem::RGBLED(float freq) {
+  static float dc = 0.0;
+  static int dir = 1;
+  if (dc >= 1.0) {
+    dir = -1;
+  }
+  else if (dc <= 0.0) {
+    dir = 1;
+  }
+  dc += dir * (2*freq * unit_config::DT);
+
+  float dc_ = dc;
+  float dir_ = dir;
+  for (int i=0; i<3; i++) {
+    dc_ += dir_ * 0.666;
+    if (dc_ > 1.0) {
+      dc_ = 2.0 - dc_;
+      dir_ = -1;
+    }
+    else if (dc_ < 0.0) {
+      dc_ = 0.0 - dc_;
+      dir_ = 1;
+    }
+    platform.get<PWMPlatform>().set(9+i, dc_);
+  }
+}

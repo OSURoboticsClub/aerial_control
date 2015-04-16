@@ -15,9 +15,8 @@ WorldEstimator::WorldEstimator(
 }
 
 WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
-  // TODO: get GPS data
-
   WorldEstimate estimate {
+    .sensors = meas,
     .loc = locEstimator.update(meas),
     .att = attEstimator.update(meas)
   };

@@ -19,6 +19,13 @@ struct GPGLLMessage {
 };
 
 void UBloxNEO7::init() {
+  // TODO(yoos): Turn off default (1Hz?!) sentences and poll at 10Hz.
+  //chprintf((BaseSequentialStream*)sd, "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n");
+  chprintf((BaseSequentialStream*)sd, "$PUBX,40,GGA,0,0,0,0,0,0*5A\r\n");
+  chprintf((BaseSequentialStream*)sd, "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n");
+  chprintf((BaseSequentialStream*)sd, "$PUBX,40,RMC,0,0,0,0,0,0*47\r\n");
+  chprintf((BaseSequentialStream*)sd, "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n");
+  chprintf((BaseSequentialStream*)sd, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
 }
 
 GPSReading UBloxNEO7::readGPS() {
@@ -26,9 +33,16 @@ GPSReading UBloxNEO7::readGPS() {
   // messages should end with a CRLF, but we'll only look for the LF.
   std::size_t len = readUntil(NMEA_LF);
 
+  //static int loop = 0;
+  //if (loop % 100 == 0) {
+  //  chprintf((BaseSequentialStream*)sd, "$PUBX,00*33\r\n");
+  //}
+  //loop = (loop+1) % 100;
+
   // Check if a full line is ready to be processed
   if(len > 0) {
     char *start = reinterpret_cast<char *>(rxbuf.data());
+    //chprintf((BaseSequentialStream*)&SD4, "%s", rxbuf.data());
 
     // Skip over the leading "$"
     start += 1;
@@ -40,9 +54,7 @@ GPSReading UBloxNEO7::readGPS() {
       GPGLLMessage message;
       int position = 0;
 
-      while(token != nullptr) {
-        token = std::strtok(nullptr, NMEA_DELIMS);
-
+      while((token = std::strtok(nullptr, NMEA_DELIMS)) != nullptr) {
         switch(position++) {
           case 0:
             message.lat = atof(token);
@@ -66,7 +78,10 @@ GPSReading UBloxNEO7::readGPS() {
       }
 
       return GPSReading {
-        .valid = true,
+        // Make sure we got all parts of the message. If fields are omitted in
+        // the message then `strtok` will skip over repeated delimiters and the
+        // above loop will complete before all delimiters were found.
+        .valid = message.valid && position == 7,
         .lat = dmd2float(message.lat, message.latDir),
         .lon = dmd2float(message.lon, message.lonDir),
         .utc = message.utc
@@ -81,4 +96,8 @@ GPSReading UBloxNEO7::readGPS() {
         .utc = 0.0
       };
   }
+}
+
+bool UBloxNEO7::healthy() {
+  return true;
 }

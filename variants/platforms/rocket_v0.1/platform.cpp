@@ -6,18 +6,18 @@
 #include "drivers/mpu9250.hpp"
 #include "drivers/ms5611.hpp"
 #include "drivers/ublox_neo7.hpp"
+#include "variant/digital_platform.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
 #include "variant/usart_platform.hpp"
 
 // H3LIS331DL SPI configuration
-// TODO(yoos): verify clock speed
 static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
-  GPIOC,
-  15,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  GPIOA,
+  4,
+  SPI_CR1_BR_1 | SPI_CR1_BR_0   // 42000000/2^3 = 5250000
 };
 
 // MPU9250 SPI configuration
@@ -25,16 +25,15 @@ static const SPIConfig MPU9250_CONFIG {
   NULL,
   GPIOC,
   14,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
 };
 
 // MS5611 SPI configuration
-// TODO(yoos): verify clock speed
 static const SPIConfig MS5611_CONFIG {
   NULL,
   GPIOC,
   13,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
 };
 
 Platform::Platform() {
@@ -42,7 +41,7 @@ Platform::Platform() {
 
 template <>
 H3LIS331DL& Platform::get() {
-  static H3LIS331DL acc(&SPID1, &H3LIS331DL_CONFIG);
+  static H3LIS331DL acc(&SPID2, &H3LIS331DL_CONFIG);
   return acc;
 }
 
@@ -74,6 +73,12 @@ template <> Gyroscope&    Platform::get() { return get<MPU9250>(); }
 template <> Magnetometer& Platform::get() { return get<MPU9250>(); }
 
 template <>
+DigitalPlatform& Platform::get() {
+  static DigitalPlatform digitalPlatform;
+  return digitalPlatform;
+}
+
+template <>
 I2CPlatform& Platform::get() {
   static I2CPlatform i2cPlatform;
   return i2cPlatform;
@@ -98,10 +103,11 @@ USARTPlatform& Platform::get() {
 }
 
 void Platform::init() {
+  get<DigitalPlatform>();
   get<I2CPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
-  get<USARTPlatform>();
+  get<USARTPlatform>();   // Do this last so the 500ms delay hack doesn't mess with other stuff.
 
   // Initialize sensors
   get<H3LIS331DL>().init();

@@ -3,14 +3,18 @@
 
 #include <array>
 
+#include "sensor/sensor.hpp"
+
 struct AccelerometerReading {
   std::array<float, 3> axes;
 };
 
-class Accelerometer {
+class Accelerometer : public Sensor {
 public:
   virtual void init() = 0;
+  virtual bool isHealthy() = 0;
   virtual AccelerometerReading readAccel() = 0;
+  virtual bool healthy() = 0;
 };
 
 #endif

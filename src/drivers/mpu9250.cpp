@@ -47,6 +47,10 @@ void MPU9250::init() {
   readAccel();
 }
 
+bool MPU9250::isHealthy() {
+  return false;   // TODO
+}
+
 GyroscopeReading MPU9250::readGyro() {
   GyroscopeReading reading;
 
@@ -96,4 +100,19 @@ MagnetometerReading MPU9250::readMag() {
   // TODO(yoos)
 
   return reading;
+}
+
+bool MPU9250::healthy() {
+  // Check WHO_AM_I
+  txbuf[0] = mpu9250::WHO_AM_I | (1<<7);
+  txbuf[1] = 0x00;
+  exchange(2);
+
+  if (rxbuf[1] == 0x68) {
+    return true;
+  }
+
+  // TODO(yoos): check gyr/acc self-test registers
+
+  return false;
 }

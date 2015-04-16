@@ -43,6 +43,10 @@ void MS5611::init() {
   C6 = (rxbuf[1]<<8) | rxbuf[2];
 }
 
+bool MS5611::isHealthy() {
+  return false;   // TODO
+}
+
 BarometerReading MS5611::readBar() {
   // Read every 10 loops to leave time for the maximum 9.04 ms conversion time.
   // This assumes DT = 1 ms. We flip-flop between reading pressure and
@@ -53,7 +57,7 @@ BarometerReading MS5611::readBar() {
   if (loop == 0) {
     txbuf[0] = ms5611::CMD_READ;
     exchange(4);
-    uint32_t raw = (rxbuf[1]<<16) | (rxbuf[2]<<8) | rxbuf[3];
+    uint32_t raw = (((uint32_t) rxbuf[1])<<16) | (((uint32_t) rxbuf[2])<<8) | rxbuf[3];
 
     if (which == 0) {
       D1 = raw;   // Pressure
@@ -86,19 +90,19 @@ void MS5611::updatePT(void) {
   int32_t TEMP = 2000 + ((dT * C6) >> 23);   // 100x actual temperature
 
   // Calculate temperature compensation offsets
-  int64_t OFF = (C2 << 16) + ((C4 * dT) >> 7);   // Offset at actual temp
+  int64_t OFF  = (C2 << 16) + ((C4 * dT) >> 7);   // Offset at actual temp
   int64_t SENS = (C1 << 15) + ((C3 * dT) >> 8);   // Sensitivity at actual temp
 
   // Second-order temperature compensation
   int32_t T2 = 0;
   int64_t OFF2 = 0;
   int64_t SENS2 = 0;
-  if (TEMP < 20) {
+  if (TEMP < 2000) {
     T2 = (dT * dT) >> 31;
     OFF2 = (5 * (TEMP - 2000) * (TEMP - 2000)) >> 1;
     SENS2 = OFF2 >> 1;
   }
-  if (TEMP < -15) {
+  if (TEMP < -1500) {
     OFF2 += 7 * (TEMP + 1500) * (TEMP + 1500);
     SENS2 += (11 * (TEMP + 1500) * (TEMP + 1500)) >> 1;
   }
@@ -110,6 +114,10 @@ void MS5611::updatePT(void) {
   int32_t P = (((D1 * SENS) >> 21) - OFF) >> 15;   // 100x temp-compensated pressure
   //chprintf((BaseSequentialStream*)&SD4, "PT: %d %d\r\n", P, TEMP);
 
-  pressure = P / 100;
-  temperature = TEMP / 100;
+  pressure = P / 100.;
+  temperature = TEMP / 100.;
+}
+
+bool MS5611::healthy() {
+  return true;
 }

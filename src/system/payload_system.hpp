@@ -1,5 +1,5 @@
-#ifndef ROCKET_SYSTEM_HPP_
-#define ROCKET_SYSTEM_HPP_
+#ifndef PAYLOAD_SYSTEM_HPP_
+#define PAYLOAD_SYSTEM_HPP_
 
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
@@ -28,19 +28,20 @@
 // Sensors
 #include "sensor/sensor_measurements.hpp"
 
-enum class RocketState {
+enum class PayloadState {
   DISARMED,
   PRE_ARM,
   ARMED,
   FLIGHT,
   APOGEE,
+  ZERO_G,
   DESCENT,
   RECOVERY
 };
 
-class RocketSystem : public VehicleSystem, public MessageListener {
+class PayloadSystem : public VehicleSystem, public MessageListener {
 public:
-  RocketSystem(
+  PayloadSystem(
       Accelerometer& accel,
       optional<Accelerometer *> accelH,
       optional<Barometer *> bar,
@@ -83,15 +84,20 @@ private:
   /**
    * Pin config
    */
+  // PWM
+  const uint8_t PIN_FIN_SWITCH_CH = 5;   // PB7
+  const uint8_t PIN_MOTOR_CH = 7;   // PB9
+  // ADC
+  const uint8_t PIN_ESC_TEMP_THERM_CH = 0;   // PC0
   // Digital
-  const uint8_t PIN_MAIN_CH   = 1;   // PA5
-  const uint8_t PIN_DROGUE_CH = 2;   // PC4
-  const uint8_t PIN_EXT_TEMP_THERM_CH = 1;   // PC1
+  const uint8_t PIN_SHUTTLE2_CH = 0;   // PA4
+  const uint8_t PIN_DROGUE_CH = 1;   // PA5
+  const uint8_t PIN_SHUTTLE1_CH = 3;   // PC5
 
   /**
    * For now, we proceed directly to PRE_ARM.
    */
-  RocketState DisarmedState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState DisarmedState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * Full data stream to ground station begins here.
@@ -104,14 +110,14 @@ private:
    *   2. GPS lock
    *   3. Software arm signal received from GS
    */
-  RocketState PreArmState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState PreArmState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * Sensor calibration should be finished.
    *
    * Proceed to FLIGHT if X accel exceeds 1.1g.
    */
-  RocketState ArmedState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState ArmedState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * Begin onboard data logging.
@@ -137,25 +143,32 @@ private:
    * because a mach transition may happen at an unknowable time, and it's
    * probably easier to track state variables this way.
    */
-  RocketState FlightState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState FlightState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * Deploy drogue chute. If magnitude of net proper acceleration does not
    * change within 5 seconds, deploy main.
    */
-  RocketState ApogeeState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState ApogeeState(SensorMeasurements meas, WorldEstimate est);
+
+  /**
+   * Perform zero-g maneuver.
+   *
+   * Fire drogue after 6+1 seconds.
+   */
+  PayloadState ZeroGState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * Deploy main chute at 1500' AGL.
    */
-  RocketState DescentState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState DescentState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * Turn off all telemetry (maybe?) except GPS.
    *
    * Try to conserve power.
    */
-  RocketState RecoveryState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState RecoveryState(SensorMeasurements meas, WorldEstimate est);
 
   /**
    * RGB LED stuff.
@@ -168,7 +181,7 @@ private:
   /**
    * In-class global vars
    */
-  RocketState state;
+  PayloadState state;
   float motorDC;
 
   /**

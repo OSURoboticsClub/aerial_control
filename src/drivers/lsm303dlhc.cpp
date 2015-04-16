@@ -9,6 +9,10 @@ void LSM303DLHC::init() {
   writeRegister(lsm303dlhc::I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));
 }
 
+bool LSM303DLHC::isHealthy() {
+  return false;   // TODO
+}
+
 AccelerometerReading LSM303DLHC::readAccel() {
   txbuf[0] = lsm303dlhc::I2C_AD_OUT_X_L_A | 0x80;
 
@@ -46,4 +50,8 @@ void LSM303DLHC::writeRegister(uint8_t reg, uint8_t val) {
   txbuf[1] = val;
 
   exchange(2, 0);
+}
+
+bool LSM303DLHC::healthy() {
+  return true;
 }
