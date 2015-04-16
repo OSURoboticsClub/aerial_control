@@ -90,7 +90,7 @@ bool H3LIS331DL::healthy() {
     exchange(2);
 
     // TODO(yoos): This should return 0x32, but I'm getting 0x00 instead..
-    chprintf((BaseSequentialStream*)&SD4, "H3: %x\r\n", rxbuf[1]);
+    //chprintf((BaseSequentialStream*)&SD4, "H3: %x\r\n", rxbuf[1]);
   }
 
   return true;
