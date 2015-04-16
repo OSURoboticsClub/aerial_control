@@ -1,6 +1,7 @@
 #include "drivers/h3lis331dl.hpp"
 
 #include "unit_config.hpp"
+#include "chprintf.h"
 
 void H3LIS331DL::init() {
 //  // Reset device.
@@ -81,5 +82,16 @@ AccelerometerReading H3LIS331DL::readAccel() {
 }
 
 bool H3LIS331DL::healthy() {
+  static int i=0;
+  i=(i+1) % 100;
+  if (i%100==0) {
+    txbuf[0] = h3lis331dl::WHO_AM_I | (1<<7);
+    txbuf[1] = 0x00;
+    exchange(2);
+
+    // TODO(yoos): This should return 0x32, but I'm getting 0x00 instead..
+    chprintf((BaseSequentialStream*)&SD4, "H3: %x\r\n", rxbuf[1]);
+  }
+
   return true;
 }
