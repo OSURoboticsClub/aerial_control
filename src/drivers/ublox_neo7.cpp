@@ -19,13 +19,6 @@ struct GPGLLMessage {
 };
 
 void UBloxNEO7::init() {
-  // TODO(yoos): Turn off default (1Hz?!) sentences and poll at 10Hz.
-  //chprintf((BaseSequentialStream*)sd, "$PUBX,40,GLL,0,0,0,0,0,0*5C\r\n");
-  chprintf((BaseSequentialStream*)sd, "$PUBX,40,GGA,0,0,0,0,0,0*5A\r\n");
-  chprintf((BaseSequentialStream*)sd, "$PUBX,40,GSA,0,0,0,0,0,0*4E\r\n");
-  chprintf((BaseSequentialStream*)sd, "$PUBX,40,RMC,0,0,0,0,0,0*47\r\n");
-  chprintf((BaseSequentialStream*)sd, "$PUBX,40,GSV,0,0,0,0,0,0*59\r\n");
-  chprintf((BaseSequentialStream*)sd, "$PUBX,40,VTG,0,0,0,0,0,0*5E\r\n");
 }
 
 GPSReading UBloxNEO7::readGPS() {
@@ -87,15 +80,15 @@ GPSReading UBloxNEO7::readGPS() {
         .utc = message.utc
       };
     }
-  } else {
-    // TODO: Return previous message with old timestamp.
-      return GPSReading {
-        .valid = false,
-        .lat = 0.0,
-        .lon = 0.0,
-        .utc = 0.0
-      };
   }
+
+  // TODO: Return previous message with old timestamp.
+  return GPSReading {
+    .valid = false,
+      .lat = 10000.0,
+      .lon = 10000.0,
+      .utc = 0.0
+  };
 }
 
 bool UBloxNEO7::healthy() {
