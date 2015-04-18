@@ -15,8 +15,8 @@
 // H3LIS331DL SPI configuration
 static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
-  GPIOA,
-  4,
+  GPIOC,
+  15,
   SPI_CR1_BR_1 | SPI_CR1_BR_0   // 42000000/2^3 = 5250000
 };
 
