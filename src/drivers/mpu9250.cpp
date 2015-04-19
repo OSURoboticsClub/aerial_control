@@ -108,7 +108,7 @@ bool MPU9250::healthy() {
   txbuf[1] = 0x00;
   exchange(2);
 
-  if (rxbuf[1] == 0x68) {
+  if (rxbuf[1] == 0x71) {
     return true;
   }
 
