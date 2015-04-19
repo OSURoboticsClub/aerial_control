@@ -66,7 +66,7 @@ void PayloadSystem::update() {
   accel = 0.5*accel + 0.5*accelReading.axes[0];
 
   // Run the controllers
-  //ActuatorSetpoint actuatorSp;
+  ActuatorSetpoint actuatorSp;
 
   // Run state machine
   switch (state) {
@@ -102,7 +102,7 @@ void PayloadSystem::update() {
   updateStreams(meas, estimate);
 
   // Update motor outputs
-  //motorMapper.run(isArmed(), actuatorSp);
+  motorMapper.run(isArmed(), actuatorSp);
 }
 
 bool PayloadSystem::healthy() {
