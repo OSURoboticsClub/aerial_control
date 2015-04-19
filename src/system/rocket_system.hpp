@@ -84,8 +84,8 @@ private:
    * Pin config
    */
   // Digital
-  const uint8_t PIN_MAIN_CH   = 1;   // PA5
-  const uint8_t PIN_DROGUE_CH = 2;   // PC4
+  const uint8_t PIN_DROGUE_CH = 1;   // PA5
+  const uint8_t PIN_MAIN_CH   = 2;   // PC4
   const uint8_t PIN_EXT_TEMP_THERM_CH = 1;   // PC1
 
   /**
