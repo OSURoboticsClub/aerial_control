@@ -13,7 +13,6 @@ struct BarometerReading {
 class Barometer : public Sensor {
 public:
   virtual void init() = 0;
-  virtual bool isHealthy() = 0;
   virtual BarometerReading readBar() = 0;
 };
 

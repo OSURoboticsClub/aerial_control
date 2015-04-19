@@ -33,9 +33,8 @@ public:
   using I2CDevice::I2CDevice;
 
   void init() override;
-  bool isHealthy() override;
   MagnetometerReading readMag() override;
-  bool healthy();
+  bool healthy() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

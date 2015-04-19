@@ -43,10 +43,6 @@ void MS5611::init() {
   C6 = (rxbuf[1]<<8) | rxbuf[2];
 }
 
-bool MS5611::isHealthy() {
-  return false;   // TODO
-}
-
 BarometerReading MS5611::readBar() {
   // Read every 10 loops to leave time for the maximum 9.04 ms conversion time.
   // This assumes DT = 1 ms. We flip-flop between reading pressure and

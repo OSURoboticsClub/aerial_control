@@ -48,10 +48,6 @@ void H3LIS331DL::init() {
 //  readAccel();
 }
 
-bool H3LIS331DL::isHealthy() {
-  return false;
-}
-
 AccelerometerReading H3LIS331DL::readAccel() {
   AccelerometerReading reading;
 //

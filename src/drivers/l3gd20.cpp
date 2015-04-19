@@ -12,10 +12,6 @@ void L3GD20::init() {
   writeRegister(l3gd20::REG_CTRL_REG4, (1 << 5) | (1 << 4));
 }
 
-bool L3GD20::isHealthy() {
-  return false;   // TODO
-}
-
 GyroscopeReading L3GD20::readGyro() {
   txbuf[0] = l3gd20::SPI_RW | l3gd20::SPI_MS | l3gd20::REG_OUT_X_L;
   txbuf[1] = 0xFF;
