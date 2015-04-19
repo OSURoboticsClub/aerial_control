@@ -4,13 +4,13 @@
 #include <cstddef>
 #include <cmath>
 
-EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator)
-  : servos(servos),
+EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& motors, Communicator& communicator)
+  : motors(motors),
     throttleStream(communicator, 5) {
 }
 
 void EsraRocketMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // Interpret input roll as servo angle
   std::array<float, 1> outputs { input.roll };
-  servos.set(armed, outputs);
+  motors.set(armed, outputs);
 }

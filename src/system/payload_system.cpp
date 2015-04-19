@@ -109,7 +109,7 @@ bool PayloadSystem::healthy() {
   bool healthy = accel.healthy() && gyr.healthy();
 
   if(accelH) {
-    healthy &= (*accelH)->healthy();
+    //healthy &= (*accelH)->healthy();
   }
 
   if(bar) {
@@ -267,15 +267,16 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   // TODO(yoos): We might still see this if partially deployed and spinning
   // around..
   static float drogueTime = 0.0;
-  if ((*meas.accel).axes[0] < -0.3) {
-    drogueTime += unit_config::DT;
-  }
-  else {
-    drogueTime = 0.0;
-  }
 
   // Wait until successful drogue deployment or 5 seconds max.
   if (sTime < 5.0) {
+    if ((*meas.accel).axes[0] < -0.3) {
+      drogueTime += unit_config::DT;
+    }
+    else {
+      drogueTime = 0.0;
+    }
+
     if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
       return PayloadState::ZERO_G;
     }
@@ -298,7 +299,10 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   platform.get<DigitalPlatform>().set(PIN_SHUTTLE2_CH, true);
 
   // Run zero-g maneuver for 6 s.
-  if (sTime < 6.0) {
+  if (sTime < 0.5) {
+    // Noop until we clear the shuttle and rocket
+  }
+  else if (sTime < 6.0) {
     if ((*meas.accel).axes[0] < 0.0 &&
         motorDC < 1.0) {
       motorDC += 0.01;
