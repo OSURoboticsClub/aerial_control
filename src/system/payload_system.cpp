@@ -61,10 +61,6 @@ void PayloadSystem::update() {
   // Poll for controller input
   ControllerInput input = inputSource.read();
 
-  // Keep moving average of acceleration
-  static float accel = -1.0f;
-  accel = 0.5*accel + 0.5*accelReading.axes[0];
-
   // Run the controllers
   ActuatorSetpoint actuatorSp;
 
@@ -303,10 +299,14 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
     // Noop until we clear the shuttle and rocket
   }
   else if (sTime < 6.0) {
-    if ((*meas.accel).axes[0] < 0.0 &&
-        motorDC < 1.0) {
-      motorDC += 0.01;
+    if ((*meas.accel).axes[0] < 0.0 && motorDC < 1.0) {
+      motorDC += 0.001;
     }
+    else if ((*meas.accel).axes[0] > 0.0 && motorDC > 0.0) {
+      motorDC -= 0.001;
+    }
+    if (motorDC < 0.0) motorDC = 0.0;
+    if (motorDC > 1.0) motorDC = 1.0;
     ActuatorSetpoint actuatorSp {0,0,0,motorDC};
     motorMapper.run(true, actuatorSp);   // Assumed armed
   }
