@@ -78,7 +78,7 @@ private:
   RateLimitedStream imuStream;
   RateLimitedStream systemStream;
 
-  void updateStreams(SensorMeasurements meas, WorldEstimate est);
+  void updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Pin config
@@ -91,7 +91,7 @@ private:
   /**
    * For now, we proceed directly to PRE_ARM.
    */
-  RocketState DisarmedState(SensorMeasurements meas, WorldEstimate est);
+  RocketState DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Full data stream to ground station begins here.
@@ -104,14 +104,14 @@ private:
    *   2. GPS lock
    *   3. Software arm signal received from GS
    */
-  RocketState PreArmState(SensorMeasurements meas, WorldEstimate est);
+  RocketState PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Sensor calibration should be finished.
    *
    * Proceed to FLIGHT if X accel exceeds 1.1g.
    */
-  RocketState ArmedState(SensorMeasurements meas, WorldEstimate est);
+  RocketState ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Begin onboard data logging.
@@ -137,25 +137,25 @@ private:
    * because a mach transition may happen at an unknowable time, and it's
    * probably easier to track state variables this way.
    */
-  RocketState FlightState(SensorMeasurements meas, WorldEstimate est);
+  RocketState FlightState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Deploy drogue chute. If magnitude of net proper acceleration does not
    * change within 5 seconds, deploy main.
    */
-  RocketState ApogeeState(SensorMeasurements meas, WorldEstimate est);
+  RocketState ApogeeState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Deploy main chute at 1500' AGL.
    */
-  RocketState DescentState(SensorMeasurements meas, WorldEstimate est);
+  RocketState DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Turn off all telemetry (maybe?) except GPS.
    *
    * Try to conserve power.
    */
-  RocketState RecoveryState(SensorMeasurements meas, WorldEstimate est);
+  RocketState RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * RGB LED stuff.

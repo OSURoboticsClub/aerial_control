@@ -58,48 +58,44 @@ void RocketSystem::update() {
   // Update the world estimate
   WorldEstimate estimate = estimator.update(meas);
 
-  // Poll for controller input
-  ControllerInput input = inputSource.read();
-
-  // Keep moving average of acceleration
-  static float accel = -1.0f;
-  accel = 0.5*accel + 0.5*accelReading.axes[0];
-
   // Run the controllers
-  ActuatorSetpoint actuatorSp;
+  ActuatorSetpoint actuatorSp = {0,0,0,0};
 
   // Run state machine
   switch (state) {
   case RocketState::DISARMED:
-    state = DisarmedState(meas, estimate);
+    state = DisarmedState(meas, estimate, actuatorSp);
     break;
   case RocketState::PRE_ARM:
-    state = PreArmState(meas, estimate);
+    state = PreArmState(meas, estimate, actuatorSp);
     break;
   case RocketState::ARMED:
-    state = ArmedState(meas, estimate);
+    state = ArmedState(meas, estimate, actuatorSp);
     break;
   case RocketState::FLIGHT:
-    state = FlightState(meas, estimate);
+    state = FlightState(meas, estimate, actuatorSp);
     break;
   case RocketState::APOGEE:
-    state = ApogeeState(meas, estimate);
+    state = ApogeeState(meas, estimate, actuatorSp);
     break;
   case RocketState::DESCENT:
-    state = DescentState(meas, estimate);
+    state = DescentState(meas, estimate, actuatorSp);
     break;
   case RocketState::RECOVERY:
-    state = RecoveryState(meas, estimate);
+    state = RecoveryState(meas, estimate, actuatorSp);
     break;
   default:
     break;
   }
 
-  // Update streams
-  updateStreams(meas, estimate);
-
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
+
+  // Poll for controller input
+  ControllerInput input = inputSource.read();
+
+  // Update streams
+  updateStreams(meas, estimate, actuatorSp);
 }
 
 bool RocketSystem::healthy() {
@@ -130,7 +126,7 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }
 
-void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
+void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   if (imuStream.ready()) {
     protocol::message::imu_message_t m {
       .time = ST2MS(chibios_rt::System::getTime()),
@@ -180,21 +176,21 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
     protocol::message::system_message_t m {
       .time = ST2MS(chibios_rt::System::getTime()),
       .state = stateNum,
-      .motorDC = motorDC
+      .motorDC = sp.throttle
     };
 
     systemStream.publish(m);
   }
 }
 
-RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,0,1);   // Red 1 Hz
 
   // Proceed directly to PRE_ARM for now.
   return RocketState::PRE_ARM;
 }
 
-RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,0,4);   // Red 4 Hz
 
   // Calibrate
@@ -209,7 +205,7 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
   return RocketState::PRE_ARM;
 }
 
-RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(1,0,0);   // Red
 
   static int count = 10;
@@ -228,7 +224,7 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est)
   return RocketState::ARMED;
 }
 
-RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(0,0,1);   // Blue
   static bool powered = true;   // First time we enter, we are in powered flight.
 
@@ -255,7 +251,7 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   return RocketState::FLIGHT;
 }
 
-RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
 
@@ -288,7 +284,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   return RocketState::APOGEE;
 }
 
-RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(1,0,1);   // Violet
   static float sTime = 0.0;   // State time
 
@@ -319,7 +315,7 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
   return RocketState::DESCENT;
 }
 
-RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
+RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off

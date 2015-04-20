@@ -79,7 +79,7 @@ private:
   RateLimitedStream imuStream;
   RateLimitedStream systemStream;
 
-  void updateStreams(SensorMeasurements meas, WorldEstimate est);
+  void updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Pin config
@@ -97,7 +97,7 @@ private:
   /**
    * For now, we proceed directly to PRE_ARM.
    */
-  PayloadState DisarmedState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Full data stream to ground station begins here.
@@ -110,14 +110,14 @@ private:
    *   2. GPS lock
    *   3. Software arm signal received from GS
    */
-  PayloadState PreArmState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Sensor calibration should be finished.
    *
    * Proceed to FLIGHT if X accel exceeds 1.1g.
    */
-  PayloadState ArmedState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Begin onboard data logging.
@@ -143,32 +143,32 @@ private:
    * because a mach transition may happen at an unknowable time, and it's
    * probably easier to track state variables this way.
    */
-  PayloadState FlightState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState FlightState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Deploy drogue chute. If magnitude of net proper acceleration does not
    * change within 5 seconds, deploy main.
    */
-  PayloadState ApogeeState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState ApogeeState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Perform zero-g maneuver.
    *
    * Fire drogue after 6+1 seconds.
    */
-  PayloadState ZeroGState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState ZeroGState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Deploy main chute at 1500' AGL.
    */
-  PayloadState DescentState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Turn off all telemetry (maybe?) except GPS.
    *
    * Try to conserve power.
    */
-  PayloadState RecoveryState(SensorMeasurements meas, WorldEstimate est);
+  PayloadState RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * RGB LED stuff.
@@ -182,7 +182,6 @@ private:
    * In-class global vars
    */
   PayloadState state;
-  float motorDC;
 
   /**
    * Per-launch calibration

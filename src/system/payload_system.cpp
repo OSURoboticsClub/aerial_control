@@ -20,7 +20,7 @@ PayloadSystem::PayloadSystem(
     motorMapper(motorMapper), platform(platform),
     imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
     systemStream(communicator, 5),
-    state(PayloadState::DISARMED), motorDC(0.0) {
+    state(PayloadState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -58,47 +58,47 @@ void PayloadSystem::update() {
   // Update the world estimate
   WorldEstimate estimate = estimator.update(meas);
 
-  // Poll for controller input
-  ControllerInput input = inputSource.read();
-
   // Run the controllers
-  ActuatorSetpoint actuatorSp;
+  ActuatorSetpoint actuatorSp = {0,0,0,0};
 
   // Run state machine
   switch (state) {
   case PayloadState::DISARMED:
-    state = DisarmedState(meas, estimate);
+    state = DisarmedState(meas, estimate, actuatorSp);
     break;
   case PayloadState::PRE_ARM:
-    state = PreArmState(meas, estimate);
+    state = PreArmState(meas, estimate, actuatorSp);
     break;
   case PayloadState::ARMED:
-    state = ArmedState(meas, estimate);
+    state = ArmedState(meas, estimate, actuatorSp);
     break;
   case PayloadState::FLIGHT:
-    state = FlightState(meas, estimate);
+    state = FlightState(meas, estimate, actuatorSp);
     break;
   case PayloadState::APOGEE:
-    state = ApogeeState(meas, estimate);
+    state = ApogeeState(meas, estimate, actuatorSp);
     break;
   case PayloadState::ZERO_G:
-    state = ZeroGState(meas, estimate);
+    state = ZeroGState(meas, estimate, actuatorSp);
     break;
   case PayloadState::DESCENT:
-    state = DescentState(meas, estimate);
+    state = DescentState(meas, estimate, actuatorSp);
     break;
   case PayloadState::RECOVERY:
-    state = RecoveryState(meas, estimate);
+    state = RecoveryState(meas, estimate, actuatorSp);
     break;
   default:
     break;
   }
 
-  // Update streams
-  updateStreams(meas, estimate);
-
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
+
+  // Poll for controller input
+  ControllerInput input = inputSource.read();
+
+  // Update streams
+  updateStreams(meas, estimate, actuatorSp);
 }
 
 bool PayloadSystem::healthy() {
@@ -127,7 +127,7 @@ void PayloadSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }
 
-void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
+void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   if (imuStream.ready()) {
     protocol::message::imu_message_t m {
       .time = ST2MS(chibios_rt::System::getTime()),
@@ -180,21 +180,21 @@ void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est) {
     protocol::message::system_message_t m {
       .time = ST2MS(chibios_rt::System::getTime()),
       .state = stateNum,
-      .motorDC = motorDC
+      .motorDC = sp.throttle
     };
 
     systemStream.publish(m);
   }
 }
 
-PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,0,1);   // Red 1 Hz
 
   // Proceed directly to PRE_ARM for now.
   return PayloadState::PRE_ARM;
 }
 
-PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,0,4);   // Red 4 Hz
 
   // Calibrate
@@ -209,7 +209,7 @@ PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate e
   return PayloadState::PRE_ARM;
 }
 
-PayloadState PayloadSystem::ArmedState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(1,0,0);   // Red
 
   static int count = 10;
@@ -228,7 +228,7 @@ PayloadState PayloadSystem::ArmedState(SensorMeasurements meas, WorldEstimate es
   return PayloadState::ARMED;
 }
 
-PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(0,0,1);   // Blue
   static bool powered = true;   // First time we enter, we are in powered flight.
 
@@ -255,7 +255,7 @@ PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate e
   return PayloadState::FLIGHT;
 }
 
-PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
 
@@ -286,9 +286,10 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   return PayloadState::APOGEE;
 }
 
-PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   RGBLED(2);   // Rainbows!
   static float sTime = 0.0;   // State time
+  static float throttle = 0.0;
 
   // Release shuttle
   platform.get<DigitalPlatform>().set(PIN_SHUTTLE1_CH, true);
@@ -299,21 +300,17 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
     // Noop until we clear the shuttle and rocket
   }
   else if (sTime < 6.0) {
-    if ((*meas.accel).axes[0] < 0.0 && motorDC < 1.0) {
-      motorDC += 0.001;
+    if ((*meas.accel).axes[0] < 0.0 && throttle < 1.0) {
+      throttle += 0.001;
     }
-    else if ((*meas.accel).axes[0] > 0.0 && motorDC > 0.0) {
-      motorDC -= 0.001;
+    else if ((*meas.accel).axes[0] > 0.0 && throttle > 0.0) {
+      throttle -= 0.001;
     }
-    if (motorDC < 0.0) motorDC = 0.0;
-    if (motorDC > 1.0) motorDC = 1.0;
-    ActuatorSetpoint actuatorSp {0,0,0,motorDC};
-    motorMapper.run(true, actuatorSp);   // Assumed armed
+    if (throttle < 0.0) throttle = 0.0;
+    if (throttle > 1.0) throttle = 1.0;
   }
   else if (sTime < 7.0) {
-    motorDC = 0.0;
-    ActuatorSetpoint actuatorSp {0,0,0,motorDC};
-    motorMapper.run(true, actuatorSp);   // Assumed armed
+    throttle = 0.0;
   }
   else if (sTime < 10.0) {
     // Fire drogue pyro
@@ -328,10 +325,13 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   }
 
   sTime += unit_config::DT;
+
+  // Outputs
+  sp.throttle = throttle;
   return PayloadState::ZERO_G;
 }
 
-PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(1,0,1);   // Violet
   static float sTime = 0.0;   // State time
 
@@ -359,7 +359,7 @@ PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate 
   return PayloadState::DESCENT;
 }
 
-PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est) {
+PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
   // Turn things off
