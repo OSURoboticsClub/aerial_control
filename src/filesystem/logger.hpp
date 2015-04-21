@@ -5,12 +5,32 @@
 
 #include "ch.hpp"
 #include "hal.h"
-#include "filesystem/filesystem.hpp"
 #include "protocol/protocol.hpp"
+
+#include "filesystem/filesystem.hpp"
+#include "filesystem/fs_writer_thread.hpp"
 
 class Logger {
 public:
-  Logger(FileSystem& fs);
+  Logger(SDCDriver& sdcd);
+
+  /**
+   * Start writer threads.
+   */
+  void start(void);
+
+  /**
+   * Write to filesystem.
+   */
+  template <typename M>
+  void write(const M& message);
+
+private:
+  FsWriterThread writer;
+
+  protocol::Encoder encoder;
 };
+
+#include "logger.tpp"
 
 #endif

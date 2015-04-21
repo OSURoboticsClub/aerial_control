@@ -9,6 +9,7 @@
 #include "variant/digital_platform.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
+#include "variant/sdc_platform.hpp"
 #include "variant/spi_platform.hpp"
 #include "variant/usart_platform.hpp"
 
@@ -91,6 +92,12 @@ PWMPlatform& Platform::get() {
 }
 
 template <>
+SDCPlatform& Platform::get() {
+  static SDCPlatform sdcPlatform;
+  return sdcPlatform;
+}
+
+template <>
 SPIPlatform& Platform::get() {
   static SPIPlatform spiPlatform;
   return spiPlatform;
@@ -106,6 +113,7 @@ void Platform::init() {
   get<DigitalPlatform>();
   get<I2CPlatform>();
   get<PWMPlatform>();
+  get<SDCPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();   // Do this last so the 500ms delay hack doesn't mess with other stuff.
 

@@ -5,8 +5,9 @@
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "motor/esra_payload_motor_mapper.hpp"
+#include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
+#include "motor/esra_payload_motor_mapper.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/payload_system.hpp"
 #include "util/optional.hpp"
@@ -27,7 +28,7 @@ struct UnitData {
 
   PayloadSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator)
+  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
         { 7 },                                       // channels
         { 0.0f },                                    // offsets
@@ -37,7 +38,7 @@ struct UnitData {
       motorMapper(motors, communicator),
       location(communicator),
       attitude(communicator),
-      world(location, attitude, communicator),
+      world(location, attitude, communicator, logger),
       inputSource(communicator),
       system(
           platform.getIdx<Accelerometer>(0),
@@ -46,7 +47,7 @@ struct UnitData {
           std::experimental::make_optional(&platform.get<GPS>()),
           platform.get<Gyroscope>(),
           std::experimental::make_optional(&platform.get<Magnetometer>()),
-          world, inputSource, motorMapper, communicator,
+          world, inputSource, motorMapper, communicator, logger,
           platform) {
   }
 };

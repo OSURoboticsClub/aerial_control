@@ -12,7 +12,7 @@ PayloadSystem::PayloadSystem(
     Gyroscope& gyr,
     optional<Magnetometer *> mag,
     WorldEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator,
+    MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
     Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),

@@ -17,6 +17,9 @@
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
 
+// Filesystem
+#include "filesystem/logger.hpp"
+
 // Platform
 #include "variant/digital_platform.hpp"
 #include "variant/pwm_platform.hpp"
@@ -49,7 +52,7 @@ public:
       Gyroscope& gyr,
       optional<Magnetometer *> mag,
       WorldEstimator& estimator, InputSource& inputSource,
-      MotorMapper& motorMapper, Communicator& communicator,
+      MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
       Platform& platform);
 
   void update() override;

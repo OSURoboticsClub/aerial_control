@@ -12,7 +12,7 @@ static const SerialConfig UART2_CONFIG {
 
 // UART4 configuration (Unused)
 static const SerialConfig UART4_CONFIG {
-  38400,
+  460800,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
