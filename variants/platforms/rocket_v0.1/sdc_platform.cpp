@@ -12,5 +12,5 @@ SDCPlatform::SDCPlatform() {
 }
 
 SDCDriver& SDCPlatform::getSDCDriver() {
-  return reinterpret_cast<SDCDriver&>(SDCD1);
+  return SDCD1;
 }
