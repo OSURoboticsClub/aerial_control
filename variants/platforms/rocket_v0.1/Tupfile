@@ -2,6 +2,13 @@
 CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/boards/ST_STM32F4_DISCOVERY/board.c
 INCLUDES-@(PLATFORM_ROCKET_V0001) += -I$(CHIBIOS)/boards/ST_STM32F4_DISCOVERY
 
+# FATFS
+CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/os/various/fatfs_bindings/fatfs_diskio.c
+CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/os/various/fatfs_bindings/fatfs_syscall.c
+CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/ext/fatfs/src/ff.c
+CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/ext/fatfs/src/option/ccsbcs.c
+INCLUDES-@(PLATFORM_ROCKET_V0001) += -I$(CHIBIOS)/ext/fatfs/src
+
 # Platform
 CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/stm32_dma.c
 CSRCS-@(PLATFORM_ROCKET_V0001) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/hal_lld.c
