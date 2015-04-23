@@ -7,6 +7,13 @@ FsWriterThread::FsWriterThread(SDCDriver& sdcd)
 }
 
 msg_t FsWriterThread::main() {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Filesystem thread online.\r\n");
+
+  if (fs.connect()) {
+    fs.mount();
+  }
+
   while(true) {
     // Check if there is data in the buffer that has not yet been written.
     while(bottom != top) {
@@ -19,6 +26,10 @@ msg_t FsWriterThread::main() {
     }
 
     // TODO(kyle): Just yield, or sleep?
-    chThdSleepMicroseconds(10);   // TODO(yoos): yield in this thread makes things not work.
+    chThdSleepMicroseconds(10000);   // TODO(yoos): yield in this thread makes things not work.
   }
+
+  // Should never get here
+  fs.umount();
+  fs.disconnect();
 }

@@ -6,23 +6,88 @@
 #include <cstring>
 
 FileSystem::FileSystem(SDCDriver& sdcd)
-  : sdcd(sdcd) {
+  : sdcd(sdcd), fs_ready(false) {
+  healthy();
 }
 
-void FileSystem::write(std::uint8_t c) {
-  //TODO(yoos);
+bool FileSystem::connect(void) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Trying to connect SDIO...");
+  if (sdcConnect(&sdcd)) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  chprintf(chp, " OK\r\n");
+
+  return true;
+}
+
+bool FileSystem::disconnect(void) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Disconnecting from SDIO...");
+  if (sdcDisconnect(&sdcd)) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  chprintf(chp, " OK\r\n");
+
+  return true;
+}
+
+bool FileSystem::mount(void) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Registering FS working area...");
+  err = f_mount(0, &SDC_FS);
+  if (err != FR_OK) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  fs_ready = TRUE;
+  chprintf(chp, " OK\r\n");
+
+  chprintf(chp, "Mounting filesystem...");
+  err = f_getfree("/", &clusters, &fsp);
+  if (err != FR_OK) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  chprintf(chp, " OK\r\n");
+  chprintf(chp,
+      "FS: %lu free clusters, %lu sectors per cluster, %lu bytes free\r\n",
+      clusters, (uint32_t)SDC_FS.csize,
+      clusters * (uint32_t)SDC_FS.csize * (uint32_t)MMCSD_BLOCK_SIZE);
+
+  return true;
+}
+
+bool FileSystem::umount(void) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Unmounting filesystem...");
+  f_mount(0, NULL);
+  if (err != FR_OK) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  chprintf(chp, " OK\r\n");
+
+  return true;
+}
+
+
+void FileSystem::read(uint8_t c) {
+  if (sdcRead(&sdcd, 0, inbuf, SDC_BURST_SIZE)) {};
+}
+
+void FileSystem::write(uint8_t c) {
+  if (sdcRead(&sdcd, 0, inbuf, SDC_BURST_SIZE)) {};
 }
 
 bool FileSystem::healthy(void) {
   uint32_t i=0;
-  static FATFS SDC_FS;   // FS object
-  static bool_t fs_ready = FALSE;   // FS mounted and ready
   BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
-  chprintf(chp, "Trying to connect SDIO... ");
 
-  if (sdcConnect(&sdcd))
-    return false;
-  chprintf(chp, "OK\r\n");
+  connect();
+
   chprintf(chp, "*** Card CSD content: ");
   chprintf(chp, "%X %X %X %X \r\n", (&sdcd)->csd[3], (&sdcd)->csd[2], (&sdcd)->csd[1], (&sdcd)->csd[0]);
 
@@ -82,38 +147,9 @@ bool FileSystem::healthy(void) {
   /**
    * Now perform some FS tests.
    */
-  FRESULT err;
-  uint32_t clusters;
-  FATFS *fsp;
-  FIL FileObject;
-  uint32_t bytes_written;
-  uint32_t bytes_read;
-  FILINFO filinfo;
   uint8_t teststring[] = {"This is test file\r\n"};
 
-  chprintf(chp, "Register working area for filesystem... ");
-  chThdSleepMilliseconds(100);
-  err = f_mount(0, &SDC_FS);
-  if (err != FR_OK){
-    return false;
-  }
-  else{
-    fs_ready = TRUE;
-    chprintf(chp, "OK\r\n");
-  }
-
-  chprintf(chp, "Mount filesystem... ");
-  chThdSleepMilliseconds(100);
-  err = f_getfree("/", &clusters, &fsp);
-  if (err != FR_OK) {
-    return false;
-  }
-  chprintf(chp, "OK\r\n");
-  chprintf(chp,
-      "FS: %lu free clusters, %lu sectors per cluster, %lu bytes free\r\n",
-      clusters, (uint32_t)SDC_FS.csize,
-      clusters * (uint32_t)SDC_FS.csize * (uint32_t)MMCSD_BLOCK_SIZE);
-
+  mount();
 
   chprintf(chp, "Create file \"chtest.txt\"... ");
   chThdSleepMilliseconds(100);
@@ -172,15 +208,9 @@ bool FileSystem::healthy(void) {
     }
   }
 
-  chprintf(chp, "Umount filesystem... ");
-  f_mount(0, NULL);
-  chprintf(chp, "OK\r\n");
+  umount();
+  disconnect();
 
-  chprintf(chp, "Disconnecting from SDIO...");
-  chThdSleepMilliseconds(100);
-  if (sdcDisconnect(&sdcd))
-    return false;
-  chprintf(chp, " OK\r\n");
   chprintf(chp, "------------------------------------------------------\r\n");
   chprintf(chp, "All tests passed successfully.\r\n");
 
