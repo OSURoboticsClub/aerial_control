@@ -19,6 +19,6 @@ msg_t FsWriterThread::main() {
     }
 
     // TODO(kyle): Just yield, or sleep?
-    yield();
+    chThdSleepMicroseconds(10);   // TODO(yoos): yield in this thread makes things not work.
   }
 }
