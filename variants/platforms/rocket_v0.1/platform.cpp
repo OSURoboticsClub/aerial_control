@@ -18,7 +18,7 @@ static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
   GPIOC,
   15,
-  SPI_CR1_BR_1 | SPI_CR1_BR_0   // 42000000/2^3 = 5250000
+  SPI_CR1_BR_1   // 21000000/2^2 = 5250000
 };
 
 // MPU9250 SPI configuration
@@ -26,7 +26,7 @@ static const SPIConfig MPU9250_CONFIG {
   NULL,
   GPIOC,
   14,
-  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
+  SPI_CR1_BR_0   // 21000000/2^1 = 10500000
 };
 
 // MS5611 SPI configuration
@@ -34,7 +34,7 @@ static const SPIConfig MS5611_CONFIG {
   NULL,
   GPIOC,
   13,
-  SPI_CR1_BR_1   // 42000000/2^2 = 10500000
+  SPI_CR1_BR_0   // 21000000/2^1 = 10500000
 };
 
 Platform::Platform() {
@@ -42,19 +42,19 @@ Platform::Platform() {
 
 template <>
 H3LIS331DL& Platform::get() {
-  static H3LIS331DL acc(&SPID2, &H3LIS331DL_CONFIG);
+  static H3LIS331DL acc(&SPID3, &H3LIS331DL_CONFIG);
   return acc;
 }
 
 template <>
 MPU9250& Platform::get() {
-  static MPU9250 imu(&SPID1, &MPU9250_CONFIG);
+  static MPU9250 imu(&SPID3, &MPU9250_CONFIG);
   return imu;
 }
 
 template <>
 MS5611& Platform::get() {
-  static MS5611 bar(&SPID1, &MS5611_CONFIG);
+  static MS5611 bar(&SPID3, &MS5611_CONFIG);
   return bar;
 }
 
@@ -113,9 +113,10 @@ void Platform::init() {
   get<DigitalPlatform>();
   get<I2CPlatform>();
   get<PWMPlatform>();
-  get<SDCPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();   // Do this last so the 500ms delay hack doesn't mess with other stuff.
+
+  get<SDCPlatform>();   // Initialize SDIO after SPI.
 
   // Initialize sensors
   get<H3LIS331DL>().init();
