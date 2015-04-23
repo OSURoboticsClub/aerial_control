@@ -12,7 +12,7 @@ RocketSystem::RocketSystem(
     Gyroscope& gyr,
     optional<Magnetometer *> mag,
     WorldEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator,
+    MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
     Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
@@ -20,6 +20,7 @@ RocketSystem::RocketSystem(
     motorMapper(motorMapper), platform(platform),
     imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
     systemStream(communicator, 5),
+    logger(logger),
     state(RocketState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
@@ -178,6 +179,7 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Act
       .state = stateNum,
       .motorDC = sp.throttle
     };
+    logger.write(m);
 
     systemStream.publish(m);
   }

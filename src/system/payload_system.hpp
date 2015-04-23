@@ -81,6 +81,7 @@ private:
 
   RateLimitedStream imuStream;
   RateLimitedStream systemStream;
+  Logger& logger;
 
   void updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 

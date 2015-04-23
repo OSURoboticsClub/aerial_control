@@ -20,6 +20,7 @@ PayloadSystem::PayloadSystem(
     motorMapper(motorMapper), platform(platform),
     imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
     systemStream(communicator, 5),
+    logger(logger),
     state(PayloadState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
@@ -182,6 +183,7 @@ void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Ac
       .state = stateNum,
       .motorDC = sp.throttle
     };
+    logger.write(m);
 
     systemStream.publish(m);
   }
