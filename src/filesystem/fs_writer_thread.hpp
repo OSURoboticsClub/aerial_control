@@ -11,7 +11,7 @@
 /**
  * Thread to write to storage media without blocking control thread.
  */
-class FsWriterThread : public chibios_rt::BaseStaticThread<1024> {
+class FsWriterThread : public chibios_rt::BaseStaticThread<2048> {
 public:
   FsWriterThread(SDCDriver& sdcd);
 
