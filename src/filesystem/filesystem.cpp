@@ -3,11 +3,11 @@
 #include "chprintf.h"
 #include "util/time.hpp"
 
+#include <cstdio>
 #include <cstring>
 
 FileSystem::FileSystem(SDCDriver& sdcd)
   : sdcd(sdcd), fs_ready(false) {
-  healthy();
 }
 
 bool FileSystem::connect(void) {
@@ -73,13 +73,75 @@ bool FileSystem::umount(void) {
   return true;
 }
 
+bool FileSystem::openNew(void) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Generating filename...");
+  uint16_t idx = 0;
+  char fn[255];
+  while (err != FR_NO_FILE) {
+    chprintf(chp, ".");
+    sprintf(fn, "celeste_%03d.log", idx++);
+    err = f_stat(fn, &filinfo);
+
+    if (idx == 1000) {
+      chprintf(chp, " too many files\r\n");
+      return false;
+    }
+  }
+  chprintf(chp, " OK\r\n");
+
+  return open(fn);
+}
+
+bool FileSystem::open(char *fn) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Opening file %s...", fn);
+
+  char fn_full[255];
+  sprintf(fn_full, "0:%s", fn);
+  err = f_open(&FileObject, fn_full, FA_WRITE | FA_OPEN_ALWAYS);
+  if (err != FR_OK) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  chprintf(chp, " OK\r\n");
+
+  return true;
+}
+
+bool FileSystem::close(void) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  chprintf(chp, "Closing file...");
+  err = f_close(&FileObject);
+  if (err != FR_OK) {
+    chprintf(chp, " failed\r\n");
+    return false;
+  }
+  chprintf(chp, " OK\r\n");
+
+  return true;
+}
 
 void FileSystem::read(uint8_t c) {
   if (sdcRead(&sdcd, 0, inbuf, SDC_BURST_SIZE)) {};
+  // TODO(yoos);
 }
 
-void FileSystem::write(uint8_t c) {
-  if (sdcRead(&sdcd, 0, inbuf, SDC_BURST_SIZE)) {};
+void FileSystem::write(uint8_t *buf, uint16_t len) {
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  uint8_t teststring[] = {"This is a test file\r\n"};
+  err = f_write(&FileObject, buf, len, (unsigned int*)&bytes_written);
+  if (err != FR_OK) {
+    chprintf(chp, "write failed\r\n");
+  }
+  err = f_sync(&FileObject);   // TODO(yoos): This ensures data gets written, but bad for performance...
+  if (err != FR_OK) {
+    chprintf(chp, "sync failed\r\n");
+  }
+  if (bytes_written != len) {
+    chprintf(chp, "write incomplete\r\n");
+  }
+  // TODO(yoos): On failure, reset logger to wait state
 }
 
 bool FileSystem::healthy(void) {
@@ -147,50 +209,32 @@ bool FileSystem::healthy(void) {
   /**
    * Now perform some FS tests.
    */
-  uint8_t teststring[] = {"This is test file\r\n"};
+  uint8_t teststring[] = "This is a test file\n";
 
   mount();
 
-  chprintf(chp, "Create file \"chtest.txt\"... ");
-  chThdSleepMilliseconds(100);
-  err = f_open(&FileObject, "0:chtest.txt", FA_WRITE | FA_OPEN_ALWAYS);
-  if (err != FR_OK) {
-    return false;
-  }
-  chprintf(chp, "OK\r\n");
-  chprintf(chp, "Write some data in it... ");
-  chThdSleepMilliseconds(100);
-  err = f_write(&FileObject, teststring, sizeof(teststring), (unsigned int*)&bytes_written);
-  if (err != FR_OK) {
-    return false;
-  }
-  else
-    chprintf(chp, "OK\r\n");
+  open("chtest.txt");
 
-  chprintf(chp, "Close file \"chtest.txt\"... ");
-  err = f_close(&FileObject);
-  if (err != FR_OK) {
-    return false;
-  }
-  else
-    chprintf(chp, "OK\r\n");
+  chprintf(chp, "Writing data...");
+  write(teststring, sizeof(teststring));
+  chprintf(chp, " OK\r\n");
 
-  chprintf(chp, "Check file size \"chtest.txt\"... ");
+  close();
+
+  chprintf(chp, "Checking file size \"chtest.txt\"...");
   err = f_stat("0:chtest.txt", &filinfo);
-  chThdSleepMilliseconds(100);
   if (err != FR_OK) {
     return false;
   }
   else{
     if (filinfo.fsize == sizeof(teststring))
-      chprintf(chp, "OK\r\n");
+      chprintf(chp, " OK\r\n");
     else
       return false;
   }
 
-  chprintf(chp, "Check file content \"chtest.txt\"... ");
+  chprintf(chp, "Check file content \"chtest.txt\"...");
   err = f_open(&FileObject, "0:chtest.txt", FA_READ | FA_OPEN_EXISTING);
-  chThdSleepMilliseconds(100);
   if (err != FR_OK) {
     return false;
   }
@@ -204,7 +248,7 @@ bool FileSystem::healthy(void) {
       return false;
     }
     else{
-      chprintf(chp, "OK\r\n");
+      chprintf(chp, " OK\r\n");
     }
   }
 

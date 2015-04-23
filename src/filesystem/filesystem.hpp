@@ -38,6 +38,23 @@ public:
   bool umount(void);
 
   /**
+   * Open new file
+   *
+   * This will generate a filename as to avoid overwriting existing log files.
+   */
+  bool openNew(void);
+
+  /**
+   * Open file by name
+   */
+  bool open(char *fn);
+
+  /**
+   * Close current file
+   */
+  bool close(void);
+
+  /**
    * Read from filesystem.
    */
   void read(uint8_t c);
@@ -45,7 +62,7 @@ public:
   /**
    * Write to filesystem.
    */
-  void write(uint8_t c);
+  void write(uint8_t *c, uint16_t len);
 
   /**
    * Health check.
