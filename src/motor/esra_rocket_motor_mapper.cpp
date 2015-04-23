@@ -4,9 +4,10 @@
 #include <cstddef>
 #include <cmath>
 
-EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& motors, Communicator& communicator)
+EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& motors, Communicator& communicator, Logger& logger)
   : motors(motors),
-    throttleStream(communicator, 5) {
+    throttleStream(communicator, 5),
+    logger(logger) {
 }
 
 void EsraRocketMotorMapper::run(bool armed, ActuatorSetpoint& input) {

@@ -26,7 +26,7 @@ public:
 private:
   FileSystem fs;
 
-  std::array<std::uint8_t, 1024> buffer;
+  std::array<std::uint8_t, 20000> buffer;
   std::size_t bottom;
   std::size_t top;
 };

@@ -3,11 +3,12 @@
 
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
+#include "filesystem/logger.hpp"
 #include "estimator/location_estimator.hpp"
 
 class AtmosphericLocationEstimator : public LocationEstimator {
 public:
-  AtmosphericLocationEstimator(Communicator& communicator);
+  AtmosphericLocationEstimator(Communicator& communicator, Logger& logger);
 
   LocationEstimate update(const SensorMeasurements& meas) override;
 
@@ -21,6 +22,7 @@ private:
 
   LocationEstimate loc;
   RateLimitedStream locationMessageStream;
+  Logger& logger;
 };
 
 #endif

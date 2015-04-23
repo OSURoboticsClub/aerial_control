@@ -35,9 +35,9 @@ struct UnitData {
         0.0f, 1.0f,                                  // input range
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range
       ),
-      motorMapper(motors, communicator),
-      location(communicator),
-      attitude(communicator),
+      motorMapper(motors, communicator, logger),
+      location(communicator, logger),
+      attitude(communicator, logger),
       world(location, attitude, communicator, logger),
       inputSource(communicator),
       system(

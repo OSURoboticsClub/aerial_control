@@ -8,9 +8,10 @@
 
 // TODO: Initial location is not valid. Maybe we should be able to mark the
 // estimate as invalid until a GPS fix is found?
-AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communicator)
+AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communicator, Logger& logger)
   : loc{0.0, 0.0, 0.0},
-    locationMessageStream(communicator, 50) {
+    locationMessageStream(communicator, 50),
+    logger(logger) {
 }
 
 LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& meas) {
@@ -56,14 +57,16 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
 }
 
 void AtmosphericLocationEstimator::updateStream() {
-  if(locationMessageStream.ready()) {
-    protocol::message::location_message_t m {
-      .time = ST2MS(chibios_rt::System::getTime()),
-      .lat = loc.lat,
-      .lon = loc.lon,
-      .alt = loc.alt
-    };
+  protocol::message::location_message_t m {
+    .time = ST2MS(chibios_rt::System::getTime()),
+    .lat = loc.lat,
+    .lon = loc.lon,
+    .alt = loc.alt
+  };
 
+  if(locationMessageStream.ready()) {
     locationMessageStream.publish(m);
   }
+
+  logger.write(m);
 }

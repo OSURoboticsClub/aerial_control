@@ -9,9 +9,9 @@ CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelero
     Communicator& communicator, Logger& logger)
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
-    locEstimator(communicator), attEstimator(communicator),
+    locEstimator(communicator, logger), attEstimator(communicator, logger),
     worldEstimator(locEstimator, attEstimator, communicator, logger),
-    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator) {
+    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator, logger) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);

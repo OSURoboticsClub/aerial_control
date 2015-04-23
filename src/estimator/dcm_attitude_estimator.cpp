@@ -6,9 +6,10 @@
 
 #include "unit_config.hpp"
 
-DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
+DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator, Logger& logger)
   : dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 5) {
+    attitudeMessageStream(communicator, 5),
+    logger(logger) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
@@ -149,16 +150,18 @@ AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& me
 }
 
 void DCMAttitudeEstimator::updateStream() {
-  if(attitudeMessageStream.ready()) {
-    protocol::message::attitude_message_t m {
-      .time = ST2MS(chibios_rt::System::getTime()),
-      .dcm = {
-        dcm(0, 0), dcm(0, 1), dcm(0, 2),
-        dcm(1, 0), dcm(1, 1), dcm(1, 2),
-        dcm(2, 0), dcm(2, 1), dcm(2, 2)
-      }
-    };
+  protocol::message::attitude_message_t m {
+    .time = ST2MS(chibios_rt::System::getTime()),
+    .dcm = {
+      dcm(0, 0), dcm(0, 1), dcm(0, 2),
+      dcm(1, 0), dcm(1, 1), dcm(1, 2),
+      dcm(2, 0), dcm(2, 1), dcm(2, 2)
+    }
+  };
 
+  if(attitudeMessageStream.ready()) {
     attitudeMessageStream.publish(m);
   }
+
+  logger.write(m);
 }

@@ -31,12 +31,19 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
     // worldMessageStream.publish(m);
   }
 
-  if (logger.ready()) {
-    protocol::message::imu_message_t msg_imu {
-      .time = ST2MS(chibios_rt::System::getTime())
-    };
-    logger.write(msg_imu);
-  }
+  protocol::message::raw_1000_message_t msg_1000 {
+    .time = ST2MS(chibios_rt::System::getTime()),
+    .accel = {(*meas.accel).axes[0],
+              (*meas.accel).axes[1],
+              (*meas.accel).axes[2]},
+    .accelH = {(*meas.accelH).axes[0],
+               (*meas.accelH).axes[1],
+               (*meas.accelH).axes[2]},
+    .gyro = {(*meas.gyro).axes[0],
+             (*meas.gyro).axes[1],
+             (*meas.gyro).axes[2]}
+  };
+  logger.write(msg_1000);
 
   return estimate;
 }
