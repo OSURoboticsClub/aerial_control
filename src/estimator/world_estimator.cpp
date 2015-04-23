@@ -29,7 +29,9 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
     // sprintf(m.data, "gps: %d %d", (int) (*meas.gps).lat * 1000, (int) (*meas.gps).lon * 1000);
     //
     // worldMessageStream.publish(m);
+  }
 
+  if (logger.ready()) {
     protocol::message::imu_message_t msg_imu {
       .time = ST2MS(chibios_rt::System::getTime())
     };
