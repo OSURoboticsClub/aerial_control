@@ -17,7 +17,9 @@ msg_t FsWriterThread::main() {
   while(true) {
     // Check if there is data in the buffer that has not yet been written.
     while(bottom != top) {
-      fs.write(&buffer[bottom++], 1);
+      size_t numbytes = (top > bottom) ? top-bottom : buffer.size()-bottom;
+      fs.write(&buffer[bottom], numbytes);
+      bottom += numbytes;
 
       // Wrap if the end of the buffer is reached.
       if(bottom >= buffer.size()) {
