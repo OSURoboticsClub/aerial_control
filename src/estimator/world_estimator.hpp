@@ -31,7 +31,7 @@ public:
 
 private:
   RateLimitedStream worldMessageStream;
-  Logger logger;
+  Logger& logger;
 };
 
 #endif
