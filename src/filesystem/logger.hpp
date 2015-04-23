@@ -20,6 +20,11 @@ public:
   void start(void);
 
   /**
+   * Check if ready.
+   */
+  bool ready(void);
+
+  /**
    * Write to filesystem.
    */
   template <typename M>

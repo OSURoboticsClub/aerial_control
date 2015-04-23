@@ -11,3 +11,8 @@ void Logger::start(void) {
   // vehicles. Maybe priorities should be user-configurable.
   writer.start(LOWPRIO + 2);
 }
+
+bool Logger::ready(void) {
+  // TODO(yoos)
+  return true;
+}
