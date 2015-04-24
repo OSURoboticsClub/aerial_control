@@ -172,16 +172,49 @@ void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Ac
 PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,0,1);   // Red 1 Hz
 
-  // Proceed directly to PRE_ARM for now.
-  return PayloadState::PRE_ARM;
+  static bool calibrated = false;
+  static int calibCount = 0;
+  static std::array<float, 3> gyrOffsets {0,0,0};
+  static std::array<float, 3> accOffsets {0,0,0};
+
+  // Calibrate ground altitude
+  groundAltitude = est.loc.alt;
+
+  // Calibrate gyroscope
+  for (int i=0; i<3; i++) {
+    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i])/(calibCount+1);
+  }
+  calibCount++;
+
+  // Reset calibration on excessive gyration
+  if (fabs((*meas.gyro).axes[0] > 0.1) ||
+      fabs((*meas.gyro).axes[1] > 0.1) ||
+      fabs((*meas.gyro).axes[2] > 0.1)) {
+    calibCount = 0;
+  }
+
+  // Run calibration for 5 seconds
+  if (calibCount == 5000) {
+    gyr.setGyrOffsets(gyrOffsets);
+    protocol::message::sensor_calibration_response_message_t m_gyrcal {
+      .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
+      .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
+    };
+    logger.write(m_gyrcal);
+
+    calibrated = true;
+  }
+
+  // Proceed to PRE_ARM if calibration done
+  if (calibrated) {
+    return PayloadState::PRE_ARM;
+  }
+
+  return PayloadState::DISARMED;
 }
 
 PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,0,4);   // Red 4 Hz
-
-  // Calibrate
-  groundAltitude = est.loc.alt;
-  // TODO(yoos): run sensor calibration here
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (healthy() && isArmed()) {
@@ -228,8 +261,9 @@ PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate e
       return PayloadState::APOGEE;
     }
     // Check for near-zero altitude change towards end of ascent (ideal case)
-    // and that we are not just undergoing a subsonic transition.
-    else if ((*meas.accel).axes[0] > -1.0) {
+    // and that we are not just undergoing a subsonic transition. We should
+    // also see a sudden forward acceleration due to the separation charge.
+    else if ((*meas.accel).axes[0] > 0.0) {
       return PayloadState::APOGEE;
     }
   }
@@ -255,13 +289,16 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
       drogueTime = 0.0;
     }
 
-    if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
+    if (drogueTime > 2.0 && (platform.get<PWMPlatform>().get(0) == 1.0)) {
       return PayloadState::ZERO_G;
     }
-    // TODO: What if payload doesn't separate?
+  }
+  else if (platform.get<PWMPlatform>().get(0) == 1.0) {
+    return PayloadState::ZERO_G;
   }
   else {
-    return PayloadState::ZERO_G;
+    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
+    return PayloadState::DESCENT;
   }
 
   sTime += unit_config::DT;
@@ -280,6 +317,15 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   // Run zero-g maneuver for 6 s.
   if (sTime < 0.5) {
     // Noop until we clear the shuttle and rocket
+  }
+  else if (sTime < 1.0) {
+    // If still connected to shuttle, fire drogue and skip to DESCENT.
+    static uint16_t noSepCount = 0;
+    noSepCount = ((*meas.accel).axes[0] < -0.2) ? noSepCount+1 : 0;
+    if (noSepCount > 200) {
+      platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
+      return PayloadState::DESCENT;
+    }
   }
   else if (sTime < 6.0) {
     if ((*meas.accel).axes[0] < 0.0 && throttle < 1.0) {
