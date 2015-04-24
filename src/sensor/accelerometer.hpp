@@ -11,8 +11,15 @@ struct AccelerometerReading {
 
 class Accelerometer : public Sensor {
 public:
+  Accelerometer();
   virtual void init() = 0;
   virtual AccelerometerReading readAccel() = 0;
+
+  void setAccOffsets(std::array<float, 3> newOffsets);
+  void clearAccOffsets(void);
+
+protected:
+  std::array<float, 3> accOffsets;
 };
 
 #endif
