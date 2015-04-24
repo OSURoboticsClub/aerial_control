@@ -46,7 +46,7 @@ struct UnitData {
           std::experimental::make_optional(&platform.get<Barometer>()),
           std::experimental::make_optional(&platform.get<GPS>()),
           platform.get<Gyroscope>(),
-          std::experimental::make_optional(&platform.get<Magnetometer>()),
+          std::experimental::nullopt,
           world, inputSource, motorMapper, communicator, logger,
           platform) {
   }
