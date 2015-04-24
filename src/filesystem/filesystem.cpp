@@ -105,6 +105,7 @@ bool FileSystem::open(char *fn) {
     return false;
   }
   chprintf(chp, " OK\r\n");
+  strcpy(fname, fn_full);
 
   return true;
 }
@@ -142,6 +143,14 @@ void FileSystem::write(uint8_t *buf, uint16_t len) {
     chprintf(chp, "write incomplete\r\n");
   }
   // TODO(yoos): On failure, reset logger to wait state
+}
+
+void FileSystem::getFn(char *buf) {
+  std::strcpy(buf, fname);
+}
+
+uint32_t FileSystem::getFileSize(void) {
+  return FileObject.fsize;
 }
 
 bool FileSystem::healthy(void) {

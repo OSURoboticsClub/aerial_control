@@ -1,7 +1,7 @@
 #include "filesystem/logger.hpp"
 
-Logger::Logger(SDCDriver& sdcd)
-  : writer(sdcd) {
+Logger::Logger(SDCDriver& sdcd, Communicator& communicator)
+  : writer(sdcd, communicator) {
 }
 
 void Logger::start(void) {

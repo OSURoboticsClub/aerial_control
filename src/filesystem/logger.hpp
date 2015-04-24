@@ -7,12 +7,13 @@
 #include "hal.h"
 #include "protocol/protocol.hpp"
 
+#include "communication/communicator.hpp"
 #include "filesystem/filesystem.hpp"
 #include "filesystem/fs_writer_thread.hpp"
 
 class Logger {
 public:
-  Logger(SDCDriver& sdcd);
+  Logger(SDCDriver& sdcd, Communicator& communicator);
 
   /**
    * Start writer threads.

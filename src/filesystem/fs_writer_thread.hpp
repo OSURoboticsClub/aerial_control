@@ -6,6 +6,8 @@
 #include "ch.hpp"
 #include "hal.h"
 
+#include "communication/communicator.hpp"
+#include "communication/rate_limited_stream.hpp"
 #include "filesystem/filesystem.hpp"
 
 /**
@@ -13,7 +15,7 @@
  */
 class FsWriterThread : public chibios_rt::BaseStaticThread<2048> {
 public:
-  FsWriterThread(SDCDriver& sdcd);
+  FsWriterThread(SDCDriver& sdcd, Communicator& communicator);
 
   msg_t main(void) override;
 
@@ -25,6 +27,7 @@ public:
 
 private:
   FileSystem fs;
+  RateLimitedStream fsInfoMessageStream;
 
   std::array<std::uint8_t, 20000> buffer;
   std::size_t bottom;

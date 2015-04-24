@@ -7,6 +7,7 @@
 #include "ff.h"
 
 #include <cstdint>
+#include <cstring>
 
 #define SDC_BURST_SIZE 8   // How many sectors to read at once
 
@@ -65,6 +66,16 @@ public:
   void write(uint8_t *c, uint16_t len);
 
   /**
+   * Get short filename
+   */
+  void getFn(char *buf);
+
+  /**
+   * Get file size
+   */
+  uint32_t getFileSize(void);
+
+  /**
    * Health check.
    */
   bool healthy(void);
@@ -75,6 +86,7 @@ private:
   void fillbuffer(uint8_t pattern, uint8_t *b);
   void fillbuffers(uint8_t pattern);
 
+  char fname[32];   // File name. TODO(yoos): I thought filinfo.lfname would give me this, but there's nothing there...
   FATFS SDC_FS;   // FS object
   bool_t fs_ready;   // FS mounted and ready
   FRESULT err;

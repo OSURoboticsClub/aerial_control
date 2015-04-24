@@ -22,7 +22,7 @@ msg_t ControlThread::main() {
   // Start the background threads
   static HeartbeatThread heartbeatThread;
   static Communicator communicator(primaryStream);
-  static Logger logger(sdcd);
+  static Logger logger(sdcd, communicator);
 
   heartbeatThread.start(LOWPRIO);
   communicator.start();
