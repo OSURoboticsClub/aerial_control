@@ -18,8 +18,7 @@ RocketSystem::RocketSystem(
     accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
-    imuStream(communicator, 10),   // TODO(yoos): calculate data link budget and increase if possible
-    systemStream(communicator, 5),
+    systemStream(communicator, 10),
     logger(logger),
     state(RocketState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
@@ -128,59 +127,40 @@ void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
 }
 
 void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  if (imuStream.ready()) {
-    protocol::message::imu_message_t m {
-      .time = ST2MS(chibios_rt::System::getTime()),
-      .gyro = {
-        (*meas.gyro).axes[0],
-        (*meas.gyro).axes[1],
-        (*meas.gyro).axes[2]
-      },
-      .accel = {
-        (*meas.accel).axes[0],
-        (*meas.accel).axes[1],
-        (*meas.accel).axes[2]
-      }
-    };
-
-    imuStream.publish(m);
+  uint8_t stateNum = 0;
+  switch (state) {
+  case RocketState::DISARMED:
+    stateNum = 0;
+    break;
+  case RocketState::PRE_ARM:
+    stateNum = 1;
+    break;
+  case RocketState::ARMED:
+    stateNum = 2;
+    break;
+  case RocketState::FLIGHT:
+    stateNum = 3;
+    break;
+  case RocketState::APOGEE:
+    stateNum = 4;
+    break;
+  case RocketState::DESCENT:
+    stateNum = 6;
+    break;
+  case RocketState::RECOVERY:
+    stateNum = 7;
+    break;
+  default:
+    break;
   }
 
+  protocol::message::system_message_t m {
+    .time = ST2MS(chibios_rt::System::getTime()),
+    .state = stateNum,
+    .motorDC = sp.throttle
+  };
+  logger.write(m);
   if (systemStream.ready()) {
-    uint8_t stateNum = 0;
-    switch (state) {
-    case RocketState::DISARMED:
-      stateNum = 0;
-      break;
-    case RocketState::PRE_ARM:
-      stateNum = 1;
-      break;
-    case RocketState::ARMED:
-      stateNum = 2;
-      break;
-    case RocketState::FLIGHT:
-      stateNum = 3;
-      break;
-    case RocketState::APOGEE:
-      stateNum = 4;
-      break;
-    case RocketState::DESCENT:
-      stateNum = 6;
-      break;
-    case RocketState::RECOVERY:
-      stateNum = 7;
-      break;
-    default:
-      break;
-    }
-
-    protocol::message::system_message_t m {
-      .time = ST2MS(chibios_rt::System::getTime()),
-      .state = stateNum,
-      .motorDC = sp.throttle
-    };
-    logger.write(m);
-
     systemStream.publish(m);
   }
 }

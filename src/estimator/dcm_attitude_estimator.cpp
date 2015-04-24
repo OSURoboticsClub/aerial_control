@@ -8,7 +8,7 @@
 
 DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator, Logger& logger)
   : dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 5),
+    attitudeMessageStream(communicator, 10),
     logger(logger) {
 }
 

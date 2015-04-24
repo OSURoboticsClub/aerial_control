@@ -30,7 +30,9 @@ public:
   WorldEstimate update(const SensorMeasurements& meas);
 
 private:
-  RateLimitedStream worldMessageStream;
+  RateLimitedStream raw1000MessageStream;
+  RateLimitedStream raw50MessageStream;
+  RateLimitedStream raw10MessageStream;
   Logger& logger;
 };
 

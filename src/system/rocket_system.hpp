@@ -78,7 +78,6 @@ private:
   MotorMapper& motorMapper;
   Platform& platform;
 
-  RateLimitedStream imuStream;
   RateLimitedStream systemStream;
   Logger& logger;
 
