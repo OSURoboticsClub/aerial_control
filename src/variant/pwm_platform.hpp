@@ -8,6 +8,7 @@ public:
   PWMPlatform();
 
   void set(std::uint8_t ch, float dc);
+  float get(std::uint8_t ch);
 };
 
 #endif
