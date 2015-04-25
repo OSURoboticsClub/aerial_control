@@ -257,13 +257,15 @@ PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate e
   // Apogee occurs after motor cutoff
   if (!powered) {
     // If falling faster than -40m/s, definitely deploy.
-    if (est.loc.dAlt < -40.0) {
-      return PayloadState::APOGEE;
-    }
+    //if (est.loc.dAlt < -40.0) {
+    //  return PayloadState::APOGEE;
+    //}
     // Check for near-zero altitude change towards end of ascent (ideal case)
     // and that we are not just undergoing a subsonic transition. We should
     // also see a sudden forward acceleration due to the separation charge.
-    else if ((*meas.accel).axes[0] > 0.0) {
+    static uint16_t sepCharge = 0;
+    sepCharge = ((*meas.accel).axes[0] > 0.0) ? sepCharge+1 : 0;
+    if (sepCharge > 100) {
       return PayloadState::APOGEE;
     }
   }
@@ -369,7 +371,7 @@ PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate 
   static int count = 1000;
   if (sTime < 1.0) {}
   // Enter recovery if altitude is unchanging and rotation rate is zero
-  else if (est.loc.dAlt > -2.0 &&
+  else if (//est.loc.dAlt > -2.0 &&
       fabs((*meas.gyro).axes[0] < 0.05) &&
       fabs((*meas.gyro).axes[1] < 0.05) &&
       fabs((*meas.gyro).axes[2] < 0.05)) {
