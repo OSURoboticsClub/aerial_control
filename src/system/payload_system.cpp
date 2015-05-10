@@ -105,7 +105,7 @@ bool PayloadSystem::healthy() {
   bool healthy = accel.healthy() && gyr.healthy();
 
   if(accelH) {
-    //healthy &= (*accelH)->healthy();
+    healthy &= (*accelH)->healthy();
   }
 
   if(bar) {

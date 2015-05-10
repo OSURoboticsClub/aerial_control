@@ -4,89 +4,55 @@
 #include "chprintf.h"
 
 void H3LIS331DL::init() {
-//  // Reset device.
-//  txbuf[0] = mpu9250::PWR_MGMT_1;
-//  txbuf[1] = 0x80;
-//  exchange(2);
-//
-//  chThdSleepMilliseconds(100);   // TODO(yoos): Check whether or not datasheet specifies this holdoff.
-//
-//  // Set sample rate to 1 kHz.
-//  txbuf[0] = mpu9250::SMPLRT_DIV;
-//  txbuf[1] = 0x00;
-//  exchange(2);
-//
-//  // Set DLPF to 4 (20 Hz gyro bandwidth1 Hz accelerometer bandwidth)
-//  txbuf[0] = mpu9250::CONFIG;
-//  txbuf[1] = 0x04;
-//  exchange(2);
-//
-//  // Wake up device and set clock source to Gyro Z.
-//  txbuf[0] = mpu9250::PWR_MGMT_1;
-//  txbuf[1] = 0x03;
-//  exchange(2);
-//
-//  // Set gyro full range to 2000 dps. We first read in the current register
-//  // value so we can change what we need and leave everything else alone.
-//  // See DS p. 12.
-//  txbuf[0] = mpu9250::GYRO_CONFIG | (1<<7);
-//  exchange(2);
-//  chThdSleepMicroseconds(0);   // TODO(yoos): Without this, the GYRO_CONFIG register does not get set. This was not the case in the old C firmware. Why?
-//  txbuf[0] = mpu9250::GYRO_CONFIG;
-//  txbuf[1] = (rxbuf[1] & ~0x18) | 0x18;
-//  exchange(2);
-//
-//  // Set accelerometer full range to 4 g. See DS p. 13.
-//  txbuf[0] = mpu9250::ACCEL_CONFIG | (1<<7);
-//  exchange(2);
-//  txbuf[0] = mpu9250::ACCEL_CONFIG;
-//  txbuf[1] = (rxbuf[1] & ~0x18) | 0x08;
-//  exchange(2);
-//
-//  // Read once to clear out bad data?
-//  readGyro();
-//  readAccel();
+  // Configure (DS p. 24-28)
+  txbuf[0] = h3lis331dl::CTRL_REG1 | (1<<6);   // Auto-increment address
+  txbuf[1] = 0b00111111;   // PM: normal mode, DR: 1000Hz, XYZ: enabled
+  txbuf[2] = 0b00000000;   // Defaults
+  txbuf[3] = 0b00000000;   // Defaults
+  txbuf[4] = 0b11110000;   // BDU: on, BLE: data MSB at lower addr, FS: 400g
+  txbuf[5] = 0b00000011;   // Turned on
+  exchange(6);
 }
 
 AccelerometerReading H3LIS331DL::readAccel() {
   AccelerometerReading reading;
-//
-//  // Poll gyro
-//  txbuf[0] = mpu9250::GYRO_XOUT_H | (1<<7);
-//  exchange(7);
-//
-//  // TODO(yoos): correct for thermal bias.
-//  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_X_OFFSET;
-//  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Y_OFFSET;
-//  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Z_OFFSET;
-//
-//  // Poll temp
-//  txbuf[0] = mpu9250::TEMP_OUT_H | (1<<7);
-//  exchange(3);
-//
-//  float temp = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 340 + 36.53;
-//
-//  // DEBUG
-//  //char dbg_buf[16];
-//  //for (int i=0; i<16; i++) {
-//  //  dbg_buf[i] = 0;
-//  //}
-//  //chsnprintf(dbg_buf, 12, "%0.6f\r\n", reading.axes[2]);
-//  //chnWriteTimeout((BaseChannel*)&SD3, (uint8_t*)dbg_buf, 12, MS2ST(20));
-//
+
+  // Poll status
+  // TODO(yoos): Do something useful with this
+  txbuf[0] = h3lis331dl::STATUS_REG | (1<<7);
+  exchange(2);
+  uint8_t status = rxbuf[1];
+
+  // Poll accel
+  txbuf[0] = h3lis331dl::OUT_X_L | (1<<7);
+  exchange(7);
+
+  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) * 400.0 / 32768 + accOffsets[0];
+  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) * 400.0 / 32768 + accOffsets[1];
+  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) * 400.0 / 32768 + accOffsets[2];
+
+  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
+  static int i=0;
+  if ((i++)%100 == 0) {
+    chprintf(chp, "H3: %6d %6d %6d\r\n", reading.axes[0], reading.axes[1], reading.axes[2]);
+  }
+
   return reading;
 }
 
 bool H3LIS331DL::healthy() {
-  static int i=0;
-  i=(i+1) % 100;
-  if (i%100==0) {
-    txbuf[0] = h3lis331dl::WHO_AM_I | (1<<7);
-    txbuf[1] = 0x00;
-    exchange(2);
+  txbuf[0] = h3lis331dl::WHO_AM_I | (1<<7);
+  txbuf[1] = 0x00;
+  exchange(2);
 
-    // TODO(yoos): This should return 0x32, but I'm getting 0x00 instead..
-    //chprintf((BaseSequentialStream*)&SD4, "H3: %x\r\n", rxbuf[1]);
+  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
+  static int i=0;
+  if ((i++)%100 == 0) {
+    chprintf(chp, "H3 whoami: %x\r\n", txbuf[1]);
+  }
+
+  if (txbuf[1] != 0x32) {
+    return false;
   }
 
   return true;
