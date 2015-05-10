@@ -12,12 +12,13 @@ FileSystem::FileSystem(SDCDriver& sdcd)
 
 bool FileSystem::connect(void) {
   BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
-  chprintf(chp, "Trying to connect SDIO...");
+  //chprintf(chp, "Trying to connect SDIO...");
   if (sdcConnect(&sdcd)) {
-    chprintf(chp, " failed\r\n");
+    // TODO(yoos): set FS error flag
+    //chprintf(chp, " failed\r\n");
     return false;
   }
-  chprintf(chp, " OK\r\n");
+  //chprintf(chp, " OK\r\n");
 
   return true;
 }
@@ -133,14 +134,17 @@ void FileSystem::write(uint8_t *buf, uint16_t len) {
   uint8_t teststring[] = {"This is a test file\r\n"};
   err = f_write(&FileObject, buf, len, (unsigned int*)&bytes_written);
   if (err != FR_OK) {
-    chprintf(chp, "write failed\r\n");
+    // TODO(yoos): set FS error flag
+    //chprintf(chp, "write failed\r\n");
   }
   err = f_sync(&FileObject);   // TODO(yoos): This ensures data gets written, but bad for performance...
   if (err != FR_OK) {
-    chprintf(chp, "sync failed\r\n");
+    // TODO(yoos): set FS error flag
+    //chprintf(chp, "sync failed\r\n");
   }
   if (bytes_written != len) {
-    chprintf(chp, "write incomplete\r\n");
+    // TODO(yoos): set FS error flag
+    //chprintf(chp, "write incomplete\r\n");
   }
   // TODO(yoos): On failure, reset logger to wait state
 }
