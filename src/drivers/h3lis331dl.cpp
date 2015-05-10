@@ -5,7 +5,7 @@
 
 void H3LIS331DL::init() {
   // Configure (DS p. 24-28)
-  txbuf[0] = h3lis331dl::CTRL_REG1 | (1<<6);   // Auto-increment address
+  txbuf[0] = h3lis331dl::CTRL_REG1 | (1<<6);   // Auto-increment write address
   txbuf[1] = 0b00111111;   // PM: normal mode, DR: 1000Hz, XYZ: enabled
   txbuf[2] = 0b00000000;   // Defaults
   txbuf[3] = 0b00000000;   // Defaults
@@ -24,7 +24,7 @@ AccelerometerReading H3LIS331DL::readAccel() {
   uint8_t status = rxbuf[1];
 
   // Poll accel
-  txbuf[0] = h3lis331dl::OUT_X_L | (1<<7);
+  txbuf[0] = h3lis331dl::OUT_X_L | (1<<7) | (1<<6);   // Auto-increment read address
   exchange(7);
 
   reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) * 400.0 / 32768 + accOffsets[0];
@@ -48,10 +48,10 @@ bool H3LIS331DL::healthy() {
   BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
   static int i=0;
   if ((i++)%100 == 0) {
-    chprintf(chp, "H3 whoami: %x\r\n", txbuf[1]);
+    chprintf(chp, "H3 whoami: %x\r\n", rxbuf[1]);
   }
 
-  if (txbuf[1] != 0x32) {
+  if (rxbuf[1] != 0x32) {
     return false;
   }
 
