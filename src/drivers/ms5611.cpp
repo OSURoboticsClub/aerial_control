@@ -81,25 +81,26 @@ BarometerReading MS5611::readBar() {
 }
 
 void MS5611::updatePT(void) {
+  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
   // Calculate temperature (-40 to 85 deg C with 0.01 deg resolution)
   int32_t dT = D2 - (C5 << 8);   // Actual temp - Reference temp
-  int32_t TEMP = 2000 + ((dT * C6) >> 23);   // 100x actual temperature
+  int32_t TEMP = 2000 + ((dT * C6) / 8388608);   // 100x actual temperature
 
   // Calculate temperature compensation offsets
-  int64_t OFF  = (C2 << 16) + ((C4 * dT) >> 7);   // Offset at actual temp
-  int64_t SENS = (C1 << 15) + ((C3 * dT) >> 8);   // Sensitivity at actual temp
+  int64_t OFF  = (C2 << 16) + ((dT * C4) / 128);   // Offset at actual temp
+  int64_t SENS = (C1 << 15) + ((dT * C3) / 256);   // Sensitivity at actual temp
 
   // Second-order temperature compensation
-  int32_t T2 = 0;
-  int64_t OFF2 = 0;
-  int64_t SENS2 = 0;
+  uint32_t T2 = 0;
+  uint64_t OFF2 = 0;
+  uint64_t SENS2 = 0;
   if (TEMP < 2000) {
     T2 = (dT * dT) >> 31;
-    OFF2 = (5 * (TEMP - 2000) * (TEMP - 2000)) >> 1;
+    OFF2  = (5 * (TEMP - 2000) * (TEMP - 2000)) >> 1;
     SENS2 = OFF2 >> 1;
   }
   if (TEMP < -1500) {
-    OFF2 += 7 * (TEMP + 1500) * (TEMP + 1500);
+    OFF2  +=   7 * (TEMP + 1500) * (TEMP + 1500);
     SENS2 += (11 * (TEMP + 1500) * (TEMP + 1500)) >> 1;
   }
   TEMP -= T2;
@@ -107,11 +108,12 @@ void MS5611::updatePT(void) {
   SENS -= SENS2;
 
   // Calculate pressure (10 to 1200 mbar with 0.01 mbar resolution)
-  int32_t P = (((D1 * SENS) >> 21) - OFF) >> 15;   // 100x temp-compensated pressure
-  //chprintf((BaseSequentialStream*)&SD4, "PT: %d %d\r\n", P, TEMP);
+  int32_t P = ((D1 * SENS / 2097152) - OFF) / 32768;   // 100x temp-compensated pressure
 
   pressure = P / 100.;
   temperature = TEMP / 100.;
+
+  chprintf(chp, "%lu %ld %f %f\r\n", D1, P, temperature, pressure);
 }
 
 bool MS5611::healthy() {
