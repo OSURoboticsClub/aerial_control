@@ -244,7 +244,7 @@ CanardState CanardSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
   PulseLED(1,0,0,4);   // Red 4 Hz
 
   static int buzzcount = 0;
-  platform.get<PWMPlatform>().set(PIN_BUZZER, 0.01 * (buzzcount<50));
+  platform.get<PWMPlatform>().set(PIN_BUZZER, 0.05 * (buzzcount<50));
   buzzcount = (buzzcount+1) % 2000;
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
@@ -405,7 +405,15 @@ CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 CanardState CanardSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   PulseLED(1,0,1,2);   // Violet 2 Hz
 
-  // Turn things off
+  // Beep loudly
+  static int buzzcount = 0;
+  if (buzzcount < 50 || (buzzcount > 100 && buzzcount < 150)) {
+    platform.get<PWMPlatform>().set(PIN_BUZZER, 0.2);
+  }
+  else {
+    platform.get<PWMPlatform>().set(PIN_BUZZER, 0);
+  }
+  buzzcount = (buzzcount+1) % 2000;
 
   sp.roll = 0.5;
   return CanardState::RECOVERY;
