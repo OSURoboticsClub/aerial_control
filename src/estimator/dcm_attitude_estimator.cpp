@@ -110,6 +110,12 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   float accelOffset = std::abs(1.0f - accel.norm());
   float accelWeight = -maxAccelWeight / validAccelRange * accelOffset + maxAccelWeight;
 
+  // Zero weight if correction would be too large. Specifically want to avoid
+  // rockets flipping on deceleration.
+  if (dcm.col(2).dot(accel) < 0) {
+    accelWeight = 0;
+  }
+
   // Limit weight to a minimum of 0
   accelWeight = std::max(0.0f, accelWeight);
 
