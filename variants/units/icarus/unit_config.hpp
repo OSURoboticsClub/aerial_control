@@ -36,7 +36,7 @@ const float ANGPOS_Z_KI = 0.0;
 const float ANGPOS_Z_KD = 0.0;
 
 // Initial angular velocity controller gains
-const float ANGVEL_X_KP = 0.2;   // TODO(yoos): Eyeballed on ground. Update after flight.
+const float ANGVEL_X_KP = 1.0;   // TODO(yoos): Eyeballed on ground. Update after flight.
 const float ANGVEL_X_KI = 0.0;
 const float ANGVEL_X_KD = 0.0;
 const float ANGVEL_Y_KP = 1.0;
