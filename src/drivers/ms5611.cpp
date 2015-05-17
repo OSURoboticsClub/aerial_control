@@ -113,7 +113,7 @@ void MS5611::updatePT(void) {
   pressure = P / 100.;
   temperature = TEMP / 100.;
 
-  chprintf(chp, "%lu %ld %f %f\r\n", D1, P, temperature, pressure);
+  //chprintf(chp, "%lu %ld %f %f\r\n", D1, P, temperature, pressure);
 }
 
 bool MS5611::healthy() {
