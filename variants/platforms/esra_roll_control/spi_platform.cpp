@@ -1,0 +1,23 @@
+#include "variant/spi_platform.hpp"
+
+#include "hal.h"
+
+SPIPlatform::SPIPlatform() {
+  // SPI3
+  palSetPadMode(GPIOB, 3, PAL_MODE_ALTERNATE(6) | PAL_STM32_OSPEED_HIGHEST);     // SPI3 SCK
+  palSetPadMode(GPIOB, 4, PAL_MODE_ALTERNATE(6) | PAL_STM32_OSPEED_HIGHEST);     // SPI3 MISO
+  palSetPadMode(GPIOB, 5, PAL_MODE_ALTERNATE(6) | PAL_STM32_OSPEED_HIGHEST);     // SPI3 MOSI
+
+  // SPI2
+  palSetPadMode(GPIOB, 13, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);    // SPI2 SCK
+  palSetPadMode(GPIOC, 2, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);     // SPI2 MISO
+  palSetPadMode(GPIOC, 3, PAL_MODE_ALTERNATE(5) | PAL_STM32_OSPEED_HIGHEST);     // SPI2 MOSI
+
+  // Slave Select
+  palSetPadMode(GPIOA,  4, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST); // H3LIS331DL CS
+  palSetPadMode(GPIOC, 13, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST); // MS5611 CS
+  palSetPadMode(GPIOC, 14, PAL_MODE_OUTPUT_PUSHPULL | PAL_STM32_OSPEED_HIGHEST); // MPU-9250 CS
+  palSetPad(GPIOA,  4);   // Unselect
+  palSetPad(GPIOC, 13);   // Unselect
+  palSetPad(GPIOC, 14);   // Unselect
+}
