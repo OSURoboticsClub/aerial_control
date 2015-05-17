@@ -1,8 +1,7 @@
 #include "variant/unit.hpp"
 
-Unit::Unit(Platform& platform, Communicator& communicator)
-  : data(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
-    platform.get<PWMPlatform>(), communicator) {
+Unit::Unit(Platform& platform, Communicator& communicator, Logger& logger)
+  : data(platform, communicator, logger) {
 }
 
 VehicleSystem& Unit::getSystem() {
