@@ -10,10 +10,9 @@ RocketAngularAccelerationController::RocketAngularAccelerationController()
     yawAccPid(unit_config::ANGACC_Z_KP, unit_config::ANGACC_Z_KI, unit_config::ANGACC_Z_KD) {
 }
 
-ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& world, const AngularAccelerationSetpoint& input) {
+ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& est, const AngularAccelerationSetpoint& input) {
   // Limit to maximum angular accelerations
   float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
-  float pitchAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.pitchAcc));
 
   // Constants
   const float M_PI = 3.1415926535;
@@ -27,7 +26,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& w
   const float I      = 1;              // TODO: Rocket rotational inertia
 
   // Sensor inputs
-  float alt = 1414;   // Altitude (m)
+  float alt = est.loc.alt;   // Altitude (m)
   float v_rocket = 50;   // TODO: Magically figure this out from sensors (m/s)
   // TODO: Expand estimate to full 12-space
 

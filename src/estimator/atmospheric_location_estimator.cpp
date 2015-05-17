@@ -5,6 +5,7 @@
 #include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
+#include "chprintf.h"
 
 // TODO: Initial location is not valid. Maybe we should be able to mark the
 // estimate as invalid until a GPS fix is found?
@@ -33,17 +34,40 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
     loc.lon = (*meas.gps).lon;
   }
 
-  // Altitude
-  static float lastAlt = 0.0;
+  // Calculate altitude only if barometer present
   if(meas.bar) {
+    static float lastAlt = 0.0;
     lastAlt = loc.alt;
+
+    // Barometer-based estimate
+    static float barAlt = 0.0;   // Barometric altitude
+    static float dBarAlt = 0.0;
     if ((*meas.bar).pressure > 12) {
       float newAlt = (pow((1000./(*meas.bar).pressure), 1/5.257) - 1) * ((*meas.bar).temperature + 273.15) / 0.0065;
-      loc.alt = 0.02*newAlt + 0.98*loc.alt;   // Moving average
+      barAlt = 0.01*newAlt + 0.99*barAlt;   // Moving average
+      dBarAlt = barAlt - newAlt;
     }
 
-    // Rate of change
-    loc.dAlt = (loc.alt - lastAlt) * 20.;   // 50 Hz altimetry
+    // Accelerometer-based estimate
+    static float accVel = 0.0;   // Vertical velocity from acceleration
+    static float accAlt = 0.0;   // Altitude integrated from acceleration
+    accVel += ((*meas.accel).axes[0]-1.0) * 9.80665 / 1000;   // Velocity in m/s
+    accAlt += accVel / 1000;   // Altitude in m
+
+    // Correct accel drift with barometer
+    accVel = 0.001*dBarAlt + 0.999*accVel;
+    accAlt = 0.001*barAlt  + 0.999*accAlt;
+
+    // Update final estimates
+    loc.alt = accAlt;
+    loc.dAlt = accVel;
+
+    static int i=0;
+    if (i == 0) {
+      BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
+      chprintf(chp, "%d: %8f %8f\r\n", chibios_rt::System::getTime(), loc.alt, loc.dAlt);
+    }
+    i = (i+1) % 10;
   }
 
   // Jerk
