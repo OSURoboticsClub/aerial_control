@@ -35,6 +35,7 @@ include variants/platforms/stm32f3discovery/Tupfile
 include variants/platforms/stm32f4discovery/Tupfile
 include variants/platforms/aerial_v3/Tupfile
 include variants/platforms/aerial_v4/Tupfile
+include variants/platforms/esra_roll_control/Tupfile
 include variants/platforms/rocket_v0.1/Tupfile
 
 # Units
