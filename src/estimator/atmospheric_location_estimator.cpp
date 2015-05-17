@@ -55,6 +55,14 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
     static float accAlt = 0.0;   // Altitude integrated from acceleration
     Eigen::Vector3f accVec((*meas.accel).axes.data());
     Eigen::Vector3f upVec(att.dcm[2], att.dcm[5], att.dcm[8]);   // Global "up" vector
+
+    // Use high-g accel on X axis if low-g accel is nearly capped out
+    if (meas.accelH) {
+      Eigen::Vector3f accHVec((*meas.accelH).axes.data());
+      if (accVec(0) > 15 || accVec(0) < -15) {
+        accVec(0) = accHVec(0);
+      }
+    }
     accVel += (accVec - upVec).dot(upVec) * 9.80665 / 1000;   // Velocity in m/s
     accAlt += accVel / 1000;   // Altitude in m
 
