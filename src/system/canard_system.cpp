@@ -302,13 +302,44 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   }
 
   // Run controller
-  AngularVelocitySetpoint velSp {
-    .rollVel = -(*meas.gyro).axes[0],
-    .pitchVel = 0,
-    .yawVel = 0,
-    .throttle = 0
-  };
-  sp = pipeline.run(est, velSp, attVelController, attAccController);
+  static float flightTime = 0.0;
+  if (flightTime < 3.0) {
+    AngularVelocitySetpoint velSp { 3.14159, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  else if (flightTime < 6.0) {
+    AngularVelocitySetpoint velSp { -3.14159, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  else if (flightTime < 7.0) {
+    AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  else if (flightTime < 8.0) {
+    AngularVelocitySetpoint velSp { 1, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  else if (flightTime < 9.0) {
+    AngularVelocitySetpoint velSp { -1, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  else if (flightTime < 11.0) {
+    AngularVelocitySetpoint velSp { 2, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  else if (flightTime < 13.0) {
+    AngularPositionSetpoint posSp { 0, 0, 0, 0 };
+    sp = pipeline.run(est, posSp, attPosController, attVelController, attAccController);
+  }
+  else if (flightTime < 17.0) {
+    AngularPositionSetpoint posSp { 3.14159, 0, 0, 0 };
+    sp = pipeline.run(est, posSp, attPosController, attVelController, attAccController);
+  }
+  else {
+    AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
+    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  }
+  flightTime += unit_config::DT;
 
   return CanardState::FLIGHT;
 }
@@ -340,6 +371,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   }
 
   sTime += unit_config::DT;
+  sp.roll = 0.5;
   return CanardState::APOGEE;
 }
 
@@ -366,6 +398,7 @@ CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate es
   }
 
   sTime += unit_config::DT;
+  sp.roll = 0.5;
   return CanardState::DESCENT;
 }
 
@@ -374,6 +407,7 @@ CanardState CanardSystem::RecoveryState(SensorMeasurements meas, WorldEstimate e
 
   // Turn things off
 
+  sp.roll = 0.5;
   return CanardState::RECOVERY;
 }
 
