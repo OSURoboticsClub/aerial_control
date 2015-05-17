@@ -119,6 +119,11 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
 AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& meas) {
   AttitudeEstimate estimate = {
     .time = ST2MS(chibios_rt::System::getTime()),
+    .dcm = {
+      dcm(0, 0), dcm(0, 1), dcm(0, 2),
+      dcm(1, 0), dcm(1, 1), dcm(1, 2),
+      dcm(2, 0), dcm(2, 1), dcm(2, 2)
+    },
 
     // TODO: Are these trig functions safe at extreme angles?
     .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),

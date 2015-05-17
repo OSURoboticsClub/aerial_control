@@ -1,6 +1,7 @@
 #ifndef LOCATION_ESTIMATOR_HPP_
 #define LOCATION_ESTIMATOR_HPP_
 
+#include "estimator/attitude_estimator.hpp"
 #include "sensor/sensor_measurements.hpp"
 
 struct LocationEstimate {
@@ -14,7 +15,7 @@ struct LocationEstimate {
 
 class LocationEstimator {
 public:
-  virtual LocationEstimate update(const SensorMeasurements& meas) = 0;
+  virtual LocationEstimate update(const SensorMeasurements& meas, const AttitudeEstimate& att) = 0;
 };
 
 #endif

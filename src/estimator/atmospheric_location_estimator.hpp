@@ -10,10 +10,10 @@ class AtmosphericLocationEstimator : public LocationEstimator {
 public:
   AtmosphericLocationEstimator(Communicator& communicator, Logger& logger);
 
-  LocationEstimate update(const SensorMeasurements& meas) override;
+  LocationEstimate update(const SensorMeasurements& meas, const AttitudeEstimate& att) override;
 
 private:
-  LocationEstimate makeEstimate(const SensorMeasurements& meas);
+  LocationEstimate makeEstimate(const SensorMeasurements& meas, const AttitudeEstimate& att);
 
   /**
    * Publish a new message to the output stream if necessary.

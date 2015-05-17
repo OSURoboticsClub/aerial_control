@@ -20,11 +20,10 @@ WorldEstimator::WorldEstimator(
 }
 
 WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
-  WorldEstimate estimate {
-    .sensors = meas,
-    .loc = locEstimator.update(meas),
-    .att = attEstimator.update(meas)
-  };
+  WorldEstimate estimate;
+  estimate.sensors = meas;
+  estimate.att = attEstimator.update(meas);
+  estimate.loc = locEstimator.update(meas, estimate.att);
 
   // Log 1 kHz stream
   protocol::message::raw_1000_message_t msg_1000 {

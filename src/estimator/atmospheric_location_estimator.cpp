@@ -3,6 +3,7 @@
 
 #include "ch.hpp"
 #include "protocol/messages.hpp"
+#include "Eigen/Dense"
 
 #include "unit_config.hpp"
 #include "chprintf.h"
@@ -15,14 +16,14 @@ AtmosphericLocationEstimator::AtmosphericLocationEstimator(Communicator& communi
     logger(logger) {
 }
 
-LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& meas) {
-  makeEstimate(meas);
+LocationEstimate AtmosphericLocationEstimator::update(const SensorMeasurements& meas, const AttitudeEstimate& att) {
+  makeEstimate(meas, att);
   updateStream();
 
   return loc;
 }
 
-LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas) {
+LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurements& meas, const AttitudeEstimate& att) {
   // TODO: Ideally, we could integrate perfectly continuous IMU data to get
   // a perfect location fix. Since we have to deal with discrete timesteps,
   // figure out how to throw GPS and barometer readings into the mix for error
@@ -41,33 +42,37 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
 
     // Barometer-based estimate
     static float barAlt = 0.0;   // Barometric altitude
-    static float dBarAlt = 0.0;
+    static float barVel = 0.0;
     if ((*meas.bar).pressure > 12) {
       float newAlt = (pow((1000./(*meas.bar).pressure), 1/5.257) - 1) * ((*meas.bar).temperature + 273.15) / 0.0065;
       barAlt = 0.01*newAlt + 0.99*barAlt;   // Moving average
-      dBarAlt = barAlt - newAlt;
+      barVel = barAlt - newAlt;
     }
 
-    // Accelerometer-based estimate
+    // Accelerometer-based estimate - use the global up vector to estimate
+    // vertical component of rocket acceleration.
     static float accVel = 0.0;   // Vertical velocity from acceleration
     static float accAlt = 0.0;   // Altitude integrated from acceleration
-    accVel += ((*meas.accel).axes[0]-1.0) * 9.80665 / 1000;   // Velocity in m/s
+    Eigen::Vector3f accVec((*meas.accel).axes.data());
+    Eigen::Vector3f upVec(att.dcm[2], att.dcm[5], att.dcm[8]);   // Global "up" vector
+    accVel += (accVec - upVec).dot(upVec) * 9.80665 / 1000;   // Velocity in m/s
     accAlt += accVel / 1000;   // Altitude in m
 
     // Correct accel drift with barometer
-    accVel = 0.001*dBarAlt + 0.999*accVel;
-    accAlt = 0.001*barAlt  + 0.999*accAlt;
+    accVel = 0.001*barVel + 0.999*accVel;   // A bit iffy because both terms are derived values
+    accAlt = 0.001*barAlt + 0.999*accAlt;
 
     // Update final estimates
     loc.alt = accAlt;
     loc.dAlt = accVel;
 
-    static int i=0;
-    if (i == 0) {
-      BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
-      chprintf(chp, "%d: %8f %8f\r\n", chibios_rt::System::getTime(), loc.alt, loc.dAlt);
-    }
-    i = (i+1) % 10;
+    // DEBUG
+    //static int i=0;
+    //if (i == 0) {
+    //  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
+    //  chprintf(chp, "%d: %8f %8f\r\n", chibios_rt::System::getTime(), loc.alt, loc.dAlt);
+    //}
+    //i = (i+1) % 10;
   }
 
   // Jerk
