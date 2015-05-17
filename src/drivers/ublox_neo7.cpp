@@ -33,7 +33,7 @@ GPSReading UBloxNEO7::readGPS() {
   //loop = (loop+1) % 100;
 
   // Check if a full line is ready to be processed
-  GPGLLMessage message;
+  static GPGLLMessage message;
   static int position = 0;
   if(len > 0) {
     char *start = reinterpret_cast<char *>(rxbuf.data());
@@ -70,6 +70,15 @@ GPSReading UBloxNEO7::readGPS() {
             break;
         };
       }
+      return GPSReading {
+        // Make sure we got all parts of the message. If fields are omitted in
+        // the message then `strtok` will skip over repeated delimiters and the
+        // above loop will complete before all delimiters were found.
+        .valid = message.valid && position == 7,
+        .lat = dmd2float(message.lat, message.latDir),
+        .lon = dmd2float(message.lon, message.lonDir),
+        .utc = message.utc
+      };
     }
   }
 
