@@ -38,7 +38,7 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
   if(meas.bar) {
     lastAlt = loc.alt;
     if ((*meas.bar).pressure > 12) {
-      float newAlt = (pow((1000./(*meas.bar).pressure), 1/5.257) - 1) * ((*meas.bar).temperature + 273.15) / 0.0065;
+      float newAlt = (std::pow((1000./(*meas.bar).pressure), 1/5.257) - 1) * ((*meas.bar).temperature + 273.15) / 0.0065;
       loc.alt = 0.02*newAlt + 0.98*loc.alt;   // Moving average
     }
 
