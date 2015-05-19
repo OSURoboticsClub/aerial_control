@@ -5,6 +5,7 @@
 #include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
+#include <cmath>
 
 // TODO: Initial location is not valid. Maybe we should be able to mark the
 // estimate as invalid until a GPS fix is found?
