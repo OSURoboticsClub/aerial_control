@@ -110,6 +110,12 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   float accelOffset = std::abs(1.0f - accel.norm());
   float accelWeight = -maxAccelWeight / validAccelRange * accelOffset + maxAccelWeight;
 
+  // Zero weight if correction would be too large. Specifically want to avoid
+  // rockets flipping on deceleration.
+  if (dcm.col(2).dot(accel) < 0) {
+    accelWeight = 0;
+  }
+
   // Limit weight to a minimum of 0
   accelWeight = std::max(0.0f, accelWeight);
 
@@ -119,6 +125,11 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
 AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& meas) {
   AttitudeEstimate estimate = {
     .time = ST2MS(chibios_rt::System::getTime()),
+    .dcm = {
+      dcm(0, 0), dcm(0, 1), dcm(0, 2),
+      dcm(1, 0), dcm(1, 1), dcm(1, 2),
+      dcm(2, 0), dcm(2, 1), dcm(2, 2)
+    },
 
     // TODO: Are these trig functions safe at extreme angles?
     .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),

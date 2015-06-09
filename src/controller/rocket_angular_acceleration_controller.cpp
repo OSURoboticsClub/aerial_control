@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "unit_config.hpp"
+#include "chprintf.h"
 
 RocketAngularAccelerationController::RocketAngularAccelerationController()
   : rollAccPid(unit_config::ANGACC_X_KP, unit_config::ANGACC_X_KI, unit_config::ANGACC_X_KD),
@@ -10,10 +11,9 @@ RocketAngularAccelerationController::RocketAngularAccelerationController()
     yawAccPid(unit_config::ANGACC_Z_KP, unit_config::ANGACC_Z_KI, unit_config::ANGACC_Z_KD) {
 }
 
-ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& world, const AngularAccelerationSetpoint& input) {
+ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& est, const AngularAccelerationSetpoint& input) {
   // Limit to maximum angular accelerations
   float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
-  float pitchAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.pitchAcc));
 
   // Constants
   const float M_PI = 3.1415926535;
@@ -27,15 +27,19 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& w
   const float I      = 1;              // TODO: Rocket rotational inertia
 
   // Sensor inputs
-  float alt = 1414;   // Altitude (m)
-  float v_rocket = 50;   // TODO: Magically figure this out from sensors (m/s)
+  //float alt = est.loc.alt;   // Altitude (m)
+  float v_rocket = est.loc.dAlt;   // Vertical velocity (m/s)   TODO(yoos): no position data, so we assume lateral speed is negligible.
   // TODO: Expand estimate to full 12-space
+  float pressure = 100*(*est.sensors.bar).pressure;   // Pressure (Pa)
+  float temp = 273.15 + (*est.sensors.bar).temperature;   // Absolute temperature (K)   TODO: add external thermistor
 
-  // Calculate atmospheric pressure. We should eventually get this from MS5611.
-  // Eq. 9 from "A Quick Derivation relating altitude to air pressure", PSAS,
-  // 2004.
-  float pressure = 100*pow((44331.514-alt)/11880.516, 5.255877);   // Pressure (Pa)
-  float temp = 273.15;   // Absolute temperature (K)   TODO: add external thermistor
+  // DEBUG
+  //static int i=0;
+  //if (i==0) {
+  //  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
+  //  chprintf(chp, "%d: %f %f %f\r\n", chibios_rt::System::getTime(), v_rocket, pressure, temp);
+  //}
+  //i = (i+1) % 50;
 
   // Calculate air density, speed of sound
   float p_air = pressure/(287.058*temp);   // Air density from ideal gas law (kg/m^3)
@@ -68,6 +72,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& w
   float F_L = torque / (F_NUM * F_D);   // Force required per fin (N)
 
   // Lift coefficient
+  v_rocket = std::max(100.0f, v_rocket);   // Prevent ridiculously large C_L
   float C_L = 2*F_L/(p_air * pow(v_rocket,2) * F_AREA);   // Subsonic
   //float C_L = (2 * M_PI * m) / (E * beta);   // Supersonic
 
