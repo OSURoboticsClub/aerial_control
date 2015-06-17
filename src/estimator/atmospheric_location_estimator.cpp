@@ -106,5 +106,10 @@ void AtmosphericLocationEstimator::updateStream() {
     locationMessageStream.publish(m);
   }
 
-  logger.write(m);
+  // Downsample logging to 100 Hz
+  static int i=0;
+  if (i % 10 == 0) {
+    logger.write(m);
+  }
+  i = (i+1) % 1000;
 }

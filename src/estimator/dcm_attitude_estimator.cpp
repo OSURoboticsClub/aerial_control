@@ -174,5 +174,12 @@ void DCMAttitudeEstimator::updateStream() {
     attitudeMessageStream.publish(m);
   }
 
-  logger.write(m);
+  // Full-resolution attitude log by itself accounts for nearly half of all
+  // logging. Downsample to 100 Hz so the filesystem has an easier time keeping
+  // up.
+  static int i=0;
+  if (i % 10 == 0) {
+    logger.write(m);
+  }
+  i = (i+1) % 1000;
 }
