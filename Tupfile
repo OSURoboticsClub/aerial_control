@@ -44,6 +44,7 @@ include variants/units/apollo/Tupfile
 include variants/units/celestep/Tupfile
 include variants/units/celestep2/Tupfile
 include variants/units/celester/Tupfile
+include variants/units/celester2/Tupfile
 include variants/units/helios/Tupfile
 include variants/units/hera/Tupfile
 include variants/units/hestia/Tupfile
