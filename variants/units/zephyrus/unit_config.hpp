@@ -39,13 +39,13 @@ const float ANGPOS_Z_KI = 0.0;
 const float ANGPOS_Z_KD = 0.0;
 
 // Initial angular velocity controller gains
-const float ANGVEL_X_KP = 1.0;
+const float ANGVEL_X_KP = 0.1;
 const float ANGVEL_X_KI = 0.0;
 const float ANGVEL_X_KD = 0.0;
-const float ANGVEL_Y_KP = 1.0;
+const float ANGVEL_Y_KP = 0.1;
 const float ANGVEL_Y_KI = 0.0;
 const float ANGVEL_Y_KD = 0.0;
-const float ANGVEL_Z_KP = 1.0;
+const float ANGVEL_Z_KP = 0.1;
 const float ANGVEL_Z_KI = 0.0;
 const float ANGVEL_Z_KD = 0.0;
 

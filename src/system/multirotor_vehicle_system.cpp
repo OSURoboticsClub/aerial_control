@@ -1,20 +1,18 @@
 #include "system/multirotor_vehicle_system.hpp"
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
-    Gyroscope& gyroscope,
-    Accelerometer& accelerometer,
+    Gyroscope& gyr,
+    Accelerometer& acc,
+    optional<Barometer *> bar,
     optional<GPS *> gps,
-    optional<Magnetometer *> magnetometer,
+    optional<Magnetometer *> mag,
     WorldEstimator& estimator,
     InputSource& inputSource,
     MotorMapper& motorMapper,
     Communicator& communicator)
   : VehicleSystem(communicator),
     MessageListener(communicator),
-    gyroscope(gyroscope),
-    accelerometer(accelerometer),
-    gps(gps),
-    magnetometer(magnetometer),
+    gyr(gyr), acc(acc), bar(bar), gps(gps), mag(mag),
     estimator(estimator),
     inputSource(inputSource),
     motorMapper(motorMapper),
@@ -26,23 +24,15 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
 
 void MultirotorVehicleSystem::update() {
   // Poll the gyroscope and accelerometer
-  GyroscopeReading gyroReading = gyroscope.readGyro();
-  AccelerometerReading accelReading = accelerometer.readAccel();
-  optional<MagnetometerReading> magReading;
+  GyroscopeReading gyroReading = gyr.readGyro();
+  AccelerometerReading accelReading = acc.readAccel();
+  optional<BarometerReading> barReading;
   optional<GPSReading> gpsReading;
+  optional<MagnetometerReading> magReading;
 
-  // Only use magnetometer if it is available
-  if(magnetometer) {
-    magReading = (*magnetometer)->readMag();
-  }
-
-  if (gps) {
-    static int i=0;
-    if (i++ % 100 == 0) {
-      // TODO(yoos): GPS read makes board freeze
-      //gpsReading = (*gps)->readGPS();
-    }
-  }
+  if (bar) barReading = (*bar)->readBar();
+  if (gps) gpsReading = (*gps)->readGPS();
+  if (mag) magReading = (*mag)->readMag();
 
   // TODO: Currently copying all readings
   SensorMeasurements meas {
@@ -63,7 +53,7 @@ void MultirotorVehicleSystem::update() {
 
   // Run the controllers
   ActuatorSetpoint actuatorSp;
-  if(isArmed() && input.valid) {
+  if (isArmed() && input.valid) {
     // Run the controller pipeline as determined by the subclass
     switch(mode) {
       case MultirotorControlMode::POSITION: {
@@ -112,14 +102,18 @@ void MultirotorVehicleSystem::update() {
 }
 
 bool MultirotorVehicleSystem::healthy() {
-  bool healthy = gyroscope.healthy() && accelerometer.healthy();
+  bool healthy = gyr.healthy() && acc.healthy();
+
+  if(bar) {
+    healthy &= (*bar)->healthy();
+  }
 
   if(gps) {
     healthy &= (*gps)->healthy();
   }
 
-  if(magnetometer) {
-    healthy &= (*magnetometer)->healthy();
+  if(mag) {
+    healthy &= (*mag)->healthy();
   }
 
   return healthy;

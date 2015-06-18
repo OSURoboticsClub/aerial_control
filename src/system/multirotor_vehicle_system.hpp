@@ -39,10 +39,11 @@ enum class MultirotorControlMode {
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(
-      Gyroscope& gyroscope,
-      Accelerometer& accelerometer,
+      Gyroscope& gyr,
+      Accelerometer& acc,
+      optional<Barometer *> bar,
       optional<GPS *> gps,
-      optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
+      optional<Magnetometer *> mag, // TODO: Use reference_wrapper?
       WorldEstimator& estimator,
       InputSource& inputSource,
       MotorMapper& motorMapper,
@@ -54,10 +55,11 @@ public:
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
-  Gyroscope& gyroscope;
-  Accelerometer& accelerometer;
+  Gyroscope& gyr;
+  Accelerometer& acc;
+  optional<Barometer *> bar;
   optional<GPS *> gps;
-  optional<Magnetometer *> magnetometer;
+  optional<Magnetometer *> mag;
 
   WorldEstimator& estimator;
   InputSource& inputSource;
