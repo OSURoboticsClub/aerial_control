@@ -39,15 +39,27 @@ MPU9250& Platform::get() {
 }
 
 template <>
+MS5611& Platform::get() {
+  static MS5611 bar(&SPID3, &MS5611_CONFIG);
+  return bar;
+}
+
+template <>
 UBloxNEO7& Platform::get() {
   static UBloxNEO7 gps(&SD6);
   return gps;
 }
 
 template <> Accelerometer& Platform::get() { return get<MPU9250>(); }
-template <> Barometer&     Platform::get() { return get<MS5611(); }
+template <> Barometer&     Platform::get() { return get<MS5611>(); }
 template <> GPS&           Platform::get() { return get<UBloxNEO7>(); }
 template <> Gyroscope&     Platform::get() { return get<MPU9250>(); }
+
+template <>
+DigitalPlatform& Platform::get() {
+  static DigitalPlatform digPlatform;
+  return digPlatform;
+}
 
 template <>
 I2CPlatform& Platform::get() {
