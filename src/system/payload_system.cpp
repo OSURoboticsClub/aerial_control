@@ -34,7 +34,7 @@ void PayloadSystem::update() {
   //}
   //time = (time+1) % 1000;
 
-  // Poll the gyroscope and accelerometer
+  // Poll sensors
   AccelerometerReading accelReading = accel.readAccel();
   GyroscopeReading gyrReading = gyr.readGyro();
   optional<AccelerometerReading> accelHReading;
@@ -47,7 +47,7 @@ void PayloadSystem::update() {
   if (bar)    barReading    = (*bar)->readBar();
   if (ggr)    ggrReading    = (*ggr)->readGeiger();
   if (gps)    gpsReading    = (*gps)->readGPS();
-  //if (mag)    magReading    = (*mag)->readMag();
+  if (mag)    magReading    = (*mag)->readMag();
 
   SensorMeasurements meas {
     .accel  = std::experimental::make_optional(accelReading),
@@ -82,8 +82,8 @@ void PayloadSystem::update() {
   case PayloadState::APOGEE:
     state = ApogeeState(meas, estimate, actuatorSp);
     break;
-  case PayloadState::ZERO_G:
-    state = ZeroGState(meas, estimate, actuatorSp);
+  case PayloadState::MICROGRAVITY:
+    state = MicrogravityState(meas, estimate, actuatorSp);
     break;
   case PayloadState::DESCENT:
     state = DescentState(meas, estimate, actuatorSp);
@@ -132,43 +132,15 @@ bool PayloadSystem::healthy() {
 }
 
 void PayloadSystem::on(const protocol::message::set_arm_state_message_t& m) {
-  setArmed(m.armed);
+  if (state == PayloadState::PRE_ARM) {
+    setArmed(m.armed);
+  }
 }
 
 void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  uint8_t stateNum = 0;
-  switch (state) {
-  case PayloadState::DISARMED:
-    stateNum = 0;
-    break;
-  case PayloadState::PRE_ARM:
-    stateNum = 1;
-    break;
-  case PayloadState::ARMED:
-    stateNum = 2;
-    break;
-  case PayloadState::FLIGHT:
-    stateNum = 3;
-    break;
-  case PayloadState::APOGEE:
-    stateNum = 4;
-    break;
-  case PayloadState::ZERO_G:
-    stateNum = 5;
-    break;
-  case PayloadState::DESCENT:
-    stateNum = 6;
-    break;
-  case PayloadState::RECOVERY:
-    stateNum = 7;
-    break;
-  default:
-    break;
-  }
-
   protocol::message::system_message_t m {
     .time = ST2MS(chibios_rt::System::getTime()),
-    .state = stateNum,
+    .state = (int) state,
     .motorDC = sp.throttle
   };
   logger.write(m);
@@ -178,15 +150,21 @@ void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Ac
 }
 
 PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,0,1);   // Red 1 Hz
+  PulseLED(0,1,0,1);   // Green 1 Hz
 
   static bool calibrated = false;
   static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets {0,0,0};
-  static std::array<float, 3> accOffsets {0,0,0};
+  static std::array<float, 3> gyrOffsets {unit_config::GYR_X_OFFSET, unit_config::GYR_Y_OFFSET, unit_config::GYR_Z_OFFSET};
+  static std::array<float, 3> accOffsets {unit_config::ACC_X_OFFSET, unit_config::ACC_Y_OFFSET, unit_config::ACC_Z_OFFSET};
+  static std::array<float, 3> acchOffsets {unit_config::ACCH_X_OFFSET, unit_config::ACCH_Y_OFFSET, unit_config::ACCH_Z_OFFSET};
 
   // Calibrate ground altitude
   groundAltitude = est.loc.alt;
+
+  // Calibrate accelerometers
+  // TODO(yoos): Implement calibration routine once we have persistent params
+  accel.setAccOffsets(accOffsets);
+  (*accelH)->setAccOffsets(acchOffsets);
 
   // Calibrate gyroscope
   for (int i=0; i<3; i++) {
@@ -222,7 +200,7 @@ PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate
 }
 
 PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,0,4);   // Red 4 Hz
+  PulseLED(0,1,0,4);   // Green 4 Hz
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (healthy() && isArmed()) {
@@ -233,17 +211,16 @@ PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate e
 }
 
 PayloadState PayloadSystem::ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  SetLED(1,0,0);   // Red
-
-  static int count = 10;
-  count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
+  SetLED(0,1,0);   // Green
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(healthy() && isArmed())) {
     return PayloadState::PRE_ARM;
   }
 
-  // Proceed to FLIGHT on 1.1g sense on X axis.
+  // Proceed to FLIGHT on 1.2g sense on X axis.
+  static int count = 10;
+  count = ((*meas.accel).axes[0] > 1.2) ? (count-1) : 10;
   if (count == 0) {
     return PayloadState::FLIGHT;
   }
@@ -259,19 +236,16 @@ PayloadState PayloadSystem::FlightState(SensorMeasurements meas, WorldEstimate e
   static int count = 100;
   if (powered) {
     count = ((*meas.accel).axes[0] < 0.0) ? (count-1) : 100;
-    powered = (count == 0) ? false : true;
+    if (count == 0) powered = false;
   }
 
-  // Apogee occurs after motor cutoff
+  // Apogee occurs after motor cutoff. Payload apogee detection is simplified
+  // to detecting the sudden forward acceleration caused by the main separation
+  // event triggered by the rocket avionics.
   if (!powered) {
-    // If falling faster than -40m/s, definitely deploy.
-    if (est.loc.dAlt < -40.0) {
-      return PayloadState::APOGEE;
-    }
-    // Check for near-zero altitude change towards end of ascent (ideal case)
-    // and that we are not just undergoing a subsonic transition. We should
-    // also see a sudden forward acceleration due to the separation charge.
-    else if ((*meas.accel).axes[0] > 0.0) {
+    static uint8_t mainSepCount = 10;
+    mainSepCount = ((*meas.accel).axes[0] > 0.0) ? mainSepCount-1 : 10;
+    if (mainSepCount == 0) {
       return PayloadState::APOGEE;
     }
   }
@@ -283,29 +257,16 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
 
-  // Count continuous time under drogue
-  // TODO(yoos): We might still see this if partially deployed and spinning
-  // around..
-  static float drogueTime = 0.0;
-
-  // Wait until successful drogue deployment or 5 seconds max.
-  if (sTime < 5.0) {
-    if ((*meas.accel).axes[0] < -0.3) {
-      drogueTime += unit_config::DT;
-    }
-    else {
-      drogueTime = 0.0;
-    }
-
-    if (drogueTime > 2.0 && (platform.get<PWMPlatform>().get(0) == 1.0)) {
-      return PayloadState::ZERO_G;
-    }
+  // Wait for separation event to complete
+  if (sTime < 0.5) {
+    // Noop
   }
+  // Check for microswitch
   else if (platform.get<PWMPlatform>().get(0) == 1.0) {
-    return PayloadState::ZERO_G;
+    return PayloadState::MICROGRAVITY;
   }
+  // Something's wrong, skip microgravity
   else {
-    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
     return PayloadState::DESCENT;
   }
 
@@ -313,28 +274,16 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   return PayloadState::APOGEE;
 }
 
-PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
+PayloadState PayloadSystem::MicrogravityState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   RGBLED(2);   // Rainbows!
   static float sTime = 0.0;   // State time
   static float throttle = 0.0;
 
-  // Release shuttle
-  platform.get<DigitalPlatform>().set(PIN_SHUTTLE1_CH, true);
-  platform.get<DigitalPlatform>().set(PIN_SHUTTLE2_CH, true);
-
-  // Run zero-g maneuver for 6 s.
-  if (sTime < 0.5) {
-    // Noop until we clear the shuttle and rocket
+  // Wait to clear rocket
+  if (sTime < 2.0) {
+    // Noop
   }
-  else if (sTime < 1.0) {
-    // If still connected to shuttle, fire drogue and skip to DESCENT.
-    static uint16_t noSepCount = 0;
-    noSepCount = ((*meas.accel).axes[0] < -0.2) ? noSepCount+1 : 0;
-    if (noSepCount > 200) {
-      platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
-      return PayloadState::DESCENT;
-    }
-  }
+  // Run microgravity maneuver for 6 s.
   else if (sTime < 6.0) {
     if ((*meas.accel).axes[0] < 0.0 && throttle < 1.0) {
       throttle += 0.001;
@@ -351,12 +300,12 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
   else if (sTime < 10.0) {
     // Fire drogue pyro
     platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
-    if ((*meas.accel).axes[0] < -10.0) {   // Large negative acceleration due to proper drogue deployment
+    if ((*meas.accel).axes[0] < -5.0) {   // Large negative acceleration due to proper drogue deployment
       return PayloadState::DESCENT;
     }
   }
   else {
-    // We would deploy main here, but payload avionics doesn't have room.
+    // If payload had one, we would deploy the main chute here.
     return PayloadState::DESCENT;
   }
 
@@ -364,14 +313,14 @@ PayloadState PayloadSystem::ZeroGState(SensorMeasurements meas, WorldEstimate es
 
   // Outputs
   sp.throttle = throttle;
-  return PayloadState::ZERO_G;
+  return PayloadState::MICROGRAVITY;
 }
 
 PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  SetLED(1,0,1);   // Violet
+  PulseLED(1,0,1,1);   // Violet 1 Hz
   static float sTime = 0.0;   // State time
 
-  // Payload does not control its own main.
+  // If payload had one, we would deploy main at 1500' AGL.
 
   // Stay for at least 1 s
   static int count = 1000;
@@ -396,7 +345,7 @@ PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate 
 }
 
 PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,1,2);   // Violet 2 Hz
+  PulseLED(1,1,1,2);   // White 2 Hz
 
   // Turn things off
   platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);

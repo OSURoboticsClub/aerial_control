@@ -34,7 +34,7 @@ void RocketSystem::update() {
   //}
   //time = (time+1) % 1000;
 
-  // Poll the gyroscope and accelerometer
+  // Poll sensors
   AccelerometerReading accelReading = accel.readAccel();
   GyroscopeReading gyrReading = gyr.readGyro();
   optional<AccelerometerReading> accelHReading;
@@ -47,7 +47,7 @@ void RocketSystem::update() {
   if (bar)    barReading    = (*bar)->readBar();
   if (ggr)    ggrReading    = (*ggr)->readGeiger();
   if (gps)    gpsReading    = (*gps)->readGPS();
-  //if (mag)    magReading    = (*mag)->readMag();
+  if (mag)    magReading    = (*mag)->readMag();
 
   SensorMeasurements meas {
     .accel  = std::experimental::make_optional(accelReading),
@@ -103,16 +103,14 @@ void RocketSystem::update() {
 }
 
 bool RocketSystem::healthy() {
-  // TODO(yoos): Most of the health checks here are disabled due to a broken av
-  // bay SPI bus. Reenable on next hardware revision.
-  bool healthy = true;//accel.healthy() && gyr.healthy();
+  bool healthy = accel.healthy() && gyr.healthy();
 
   if(accelH) {
-    //healthy &= (*accelH)->healthy();
+    healthy &= (*accelH)->healthy();
   }
 
   if(bar) {
-    //healthy &= (*bar)->healthy();
+    healthy &= (*bar)->healthy();
   }
 
   if(ggr) {
@@ -124,47 +122,22 @@ bool RocketSystem::healthy() {
   }
 
   if(mag) {
-    //healthy &= (*mag)->healthy();
+    healthy &= (*mag)->healthy();
   }
 
   return healthy;
 }
 
 void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
-  setArmed(m.armed);
+  if (state == RocketState::PRE_ARM) {
+    setArmed(m.armed);
+  }
 }
 
 void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  uint8_t stateNum = 0;
-  switch (state) {
-  case RocketState::DISARMED:
-    stateNum = 0;
-    break;
-  case RocketState::PRE_ARM:
-    stateNum = 1;
-    break;
-  case RocketState::ARMED:
-    stateNum = 2;
-    break;
-  case RocketState::FLIGHT:
-    stateNum = 3;
-    break;
-  case RocketState::APOGEE:
-    stateNum = 4;
-    break;
-  case RocketState::DESCENT:
-    stateNum = 6;
-    break;
-  case RocketState::RECOVERY:
-    stateNum = 7;
-    break;
-  default:
-    break;
-  }
-
   protocol::message::system_message_t m {
     .time = ST2MS(chibios_rt::System::getTime()),
-    .state = stateNum,
+    .state = (int) state,
     .motorDC = sp.throttle
   };
   logger.write(m);
@@ -174,18 +147,57 @@ void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Act
 }
 
 RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,0,1);   // Red 1 Hz
+  PulseLED(0,1,0,1);   // Green 1 Hz
 
-  // Proceed directly to PRE_ARM for now.
-  return RocketState::PRE_ARM;
+  static bool calibrated = false;
+  static int calibCount = 0;
+  static std::array<float, 3> gyrOffsets {unit_config::GYR_X_OFFSET, unit_config::GYR_Y_OFFSET, unit_config::GYR_Z_OFFSET};
+  static std::array<float, 3> accOffsets {unit_config::ACC_X_OFFSET, unit_config::ACC_Y_OFFSET, unit_config::ACC_Z_OFFSET};
+  static std::array<float, 3> acchOffsets {unit_config::ACCH_X_OFFSET, unit_config::ACCH_Y_OFFSET, unit_config::ACCH_Z_OFFSET};
+
+  // Calibrate ground altitude
+  groundAltitude = est.loc.alt;
+
+  // Calibrate accelerometers
+  // TODO(yoos): Implement calibration routine once we have persistent params
+  accel.setAccOffsets(accOffsets);
+  (*accelH)->setAccOffsets(acchOffsets);
+
+  // Calibrate gyroscope
+  for (int i=0; i<3; i++) {
+    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i])/(calibCount+1);
+  }
+  calibCount++;
+
+  // Reset calibration on excessive gyration
+  if (fabs((*meas.gyro).axes[0] > 0.1) ||
+      fabs((*meas.gyro).axes[1] > 0.1) ||
+      fabs((*meas.gyro).axes[2] > 0.1)) {
+    calibCount = 0;
+  }
+
+  // Run calibration for 5 seconds
+  if (calibCount == 5000) {
+    gyr.setGyrOffsets(gyrOffsets);
+    protocol::message::sensor_calibration_response_message_t m_gyrcal {
+      .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
+      .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
+    };
+    logger.write(m_gyrcal);
+
+    calibrated = true;
+  }
+
+  // Proceed to PRE_ARM if calibration done
+  if (calibrated) {
+    return RocketState::PRE_ARM;
+  }
+
+  return RocketState::DISARMED;
 }
 
 RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,0,4);   // Red 4 Hz
-
-  // Calibrate
-  groundAltitude = est.loc.alt;
-  // TODO(yoos): run sensor calibration here
+  PulseLED(0,1,0,4);   // Green 4 Hz
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (healthy() && isArmed()) {
@@ -196,17 +208,16 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  SetLED(1,0,0);   // Red
-
-  static int count = 10;
-  count = ((*meas.accel).axes[0] > 1.1) ? (count-1) : 10;
+  SetLED(0,1,0);   // Green
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(healthy() && isArmed())) {
     return RocketState::PRE_ARM;
   }
 
-  // Proceed to FLIGHT on 1.1g sense on X axis.
+  // Proceed to FLIGHT on 1.2g sense on X axis.
+  static int count = 10;
+  count = ((*meas.accel).axes[0] > 1.2) ? (count-1) : 10;
   if (count == 0) {
     return RocketState::FLIGHT;
   }
@@ -222,17 +233,18 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   static int count = 100;
   if (powered) {
     count = ((*meas.accel).axes[0] < 0.0) ? (count-1) : 100;
-    powered = (count == 0) ? false : true;
+    if (count == 0) powered = false;
   }
 
-  // Apogee occurs after motor cutoff
+  // Apogee occurs after motor cutoff and at near-zero altitude change towards
+  // end of ascent (ideal case)
   if (!powered && est.loc.dAlt < 2.0) {
-    // If falling faster than -40m/s, definitely deploy.
+    // If falling faster than -40m/s for whatever reason, definitely deploy.
     if (est.loc.dAlt < -40.0) {
       return RocketState::APOGEE;
     }
-    // Check for near-zero altitude change towards end of ascent (ideal case)
-    // and that we are not just undergoing a subsonic transition.
+    // Otherwise, also check that we are not just undergoing a subsonic
+    // transition.
     else if ((*meas.accel).axes[0] > -1.0) {
       return RocketState::APOGEE;
     }
@@ -261,7 +273,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
 
   // Check for successful drogue deployment. If failure detected, deploy main.
   if (sTime < 10.0) {   // TODO(yoos): Is it safe to wait this long?
-    if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer for ensure drogue?
+    if (drogueTime > 1.0) {   // TODO(yoos): Do we want to wait longer to ensure drogue?
       return RocketState::DESCENT;
     }
   }
@@ -275,7 +287,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
 }
 
 RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  SetLED(1,0,1);   // Violet
+  PulseLED(1,0,1,1);   // Violet 1 Hz
   static float sTime = 0.0;   // State time
 
   // Deploy main at 1500' (457.2m) AGL.
@@ -306,11 +318,11 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 }
 
 RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,1,2);   // Violet 2 Hz
+  PulseLED(1,1,1,2);   // White 2 Hz
 
   // Turn things off
-    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, false);
-    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
+  platform.get<DigitalPlatform>().set(PIN_MAIN_CH, false);
+  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
 
   return RocketState::RECOVERY;
 }

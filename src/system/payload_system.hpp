@@ -37,7 +37,7 @@ enum class PayloadState {
   ARMED,
   FLIGHT,
   APOGEE,
-  ZERO_G,
+  MICROGRAVITY,
   DESCENT,
   RECOVERY
 };
@@ -157,11 +157,11 @@ private:
   PayloadState ApogeeState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
-   * Perform zero-g maneuver.
+   * Perform microgravity maneuver.
    *
    * Fire drogue after 6+1 seconds.
    */
-  PayloadState ZeroGState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
+  PayloadState MicrogravityState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp);
 
   /**
    * Deploy main chute at 1500' AGL.

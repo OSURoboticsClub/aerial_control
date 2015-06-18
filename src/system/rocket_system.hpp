@@ -37,6 +37,7 @@ enum class RocketState {
   ARMED,
   FLIGHT,
   APOGEE,
+  MICROGRAVITY,   // Dummy state to keep state numbers the same as payload. Firmware doesn't care, but this makes the current ground station simpler. It all needs to be rethought anyway.
   DESCENT,
   RECOVERY
 };
