@@ -115,10 +115,13 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
 
 AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& meas) {
   AttitudeEstimate estimate = {
-    // TODO: Are these trig functions safe at extreme angles?
-    .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
-    .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
-    .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
+    // Euler angles (yaw-pitch-roll)
+    // TODO(yoos): Due to singularities, this is really only safe for
+    // visualization. We can use this for position control but should not
+    // deviate more than perhaps 30 degrees away from horizontal.
+    .roll = atan2(dcm(1,2), dcm(2,2)),
+    .pitch = asin(-dcm(0,2)),
+    .yaw = atan2(dcm(0,1), dcm(0,0)),
 
     // Velocities are set later if a gyro is available.
     .rollVel = 0.0f,
