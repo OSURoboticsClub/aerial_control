@@ -76,12 +76,12 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
     loc.dAlt = accVel;
 
     // DEBUG
-    //static int i=0;
-    //if (i == 0) {
+    //static int loop=0;
+    //if (loop == 0) {
     //  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
     //  chprintf(chp, "%d: %8f %8f\r\n", chibios_rt::System::getTime(), loc.alt, loc.dAlt);
     //}
-    //i = (i+1) % 10;
+    //loop = (loop+1) % 10;
   }
 
   // Jerk
