@@ -4,7 +4,7 @@
 
 // UART1 configuration (Debug)
 static const SerialConfig UART1_CONFIG {
-  38400,
+  115200,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
@@ -20,7 +20,7 @@ static const SerialConfig UART2_CONFIG {
 
 // UART4 configuration (Geiger counter)
 static const SerialConfig UART4_CONFIG {
-  115200,
+  115200,   // TODO(yoos): switch to 9600 after debug
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
@@ -62,5 +62,5 @@ USARTPlatform::USARTPlatform() {
 }
 
 chibios_rt::BaseSequentialStreamInterface& USARTPlatform::getPrimaryStream() {
-  return reinterpret_cast<chibios_rt::BaseSequentialStreamInterface&>(SD1);
+  return reinterpret_cast<chibios_rt::BaseSequentialStreamInterface&>(SD2);
 }

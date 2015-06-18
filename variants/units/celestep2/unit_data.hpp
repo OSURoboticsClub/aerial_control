@@ -44,6 +44,7 @@ struct UnitData {
           platform.getIdx<Accelerometer>(0),
           std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
           std::experimental::make_optional(&platform.get<Barometer>()),
+          std::experimental::make_optional(&platform.get<Geiger>()),
           std::experimental::make_optional(&platform.get<GPS>()),
           platform.get<Gyroscope>(),
           std::experimental::nullopt,

@@ -49,6 +49,7 @@ void MultirotorVehicleSystem::update() {
     .accel  = std::experimental::make_optional(accelReading),
     .accelH = std::experimental::nullopt,
     .bar    = std::experimental::nullopt,
+    .ggr    = std::experimental::nullopt,
     .gps    = gpsReading,
     .gyro   = std::experimental::make_optional(gyroReading),
     .mag    = magReading

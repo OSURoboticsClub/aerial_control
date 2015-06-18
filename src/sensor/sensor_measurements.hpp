@@ -3,6 +3,7 @@
 
 #include "sensor/accelerometer.hpp"
 #include "sensor/barometer.hpp"
+#include "sensor/geiger.hpp"
 #include "sensor/gps.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
@@ -13,6 +14,7 @@ struct SensorMeasurements {
   optional<AccelerometerReading> accel;
   optional<AccelerometerReading> accelH;
   optional<BarometerReading> bar;
+  optional<GeigerReading> ggr;
   optional<GPSReading> gps;
   optional<GyroscopeReading> gyro;
   optional<MagnetometerReading> mag;

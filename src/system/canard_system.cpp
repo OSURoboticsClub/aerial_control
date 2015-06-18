@@ -8,6 +8,7 @@ CanardSystem::CanardSystem(
     Accelerometer& accel,
     optional<Accelerometer *> accelH,
     optional<Barometer *> bar,
+    optional<Geiger *> ggr,
     optional<GPS *> gps,
     Gyroscope& gyr,
     optional<Magnetometer *> mag,
@@ -15,7 +16,7 @@ CanardSystem::CanardSystem(
     MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
     Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
-    accel(accel), accelH(accelH), bar(bar), gps(gps), gyr(gyr), mag(mag),
+    accel(accel), accelH(accelH), bar(bar), ggr(ggr), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
     systemStream(communicator, 10),
@@ -38,11 +39,13 @@ void CanardSystem::update() {
   GyroscopeReading gyrReading = gyr.readGyro();
   optional<AccelerometerReading> accelHReading;
   optional<BarometerReading> barReading;
+  optional<GeigerReading> ggrReading;
   optional<GPSReading> gpsReading;
   optional<MagnetometerReading> magReading;
 
   if (accelH) accelHReading = (*accelH)->readAccel();
   if (bar)    barReading    = (*bar)->readBar();
+  if (ggr)    ggrReading    = (*ggr)->readGeiger();
   if (gps)    gpsReading    = (*gps)->readGPS();
   //if (mag)    magReading    = (*mag)->readMag();
 
@@ -50,6 +53,7 @@ void CanardSystem::update() {
     .accel  = std::experimental::make_optional(accelReading),
     .accelH = accelHReading,
     .bar    = barReading,
+    .ggr    = ggrReading,
     .gps    = gpsReading,
     .gyro   = std::experimental::make_optional(gyrReading),
     .mag    = magReading
@@ -109,6 +113,10 @@ bool CanardSystem::healthy() {
 
   if(bar) {
     healthy &= (*bar)->healthy();
+  }
+
+  if(ggr) {
+    healthy &= (*ggr)->healthy();
   }
 
   if(gps) {

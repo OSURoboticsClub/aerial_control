@@ -47,6 +47,7 @@ public:
       Accelerometer& accel,
       optional<Accelerometer *> accelH,
       optional<Barometer *> bar,
+      optional<Geiger *> ggr,
       optional<GPS *> gps,
       Gyroscope& gyr,
       optional<Magnetometer *> mag,
@@ -63,6 +64,7 @@ private:
   Accelerometer& accel;
   optional<Accelerometer *> accelH;
   optional<Barometer *> bar;
+  optional<Geiger *> ggr;
   optional<GPS *> gps;
   Gyroscope& gyr;
   optional<Magnetometer *> mag;

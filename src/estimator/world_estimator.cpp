@@ -63,18 +63,22 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
   }
 
   // Log 10 Hz stream
+  static uint16_t geigerCount = 0;
+  geigerCount += (*meas.ggr).blips;
   if (i % 100 == 0) {
     protocol::message::raw_10_message_t msg_10 {
       .time = ST2MS(chibios_rt::System::getTime()),
       .gps_valid = (*meas.gps).valid,
       .lat  = (*meas.gps).lat,
       .lon  = (*meas.gps).lon,
-      .utc  = (*meas.gps).utc
+      .utc  = (*meas.gps).utc,
+      .geigerCount = geigerCount
     };
     logger.write(msg_10);
     if (raw10MessageStream.ready()) {
       raw10MessageStream.publish(msg_10);
     }
+    geigerCount = 0;
   }
   i = (i+1) % 1000;
 

@@ -26,6 +26,7 @@ void CarVehicleSystem::update() {
     .accel  = std::experimental::make_optional(accelReading),
     .accelH = std::experimental::nullopt,
     .bar    = std::experimental::nullopt,
+    .ggr    = std::experimental::nullopt,
     .gps    = std::experimental::nullopt,
     .gyro   = std::experimental::make_optional(gyroReading),
     .mag    = std::experimental::nullopt
