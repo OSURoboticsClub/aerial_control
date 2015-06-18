@@ -47,7 +47,7 @@ struct UnitData {
           std::experimental::make_optional(&platform.get<Geiger>()),
           std::experimental::make_optional(&platform.get<GPS>()),
           platform.get<Gyroscope>(),
-          std::experimental::nullopt,
+          std::experimental::nullopt,   // No magnetometer
           world, inputSource, motorMapper, communicator, logger,
           platform) {
   }
