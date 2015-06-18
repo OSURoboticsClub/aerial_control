@@ -1,6 +1,13 @@
 # Board
-CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/boards/ST_STM32F4_DISCOVERY/board.c
-INCLUDES-@(PLATFORM_AERIAL_V4) += -I$(CHIBIOS)/boards/ST_STM32F4_DISCOVERY
+CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/boards/NONSTANDARD_STM32F4_BARTHESS1/board.c
+INCLUDES-@(PLATFORM_AERIAL_V4) += -I$(CHIBIOS)/boards/NONSTANDARD_STM32F4_BARTHESS1
+
+# FATFS
+CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/os/various/fatfs_bindings/fatfs_diskio.c
+CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/os/various/fatfs_bindings/fatfs_syscall.c
+CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/ext/fatfs/src/ff.c
+CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/ext/fatfs/src/option/ccsbcs.c
+INCLUDES-@(PLATFORM_AERIAL_V4) += -I$(CHIBIOS)/ext/fatfs/src
 
 # Platform
 CSRCS-@(PLATFORM_AERIAL_V4) += $(CHIBIOS)/os/hal/platforms/STM32F4xx/stm32_dma.c

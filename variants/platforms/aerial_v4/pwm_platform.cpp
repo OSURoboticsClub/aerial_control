@@ -31,8 +31,8 @@ static const PWMConfig PWMD3_CONFIG {
 };
 
 static const PWMConfig PWMD4_CONFIG {
-  500000,    // 500 kHz PWM clock frequency.
-  1000,      // PWM period 2.0 ms.
+  50000,     // 50 kHz PWM clock frequency.
+  1000,      // PWM period 20 ms.
   NULL,      // No callback.
   {
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
