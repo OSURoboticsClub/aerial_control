@@ -5,6 +5,7 @@
 
 #include "unit_config.hpp"
 #include "util/time.hpp"
+#include <chprintf.h>
 
 WorldEstimator::WorldEstimator(
     LocationEstimator& locEstimator,
@@ -42,6 +43,14 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
   if (raw1000MessageStream.ready()) {
     raw1000MessageStream.publish(msg_1000);
   }
+
+  // DEBUG
+  //static int loop=0;
+  //if (loop == 0) {
+  //  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
+  //  chprintf(chp, "%d: %8f %8f %8f\r\n", chibios_rt::System::getTime(), (*meas.accelH).axes[0], (*meas.accelH).axes[1], (*meas.accelH).axes[2]);
+  //}
+  //loop = (loop+1) % 10;
 
   // Downsampled streams
   // TODO(yoos): Need RateLimitedStream for logger.
