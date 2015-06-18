@@ -30,7 +30,7 @@ struct UnitData {
 
   UnitData(Platform& platform, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
-        { 7 },                                       // channels
+        { 0 },                                       // channels
         { 0.0f },                                    // offsets
         0.0f, 1.0f,                                  // input range
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range

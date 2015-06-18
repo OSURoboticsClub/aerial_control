@@ -299,7 +299,7 @@ PayloadState PayloadSystem::MicrogravityState(SensorMeasurements meas, WorldEsti
   }
   else if (sTime < 10.0) {
     // Fire drogue pyro
-    platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
+    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
     if ((*meas.accel).axes[0] < -5.0) {   // Large negative acceleration due to proper drogue deployment
       return PayloadState::DESCENT;
     }
@@ -348,7 +348,7 @@ PayloadState PayloadSystem::RecoveryState(SensorMeasurements meas, WorldEstimate
   PulseLED(1,1,1,2);   // White 2 Hz
 
   // Turn things off
-  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
+  platform.get<DigitalPlatform>().set(PIN_MAIN_CH, false);
 
   return PayloadState::RECOVERY;
 }

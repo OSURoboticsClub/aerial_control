@@ -89,15 +89,10 @@ private:
   /**
    * Pin config
    */
-  // PWM
-  const uint8_t PIN_FIN_SWITCH_CH = 5;   // PB7
-  const uint8_t PIN_MOTOR_CH = 7;   // PB9
   // ADC
   const uint8_t PIN_ESC_TEMP_THERM_CH = 0;   // PC0
   // Digital
-  const uint8_t PIN_SHUTTLE2_CH = 0;   // PA4
-  const uint8_t PIN_DROGUE_CH = 1;   // PA5
-  const uint8_t PIN_SHUTTLE1_CH = 3;   // PC5
+  const uint8_t PIN_MAIN_CH = 3;   // PC5
 
   /**
    * For now, we proceed directly to PRE_ARM.
