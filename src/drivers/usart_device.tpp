@@ -28,6 +28,21 @@ std::size_t USARTDevice<tx_size, rx_size>::readUntil(std::uint8_t stop) {
 }
 
 template <std::size_t tx_size, std::size_t rx_size>
+std::size_t USARTDevice<tx_size, rx_size>::read(std::uint8_t maxBytes) {
+  rxpos = 0;
+  while (!sdGetWouldBlock(sd)) {
+    std::uint8_t b = sdGet(sd);
+    rxbuf[rxpos++] = b;
+
+    // Return early if we've reached max number of bytes to read
+    if (rxpos == maxBytes) {
+      return maxBytes;
+    }
+  }
+  return rxpos;
+}
+
+template <std::size_t tx_size, std::size_t rx_size>
 void USARTDevice<tx_size, rx_size>::write(std::size_t count) {
   // Stuff txbuf
   // TODO

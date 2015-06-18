@@ -22,6 +22,14 @@ protected:
    */
   std::size_t readUntil(std::uint8_t stop);
 
+  /**
+   * Read up to maxBytes bytes. If maxBytes is 0, read all available bytes. Does not
+   * block.
+   *
+   * Returns the number of bytes available.
+   */
+  std::size_t read(std::uint8_t maxBytes);
+
   void write(std::size_t count);
 
   SerialDriver *sd;
