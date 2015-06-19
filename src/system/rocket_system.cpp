@@ -247,7 +247,7 @@ RocketState RocketSystem::FlightState(SensorMeasurements meas, WorldEstimate est
     }
     // Otherwise, also check that we are not just undergoing a subsonic
     // transition.
-    else if ((*meas.accel).axes[0] > -1.0) {
+    else if ((*meas.accel).axes[0] > -0.2) {
       return RocketState::APOGEE;
     }
   }
