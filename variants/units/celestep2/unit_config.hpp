@@ -20,12 +20,12 @@ const float MAX_PITCH_ROLL_ACC = 4.0;   // TODO: calculate properly
 const float GYR_X_OFFSET  = 0.0;
 const float GYR_Y_OFFSET  = 0.0;
 const float GYR_Z_OFFSET  = 0.0;
-const float ACC_X_OFFSET  =  0.011;
+const float ACC_X_OFFSET  = 0.011;
 const float ACC_Y_OFFSET  = -0.018;
 const float ACC_Z_OFFSET  = -0.240;
-const float ACCH_X_OFFSET = 0.0;
-const float ACCH_Y_OFFSET = 0.0;
-const float ACCH_Z_OFFSET = 0.0;
+const float ACCH_X_OFFSET = 0.301;
+const float ACCH_Y_OFFSET = 0.639;
+const float ACCH_Z_OFFSET = 0.457;
 
 // Initial angular position controller gains
 const float ANGPOS_X_KP = 1.0;
