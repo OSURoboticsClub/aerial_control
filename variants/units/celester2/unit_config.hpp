@@ -17,9 +17,9 @@ const float MAX_PITCH_ROLL_VEL = 100.0 * PI / 180.0;
 const float MAX_PITCH_ROLL_ACC = 4.0;   // TODO: calculate properly
 
 // Sensor config
-const std::array<int, 3>   GYR_AXES  = {-0, -1, -2};
-const std::array<int, 3>   ACC_AXES  = {-0, -1, -2};
-const std::array<int, 3>   ACCH_AXES = { 0,  1, -2};
+const std::array<int, 3>   GYR_AXES  = {-1, -2, -3};
+const std::array<int, 3>   ACC_AXES  = {-1, -2, -3};
+const std::array<int, 3>   ACCH_AXES = { 1,  2, -3};
 const std::array<float, 3> GYR_OFFSETS  = {0.0, 0.0, 0.0};
 const std::array<float, 3> ACC_OFFSETS  = {0.0, 0.0, 0.0};
 const std::array<float, 3> ACCH_OFFSETS = {0.0, 0.0, 0.0};
