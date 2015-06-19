@@ -21,7 +21,7 @@ std::size_t rb_add(rb_t *buf, std::size_t num_bytes, uint8_t *input)
   /* Check if buffer is too full. */
   if (buf->size - buf->count < num_bytes) {
     overflowCount++;
-    chprintf(chp, "RB %d %d %d %d ###\r\n", ST2MS(chibios_rt::System::getTime()), overflowCount, num_bytes, buf->count);
+    //chprintf(chp, "RB %d %d %d %d ###\r\n", ST2MS(chibios_rt::System::getTime()), overflowCount, num_bytes, buf->count);
 
     // Drop a few bytes
     int dropCount = 10000;
@@ -63,7 +63,7 @@ std::size_t rb_remove(rb_t *buf, std::size_t num_bytes, uint8_t *output)
   static systime_t lastTime = 0;
   avgBps = 0.01*num_bytes*1000/(ST2MS(chibios_rt::System::getTime()-lastTime)) + 0.99*avgBps;
   lastTime = chibios_rt::System::getTime();
-  chprintf(chp, "RB<%d> %d %d %d\r\n", ST2MS(chibios_rt::System::getTime()), overflowCount, avgBps, buf->count);
+  //chprintf(chp, "RB<%d> %d %d %d\r\n", ST2MS(chibios_rt::System::getTime()), overflowCount, avgBps, buf->count);
 
 
   buf->count -= num_bytes;
