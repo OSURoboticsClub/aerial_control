@@ -20,6 +20,8 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
+  gyr.setAxisConfig(unit_config::GYR_AXES);
+  acc.setAxisConfig(unit_config::ACC_AXES);
 }
 
 void MultirotorVehicleSystem::update() {

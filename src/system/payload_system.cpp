@@ -25,6 +25,9 @@ PayloadSystem::PayloadSystem(
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
+  gyr.setAxisConfig(unit_config::GYR_AXES);
+  accel.setAxisConfig(unit_config::ACC_AXES);
+  (*accelH)->setAxisConfig(unit_config::ACCH_AXES);
 }
 
 void PayloadSystem::update() {
