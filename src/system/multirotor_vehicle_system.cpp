@@ -22,6 +22,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
   setArmed(false);
   gyr.setAxisConfig(unit_config::GYR_AXES);
   acc.setAxisConfig(unit_config::ACC_AXES);
+  acc.setOffsets(unit_config::ACC_OFFSETS);
 }
 
 void MultirotorVehicleSystem::update() {
