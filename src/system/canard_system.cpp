@@ -199,7 +199,7 @@ CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
 
   // Run calibration for 5 seconds
   if (calibCount == 5000) {
-    gyr.setGyrOffsets(gyrOffsets);
+    gyr.setOffsets(gyrOffsets);
     protocol::message::sensor_calibration_response_message_t m_gyrcal {
       .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
       .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}

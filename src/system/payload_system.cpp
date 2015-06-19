@@ -164,8 +164,8 @@ PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate
 
   // Calibrate accelerometers
   // TODO(yoos): Implement calibration routine once we have persistent params
-  accel.setAccOffsets(accOffsets);
-  (*accelH)->setAccOffsets(acchOffsets);
+  accel.setOffsets(accOffsets);
+  (*accelH)->setOffsets(acchOffsets);
 
   // Calibrate gyroscope
   for (int i=0; i<3; i++) {
@@ -182,7 +182,7 @@ PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate
 
   // Run calibration for 5 seconds
   if (calibCount == 5000) {
-    gyr.setGyrOffsets(gyrOffsets);
+    gyr.setOffsets(gyrOffsets);
     protocol::message::sensor_calibration_response_message_t m_gyrcal {
       .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
       .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
