@@ -20,7 +20,7 @@ static const SerialConfig UART2_CONFIG {
 
 // UART4 configuration (Geiger counter)
 static const SerialConfig UART4_CONFIG {
-  115200,   // TODO(yoos): switch to 9600 after debug
+  9600,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
