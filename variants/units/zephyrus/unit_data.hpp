@@ -56,7 +56,7 @@ struct UnitData {
              std::experimental::make_optional(&platform.get<Barometer>()),
              std::experimental::make_optional(&platform.get<GPS>()),
              std::experimental::nullopt,   // No magnetometer
-             world, inputSource, motorMapper, communicator) {
+             world, inputSource, motorMapper, communicator, logger, platform) {
   }
 };
 

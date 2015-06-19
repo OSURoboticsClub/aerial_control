@@ -20,6 +20,13 @@
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
 
+// Filesystem
+#include "filesystem/logger.hpp"
+
+// Platform
+#include "variant/pwm_platform.hpp"
+#include "variant/platform.hpp"
+
 // World estimation
 #include "estimator/world_estimator.hpp"
 
@@ -44,10 +51,9 @@ public:
       optional<Barometer *> bar,
       optional<GPS *> gps,
       optional<Magnetometer *> mag, // TODO: Use reference_wrapper?
-      WorldEstimator& estimator,
-      InputSource& inputSource,
-      MotorMapper& motorMapper,
-      Communicator& communicator);
+      WorldEstimator& estimator, InputSource& inputSource,
+      MotorMapper& motorMapper, Communicator& communicator,
+      Logger& logger, Platform& platform);
 
   void update() override;
   bool healthy();
@@ -73,8 +79,18 @@ private:
   ZeroController<ActuatorSetpoint> zeroController;
 
   MotorMapper& motorMapper;
+  Platform& platform;
+  Logger& logger;
 
   MultirotorControlMode mode;
+
+  /**
+   * RGB LED stuff.
+   */
+  void SetLED(float r, float g, float b);
+  void BlinkLED(float r, float g, float b, float freq);
+  void PulseLED(float r, float g, float b, float freq);
+  void RGBLED(float freq);
 };
 
 #endif
