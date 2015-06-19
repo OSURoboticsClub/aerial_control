@@ -9,7 +9,7 @@ void Logger::start(void) {
   // TODO(yoos): Rethink this, as in the rocket, we really want to log data
   // before we transmit to ground, but this is not the case in radio-controlled
   // vehicles. Maybe priorities should be user-configurable.
-  writer.start(LOWPRIO + 2);
+  writer.start(HIGHPRIO-1);
 }
 
 bool Logger::ready(void) {

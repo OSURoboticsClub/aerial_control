@@ -66,6 +66,11 @@ public:
   void write(uint8_t *c, uint16_t len);
 
   /**
+   * Sync filesystem.
+   */
+  void sync(void);
+
+  /**
    * Get short filename
    */
   void getFn(char *buf);

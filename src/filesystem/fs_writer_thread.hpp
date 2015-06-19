@@ -9,11 +9,12 @@
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
 #include "filesystem/filesystem.hpp"
+#include "filesystem/ringbuffer.hpp"
 
 /**
  * Thread to write to storage media without blocking control thread.
  */
-class FsWriterThread : public chibios_rt::BaseStaticThread<2048> {
+class FsWriterThread : public chibios_rt::BaseStaticThread<1024> {
 public:
   FsWriterThread(SDCDriver& sdcd, Communicator& communicator);
 
@@ -27,11 +28,12 @@ public:
 
 private:
   FileSystem fs;
+  bool fsReady;
   RateLimitedStream fsInfoMessageStream;
 
-  std::array<std::uint8_t, 20000> buffer;
-  std::size_t bottom;
-  std::size_t top;
+  rb_t buf;
+  std::uint8_t _buf[83000];
+  std::uint8_t writebuf[8000];
 };
 
 #include "filesystem/fs_writer_thread.tpp"

@@ -8,6 +8,7 @@
 FsWriterThread::FsWriterThread(SDCDriver& sdcd, Communicator& communicator)
   : fs(sdcd),
     fsInfoMessageStream(communicator, 1) {
+      rb_init(&buf, sizeof(_buf), _buf);
 }
 
 msg_t FsWriterThread::main() {
@@ -17,19 +18,14 @@ msg_t FsWriterThread::main() {
   while (!fs.connect()) chThdSleepMilliseconds(10);
   while (!fs.mount())   chThdSleepMilliseconds(10);
   while (!fs.openNew()) chThdSleepMilliseconds(10);
+  fsReady = true;
 
   while(true) {
-    // Check if there is data in the buffer that has not yet been written.
-    if(bottom != top) {
-      size_t numbytes = (top > bottom) ? top-bottom : buffer.size()-bottom;
-      fs.write(&buffer[bottom], numbytes);
-      bottom += numbytes;
-
-      // Wrap if the end of the buffer is reached.
-      if(bottom >= buffer.size()) {
-        bottom = 0;
-      }
-    }
+    uint32_t count = buf.count;
+    if (count > 3000) count = 3000 + 0.0625*(count-3000);
+    rb_remove(&buf, count, writebuf);
+    fs.write(writebuf, count);
+    fs.sync();
 
     if (fsInfoMessageStream.ready()) {
       protocol::message::fs_info_message_t m;
@@ -40,7 +36,6 @@ msg_t FsWriterThread::main() {
       fsInfoMessageStream.publish(m);
     }
 
-    // TODO(kyle): Just yield, or sleep?
     yield();
   }
 

@@ -137,16 +137,20 @@ void FileSystem::write(uint8_t *buf, uint16_t len) {
     // TODO(yoos): set FS error flag
     //chprintf(chp, "write failed\r\n");
   }
-  err = f_sync(&FileObject);   // TODO(yoos): This ensures data gets written, but bad for performance...
-  if (err != FR_OK) {
-    // TODO(yoos): set FS error flag
-    //chprintf(chp, "sync failed\r\n");
-  }
   if (bytes_written != len) {
     // TODO(yoos): set FS error flag
     //chprintf(chp, "write incomplete\r\n");
   }
+  //sync();   // TODO(yoos): This ensures data gets written, but bad for performance...
   // TODO(yoos): On failure, reset logger to wait state
+}
+
+void FileSystem::sync(void) {
+  err = f_sync(&FileObject);
+  if (err != FR_OK) {
+    // TODO(yoos): set FS error flag
+    //chprintf(chp, "sync failed\r\n");
+  }
 }
 
 void FileSystem::getFn(char *buf) {
