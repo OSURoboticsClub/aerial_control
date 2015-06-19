@@ -132,9 +132,10 @@ bool PayloadSystem::healthy() {
 }
 
 void PayloadSystem::on(const protocol::message::set_arm_state_message_t& m) {
-  if (state == PayloadState::PRE_ARM) {
-    setArmed(m.armed);
+  if (state == PayloadState::DISARMED) {
+    return;
   }
+  setArmed(m.armed);
 }
 
 void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {

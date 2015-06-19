@@ -129,9 +129,10 @@ bool RocketSystem::healthy() {
 }
 
 void RocketSystem::on(const protocol::message::set_arm_state_message_t& m) {
-  if (state == RocketState::PRE_ARM) {
-    setArmed(m.armed);
+  if (state == RocketState::DISARMED) {
+    return;
   }
+  setArmed(m.armed);
 }
 
 void RocketSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
