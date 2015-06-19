@@ -56,9 +56,6 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
   //}
   //loop = (loop+1) % 10;
 
-  // Downsampled streams
-  // TODO(yoos): Need RateLimitedStream for logger.
-  static uint16_t i = 0;
   // Log 50 Hz stream
   if (i % 20 == 0) {
     protocol::message::raw_50_message_t msg_50 {
