@@ -48,11 +48,19 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
     }
   }
 
-  // DEBUG
+  // Calibration
+  //static uint32_t calibCount = 0;
+  //static std::array<float, 3> calib = {0,0,0};
+  //for (int i=0; i<3; i++) {
+  //  calib[i] = (calib[i]*calibCount + (*meas.accelH).axes[i])/(calibCount+1);
+  //  //calib[i] = (*meas.accelH).axes[i];
+  //}
+  //calibCount++;
+
   //static int loop=0;
   //if (loop == 0) {
-  //  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
-  //  chprintf(chp, "%d: %8f %8f %8f\r\n", chibios_rt::System::getTime(), (*meas.accelH).axes[0], (*meas.accelH).axes[1], (*meas.accelH).axes[2]);
+  //  BaseSequentialStream* chp = (BaseSequentialStream*)&SD1;
+  //  chprintf(chp, "%d: %8f %8f %8f\r\n", chibios_rt::System::getTime(), calib[0], calib[1], calib[2]);
   //}
   //loop = (loop+1) % 10;
 
