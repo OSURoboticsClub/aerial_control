@@ -6,7 +6,7 @@
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "filesystem/logger.hpp"
-#include "input/offboard_input_source.hpp"
+#include "input/ppm_input_source.hpp"
 #include "motor/multirotor_tri_motor_mapper.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/multirotor_vehicle_system.hpp"
@@ -30,7 +30,7 @@ struct UnitData {
   WorldEstimator world;
   AtmosphericLocationEstimator location;
   DCMAttitudeEstimator attitude;
-  OffboardInputSource inputSource;
+  PPMInputSource inputSource;
 
   MultirotorVehicleSystem system;
 
@@ -51,7 +51,7 @@ struct UnitData {
       location(communicator, logger),
       attitude(communicator, logger),
       world(location, attitude, communicator, logger),
-      inputSource(communicator),
+      inputSource(),
       system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::make_optional(&platform.get<Barometer>()),
              std::experimental::make_optional(&platform.get<GPS>()),
