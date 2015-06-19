@@ -11,15 +11,9 @@ struct GyroscopeReading {
 
 class Gyroscope : public Sensor {
 public:
-  Gyroscope();
+  using Sensor::Sensor;
   virtual void init() = 0;
   virtual GyroscopeReading readGyro() = 0;
-
-  void setGyrOffsets(std::array<float, 3> newOffsets);
-  void clearGyrOffsets(void);
-
-protected:
-  std::array<float, 3> gyrOffsets;
 };
 
 #endif

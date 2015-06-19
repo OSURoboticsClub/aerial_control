@@ -55,9 +55,9 @@ GyroscopeReading MPU6000::readGyro() {
   exchange(7);
 
   // TODO(yoos): correct for thermal bias.
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 - gyrOffsets[0];
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 - gyrOffsets[1];
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 - gyrOffsets[2];
+  reading.axes[Gyroscope::axes[0]] = Gyroscope::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[0];
+  reading.axes[Gyroscope::axes[1]] = Gyroscope::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[1];
+  reading.axes[Gyroscope::axes[2]] = Gyroscope::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[2];
 
   // Poll temp
   txbuf[0] = mpu6000::REG_TEMP_OUT_H | (1<<7);
@@ -82,9 +82,9 @@ AccelerometerReading MPU6000::readAccel() {
   // Get data
   txbuf[0] = mpu6000::REG_ACCEL_XOUT_H | (1<<7);
   exchange(7);
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 2048.0 - accOffsets[0];
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 2048.0 - accOffsets[1];
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 2048.0 - accOffsets[2];
+  reading.axes[Accelerometer::axes[0]] = Accelerometer::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 2048.0 - Accelerometer::offsets[0];
+  reading.axes[Accelerometer::axes[1]] = Accelerometer::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 2048.0 - Accelerometer::offsets[1];
+  reading.axes[Accelerometer::axes[2]] = Accelerometer::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 2048.0 - Accelerometer::offsets[2];
 
   return reading;
 }

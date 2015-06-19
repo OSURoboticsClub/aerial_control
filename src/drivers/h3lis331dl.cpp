@@ -27,9 +27,9 @@ AccelerometerReading H3LIS331DL::readAccel() {
   txbuf[0] = h3lis331dl::OUT_X_L | (1<<7) | (1<<6);   // Auto-increment read address
   exchange(7);
 
-  reading.axes[0] = -((int16_t) ((rxbuf[1]<<8) | rxbuf[2]))/16 * 0.049 + accOffsets[0];
-  reading.axes[1] = -((int16_t) ((rxbuf[3]<<8) | rxbuf[4]))/16 * 0.049 + accOffsets[1];
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6]))/16 * 0.049 + accOffsets[2];
+  reading.axes[axes[0]] = signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2]))/16 * 0.049 - offsets[0];
+  reading.axes[axes[1]] = signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4]))/16 * 0.049 - offsets[1];
+  reading.axes[axes[2]] = signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6]))/16 * 0.049 - offsets[2];
 
   // DEBUG
   //BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
