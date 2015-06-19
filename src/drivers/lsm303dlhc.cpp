@@ -26,9 +26,9 @@ AccelerometerReading LSM303DLHC::readAccel() {
     reading.axes[i] = (float) raw[i] / 32768.0 * 2.0;
   }
 
-  reading.axes[0] += unit_config::ACC_X_OFFSET;
-  reading.axes[1] += unit_config::ACC_Y_OFFSET;
-  reading.axes[2] += unit_config::ACC_Z_OFFSET;
+  reading.axes[0] -= offsets[0];
+  reading.axes[1] -= offsets[1];
+  reading.axes[2] -= offsets[2];
 
   return reading;
 }

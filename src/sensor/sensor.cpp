@@ -2,7 +2,7 @@
 
 Sensor::Sensor() {
   // Default to device axes and zero offsets.
-  setAxisConfig({1,1,1});
+  setAxisConfig({0,1,2});
   setOffsets({0,0,0});
 }
 

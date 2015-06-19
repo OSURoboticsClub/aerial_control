@@ -152,17 +152,15 @@ RocketState RocketSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
 
   static bool calibrated = false;
   static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets {unit_config::GYR_X_OFFSET, unit_config::GYR_Y_OFFSET, unit_config::GYR_Z_OFFSET};
-  static std::array<float, 3> accOffsets {unit_config::ACC_X_OFFSET, unit_config::ACC_Y_OFFSET, unit_config::ACC_Z_OFFSET};
-  static std::array<float, 3> acchOffsets {unit_config::ACCH_X_OFFSET, unit_config::ACCH_Y_OFFSET, unit_config::ACCH_Z_OFFSET};
+  static std::array<float, 3> gyrOffsets  = unit_config::GYR_OFFSETS;
 
   // Calibrate ground altitude
   groundAltitude = est.loc.alt;
 
   // Calibrate accelerometers
   // TODO(yoos): Implement calibration routine once we have persistent params
-  accel.setOffsets(accOffsets);
-  (*accelH)->setOffsets(acchOffsets);
+  accel.setOffsets(unit_config::ACC_OFFSETS);
+  (*accelH)->setOffsets(unit_config::ACCH_OFFSETS);
 
   // Calibrate gyroscope
   for (int i=0; i<3; i++) {

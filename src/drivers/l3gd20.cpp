@@ -31,9 +31,9 @@ GyroscopeReading L3GD20::readGyro() {
     reading.axes[i] = (float) raw[i] * l3gd20::SENSITIVITY_2000DPS * l3gd20::DPS_TO_RADS;
   }
 
-  reading.axes[0] += unit_config::GYR_X_OFFSET;
-  reading.axes[1] += unit_config::GYR_Y_OFFSET;
-  reading.axes[2] += unit_config::GYR_Z_OFFSET;
+  reading.axes[0] -= offsets[0];
+  reading.axes[1] -= offsets[1];
+  reading.axes[2] -= offsets[2];
 
   return reading;
 }
