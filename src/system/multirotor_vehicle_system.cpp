@@ -45,7 +45,7 @@ void MultirotorVehicleSystem::update() {
   SensorMeasurements meas {
     .accel  = std::experimental::make_optional(accelReading),
     .accelH = std::experimental::nullopt,
-    .bar    = std::experimental::nullopt,
+    .bar    = barReading,
     .ggr    = std::experimental::nullopt,
     .gps    = gpsReading,
     .gyro   = std::experimental::make_optional(gyroReading),
@@ -103,7 +103,7 @@ void MultirotorVehicleSystem::update() {
       }
     }
   } else {
-    PulseLED(0,1,0,1);
+    PulseLED(0,1,0,0.5);
     // Run the zero controller
     actuatorSp = zeroController.run(world, actuatorSp);
   }
