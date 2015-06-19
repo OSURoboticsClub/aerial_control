@@ -114,7 +114,7 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
 
   // Zero weight if correction would be too large. Specifically want to avoid
   // rockets flipping on deceleration.
-  if (dcm.col(2).dot(accel) < 0) {
+  if (dcm.col(2).dot(accel) < -0.5) {
     accelWeight = 0;
   }
 
