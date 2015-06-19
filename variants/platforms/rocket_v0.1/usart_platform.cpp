@@ -12,7 +12,7 @@ static const SerialConfig UART2_CONFIG {
 
 // UART4 configuration (Unused)
 static const SerialConfig UART4_CONFIG {
-  38400,
+  115200,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
@@ -27,6 +27,11 @@ static const SerialConfig UART6_CONFIG {
 };
 
 USARTPlatform::USARTPlatform() {
+  // Force RX high on startup to prevent XBee from entering SPI mode
+  palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);   // RX
+  palSetPad(GPIOA, 3);
+  chThdSleepMilliseconds(500);
+
   // UART2
   sdStart(&SD2, &UART2_CONFIG);
   palSetPadMode(GPIOA, 2, PAL_MODE_ALTERNATE(7));   // TX

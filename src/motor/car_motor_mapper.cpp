@@ -5,10 +5,11 @@
 
 #include "protocol/messages.hpp"
 
-CarMotorMapper::CarMotorMapper(PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices, Communicator& communicator)
+CarMotorMapper::CarMotorMapper(PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices, Communicator& communicator, Logger& logger)
   : motorDevices(motorDevices),
     servoDevices(servoDevices),
-    throttleStream(communicator, 1) {
+    throttleStream(communicator, 1),
+    logger(logger) {
 }
 
 void CarMotorMapper::run(bool armed, ActuatorSetpoint& input) {

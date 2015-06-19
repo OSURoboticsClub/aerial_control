@@ -3,60 +3,45 @@
 #include "hal.h"
 
 #include "drivers/mpu9250.hpp"
-#include "sensor/accelerometer.hpp"
-#include "sensor/gyroscope.hpp"
-
+#include "drivers/ms5611.hpp"
 #include "drivers/ublox_neo7.hpp"
-#include "sensor/gps.hpp"
 
+#include "variant/digital_platform.hpp"
 #include "variant/i2c_platform.hpp"
 #include "variant/pwm_platform.hpp"
+#include "variant/sdc_platform.hpp"
 #include "variant/spi_platform.hpp"
 #include "variant/usart_platform.hpp"
-
-Platform::Platform() {
-}
-
-// MS5611 SPI configuration
-// TODO(yoos): verify clock speed
-static const SPIConfig MS5611_CONFIG {
-  NULL,
-  GPIOC,
-  13,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
-};
 
 // MPU9250 SPI configuration
 static const SPIConfig MPU9250_CONFIG {
   NULL,
   GPIOC,
   14,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  SPI_CR1_BR_0   // 21000000/2^1 = 10500000
 };
 
-// H3LIS331DL SPI configuration
-// TODO(yoos): verify clock speed
-static const SPIConfig H3LIS331DL_CONFIG {
+// MS5611 SPI configuration
+static const SPIConfig MS5611_CONFIG {
   NULL,
   GPIOC,
-  15,
-  SPI_CR1_BR_0   // 42000000/2^1 = 21000000
+  13,
+  SPI_CR1_BR_0   // 21000000/2^1 = 10500000
 };
+
+Platform::Platform() {
+}
 
 template <>
 MPU9250& Platform::get() {
-  static MPU9250 imu(&SPID1, &MPU9250_CONFIG);
+  static MPU9250 imu(&SPID3, &MPU9250_CONFIG);
   return imu;
 }
 
 template <>
-Gyroscope& Platform::get() {
-  return get<MPU9250>();
-}
-
-template <>
-Accelerometer& Platform::get() {
-  return get<MPU9250>();
+MS5611& Platform::get() {
+  static MS5611 bar(&SPID3, &MS5611_CONFIG);
+  return bar;
 }
 
 template <>
@@ -65,9 +50,15 @@ UBloxNEO7& Platform::get() {
   return gps;
 }
 
+template <> Accelerometer& Platform::get() { return get<MPU9250>(); }
+template <> Barometer&     Platform::get() { return get<MS5611>(); }
+template <> GPS&           Platform::get() { return get<UBloxNEO7>(); }
+template <> Gyroscope&     Platform::get() { return get<MPU9250>(); }
+
 template <>
-GPS& Platform::get() {
-  return get<UBloxNEO7>();
+DigitalPlatform& Platform::get() {
+  static DigitalPlatform digPlatform;
+  return digPlatform;
 }
 
 template <>
@@ -83,6 +74,12 @@ PWMPlatform& Platform::get() {
 }
 
 template <>
+SDCPlatform& Platform::get() {
+  static SDCPlatform sdcPlatform;
+  return sdcPlatform;
+}
+
+template <>
 SPIPlatform& Platform::get() {
   static SPIPlatform spiPlatform;
   return spiPlatform;
@@ -95,14 +92,16 @@ USARTPlatform& Platform::get() {
 }
 
 void Platform::init() {
+  get<DigitalPlatform>();
   get<I2CPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();
 
-  // Initialize IMU
-  get<MPU9250>().init();
+  get<SDCPlatform>();   // Initialize SDIO after SPI.
 
-  // Initialize GPS
+  // Initialize sensors
+  get<MPU9250>().init();
+  get<MS5611>().init();
   get<UBloxNEO7>().init();
 }

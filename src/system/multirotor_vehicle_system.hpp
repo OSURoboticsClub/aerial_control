@@ -20,6 +20,13 @@
 #include "motor/motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
 
+// Filesystem
+#include "filesystem/logger.hpp"
+
+// Platform
+#include "variant/pwm_platform.hpp"
+#include "variant/platform.hpp"
+
 // World estimation
 #include "estimator/world_estimator.hpp"
 
@@ -39,24 +46,26 @@ enum class MultirotorControlMode {
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(
-      Gyroscope& gyroscope,
-      Accelerometer& accelerometer,
+      Gyroscope& gyr,
+      Accelerometer& acc,
+      optional<Barometer *> bar,
       optional<GPS *> gps,
-      optional<Magnetometer *> magnetometer, // TODO: Use reference_wrapper?
-      WorldEstimator& estimator,
-      InputSource& inputSource,
-      MotorMapper& motorMapper,
-      Communicator& communicator);
+      optional<Magnetometer *> mag, // TODO: Use reference_wrapper?
+      WorldEstimator& estimator, InputSource& inputSource,
+      MotorMapper& motorMapper, Communicator& communicator,
+      Logger& logger, Platform& platform);
 
   void update() override;
+  bool healthy();
 
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
-  Gyroscope& gyroscope;
-  Accelerometer& accelerometer;
+  Gyroscope& gyr;
+  Accelerometer& acc;
+  optional<Barometer *> bar;
   optional<GPS *> gps;
-  optional<Magnetometer *> magnetometer;
+  optional<Magnetometer *> mag;
 
   WorldEstimator& estimator;
   InputSource& inputSource;
@@ -70,8 +79,18 @@ private:
   ZeroController<ActuatorSetpoint> zeroController;
 
   MotorMapper& motorMapper;
+  Platform& platform;
+  Logger& logger;
 
   MultirotorControlMode mode;
+
+  /**
+   * RGB LED stuff.
+   */
+  void SetLED(float r, float g, float b);
+  void BlinkLED(float r, float g, float b, float freq);
+  void PulseLED(float r, float g, float b, float freq);
+  void RGBLED(float freq);
 };
 
 #endif

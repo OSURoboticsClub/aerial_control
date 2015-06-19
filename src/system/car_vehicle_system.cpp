@@ -6,12 +6,12 @@
 
 CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
     PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
-    Communicator& communicator)
+    Communicator& communicator, Logger& logger)
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
-    locEstimator(communicator), attEstimator(communicator),
-    worldEstimator(locEstimator, attEstimator, communicator),
-    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator) {
+    locEstimator(communicator, logger), attEstimator(communicator, logger),
+    worldEstimator(locEstimator, attEstimator, communicator, logger),
+    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator, logger) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -26,6 +26,7 @@ void CarVehicleSystem::update() {
     .accel  = std::experimental::make_optional(accelReading),
     .accelH = std::experimental::nullopt,
     .bar    = std::experimental::nullopt,
+    .ggr    = std::experimental::nullopt,
     .gps    = std::experimental::nullopt,
     .gyro   = std::experimental::make_optional(gyroReading),
     .mag    = std::experimental::nullopt

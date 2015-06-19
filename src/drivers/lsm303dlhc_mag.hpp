@@ -34,6 +34,7 @@ public:
 
   void init() override;
   MagnetometerReading readMag() override;
+  bool healthy() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

@@ -1,46 +1,54 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
-#include "system/rocket_system.hpp"
-#include "motor/esra_rocket_motor_mapper.hpp"
+#include "communication/communicator.hpp"
+#include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "estimator/world_estimator.hpp"
-#include "communication/communicator.hpp"
+#include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/accelerometer.hpp"
+#include "motor/esra_rocket_motor_mapper.hpp"
+#include "sensor/sensor_measurements.hpp"
+#include "system/canard_system.hpp"
+#include "util/optional.hpp"
 #include "variant/platform.hpp"
 
-static const float MOTOR_PWM_MIN = 0.40f;
-static const float MOTOR_PWM_MAX = 0.50f;
-static const float MOTOR_PWM_SAFE = 0.0f;   // Disable servo
+static const float MOTOR_PWM_MIN = 0.275f;
+static const float MOTOR_PWM_MAX = 0.475f;
+static const float MOTOR_PWM_SAFE = 0.375f;
 
 struct UnitData {
-  PWMDeviceGroup<1> servos;
+  PWMDeviceGroup<1> motors;
   EsraRocketMotorMapper motorMapper;
 
+  WorldEstimator world;
   AtmosphericLocationEstimator location;
   DCMAttitudeEstimator attitude;
-  WorldEstimator world;
   OffboardInputSource inputSource;
 
-  RocketSystem system;
+  CanardSystem system;
 
-  UnitData(Gyroscope& gyro, Accelerometer& accel, PWMPlatform& pwmPlatform,
-      Communicator& communicator)
-    : servos(pwmPlatform,
-        { 0 },                              // channels
-        { 0.0f },                  // offsets
+  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
+    : motors(platform.get<PWMPlatform>(),
+        { 7 },                                       // channels
+        { 0.0f },                                    // offsets
         0.0f, 1.0f,                                  // input range
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range
       ),
-      motorMapper(servos, communicator),
-      location(communicator),
-      attitude(communicator),
-      world(location, attitude, communicator),
+      motorMapper(motors, communicator, logger),
+      location(communicator, logger),
+      attitude(communicator, logger),
+      world(location, attitude, communicator, logger),
       inputSource(communicator),
-      system(gyro, accel, world, inputSource, motorMapper, communicator) {
+      system(
+          platform.getIdx<Accelerometer>(0),
+          std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
+          std::experimental::make_optional(&platform.get<Barometer>()),
+          std::experimental::make_optional(&platform.get<GPS>()),
+          platform.get<Gyroscope>(),
+          std::experimental::nullopt,
+          world, inputSource, motorMapper, communicator, logger,
+          platform) {
   }
 };
 

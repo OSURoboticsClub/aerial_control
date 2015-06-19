@@ -6,14 +6,14 @@
 
 void L3GD20::init() {
   // Wake up device, enable X, Y, and Z outputs, and set 760Hz mode.
-  writeRegister(l3gd20::SPI_AD_CTRL_REG1, 0x0F | (1 << 7) | (1 << 6));
+  writeRegister(l3gd20::REG_CTRL_REG1, 0x0F | (1 << 7) | (1 << 6));
 
   // Set 2000 DPS mode
-  writeRegister(l3gd20::SPI_AD_CTRL_REG4, (1 << 5) | (1 << 4));
+  writeRegister(l3gd20::REG_CTRL_REG4, (1 << 5) | (1 << 4));
 }
 
 GyroscopeReading L3GD20::readGyro() {
-  txbuf[0] = l3gd20::SPI_RW | l3gd20::SPI_MS | l3gd20::SPI_AD_OUT_X_L;
+  txbuf[0] = l3gd20::SPI_RW | l3gd20::SPI_MS | l3gd20::REG_OUT_X_L;
   txbuf[1] = 0xFF;
   txbuf[2] = 0xFF;
 
@@ -31,9 +31,9 @@ GyroscopeReading L3GD20::readGyro() {
     reading.axes[i] = (float) raw[i] * l3gd20::SENSITIVITY_2000DPS * l3gd20::DPS_TO_RADS;
   }
 
-  reading.axes[0] += unit_config::GYR_X_OFFSET;
-  reading.axes[1] += unit_config::GYR_Y_OFFSET;
-  reading.axes[2] += unit_config::GYR_Z_OFFSET;
+  reading.axes[0] -= offsets[0];
+  reading.axes[1] -= offsets[1];
+  reading.axes[2] -= offsets[2];
 
   return reading;
 }
@@ -52,4 +52,8 @@ void L3GD20::writeRegister(uint8_t reg, uint8_t val) {
   txbuf[1] = val;
 
   exchange(2);
+}
+
+bool L3GD20::healthy() {
+  return readRegister(l3gd20::REG_WHO_AM_I) == l3gd20::WHO_AM_I;
 }

@@ -11,6 +11,7 @@
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "estimator/world_estimator.hpp"
+#include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/car_motor_mapper.hpp"
 #include "motor/pwm_device_group.hpp"
@@ -22,7 +23,7 @@ class CarVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
       PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
-      Communicator& communicator);
+      Communicator& communicator, Logger& logger);
 
   void update() override;
 

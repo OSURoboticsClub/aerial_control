@@ -29,13 +29,14 @@ public:
 private:
   uint8_t readRegister(uint8_t reg);
   void writeRegister(uint8_t reg, uint8_t val);
+  bool healthy() override;
 
   /**
    * Update temperature-compensated pressure and temperature
    */
   void updatePT(void);
 
-  uint32_t C1, C2, C3, C4, C5, C6;   // These are really 16-bit values, but we'll just make them 32 bits wide so we can bit shift conveniently.
+  int64_t C1, C2, C3, C4, C5, C6;   // These are really 16-bit values, but we'll just make them 64 bits wide and signed to make calculations convenient.
   uint32_t D1, D2;
   float pressure, temperature;
 };

@@ -4,13 +4,14 @@
 #include <cstddef>
 #include <cmath>
 
-EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& servos, Communicator& communicator)
-  : servos(servos),
-    throttleStream(communicator, 5) {
+EsraRocketMotorMapper::EsraRocketMotorMapper(PWMDeviceGroup<1>& motors, Communicator& communicator, Logger& logger)
+  : motors(motors),
+    throttleStream(communicator, 5),
+    logger(logger) {
 }
 
 void EsraRocketMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // Interpret input roll as servo angle
   std::array<float, 1> outputs { input.roll };
-  servos.set(armed, outputs);
+  motors.set(true, outputs);   // Ignored armed setting for relatively safe servos. TODO(yoos): Obviously a hack. Fix.
 }

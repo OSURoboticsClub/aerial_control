@@ -112,6 +112,7 @@ public:
   GyroscopeReading readGyro() override;
   AccelerometerReading readAccel() override;
   MagnetometerReading readMag() override;
+  bool healthy() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

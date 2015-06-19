@@ -1,12 +1,17 @@
 #include "estimator/dcm_attitude_estimator.hpp"
+#include "util/time.hpp"
 
+#include "ch.hpp"
 #include "protocol/messages.hpp"
 
 #include "unit_config.hpp"
 
-DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator)
+#include <chprintf.h>
+
+DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator, Logger& logger)
   : dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 5) {
+    attitudeMessageStream(communicator, 10),
+    logger(logger) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
@@ -100,12 +105,18 @@ void DCMAttitudeEstimator::orthonormalize() {
 float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   // TODO(kyle): Pull these out as parameters
   float maxAccelWeight = 0.005f; // Accelerometer weight at exactly 1g
-  float validAccelRange = 0.5f; // Maximum additional acceleration until accelWeight goes to 0
+  float validAccelRange = 0.2f; // Maximum additional acceleration until accelWeight goes to 0
 
   // Deweight accelerometer as a linear function of the reading's difference
   // from 1g.
   float accelOffset = std::abs(1.0f - accel.norm());
   float accelWeight = -maxAccelWeight / validAccelRange * accelOffset + maxAccelWeight;
+
+  // Zero weight if correction would be too large. Specifically want to avoid
+  // rockets flipping on deceleration.
+  if (dcm.col(2).dot(accel) < -0.5) {
+    accelWeight = 0;
+  }
 
   // Limit weight to a minimum of 0
   accelWeight = std::max(0.0f, accelWeight);
@@ -115,10 +126,20 @@ float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
 
 AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& meas) {
   AttitudeEstimate estimate = {
-    // TODO: Are these trig functions safe at extreme angles?
-    .roll = -atan2f(dcm(2, 1), dcm(2, 2)) * dcm(0, 0) + atan2f(dcm(2, 0), dcm(2, 2)) * dcm(0, 1),
-    .pitch = atan2f(dcm(2, 0), dcm(2, 2)) * dcm(1, 1) - atan2f(dcm(2, 1), dcm(2, 2)) * dcm(1, 0),
-    .yaw = 0.0f, // atan2f(dcm(1, 1), dcm(0, 1)),
+    .time = ST2MS(chibios_rt::System::getTime()),
+    .dcm = {
+      dcm(0, 0), dcm(0, 1), dcm(0, 2),
+      dcm(1, 0), dcm(1, 1), dcm(1, 2),
+      dcm(2, 0), dcm(2, 1), dcm(2, 2)
+    },
+
+    // Euler angles (yaw-pitch-roll)
+    // TODO(yoos): Due to singularities, this is really only safe for
+    // visualization. We can use this for position control but should not
+    // deviate more than perhaps 30 degrees away from horizontal.
+    .roll = atan2(dcm(1,2), dcm(2,2)),
+    .pitch = asin(-dcm(0,2)),
+    .yaw = atan2(dcm(0,1), dcm(0,0)),
 
     // Velocities are set later if a gyro is available.
     .rollVel = 0.0f,
@@ -145,15 +166,25 @@ AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& me
 }
 
 void DCMAttitudeEstimator::updateStream() {
-  if(attitudeMessageStream.ready()) {
-    protocol::message::attitude_message_t m {
-      .dcm = {
-        dcm(0, 0), dcm(0, 1), dcm(0, 2),
-        dcm(1, 0), dcm(1, 1), dcm(1, 2),
-        dcm(2, 0), dcm(2, 1), dcm(2, 2)
-      }
-    };
+  protocol::message::attitude_message_t m {
+    .time = ST2MS(chibios_rt::System::getTime()),
+    .dcm = {
+      dcm(0, 0), dcm(0, 1), dcm(0, 2),
+      dcm(1, 0), dcm(1, 1), dcm(1, 2),
+      dcm(2, 0), dcm(2, 1), dcm(2, 2)
+    }
+  };
 
+  if(attitudeMessageStream.ready()) {
     attitudeMessageStream.publish(m);
   }
+
+  // Full-resolution attitude log by itself accounts for nearly half of all
+  // logging. Downsample to 100 Hz so the filesystem has an easier time keeping
+  // up.
+  static int i=0;
+  if (i % 10 == 0) {
+    logger.write(m);
+  }
+  i = (i+1) % 1000;
 }

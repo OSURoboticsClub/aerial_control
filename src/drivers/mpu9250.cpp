@@ -55,9 +55,9 @@ GyroscopeReading MPU9250::readGyro() {
   exchange(7);
 
   // TODO(yoos): correct for thermal bias.
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_X_OFFSET;
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Y_OFFSET;
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 + unit_config::GYR_Z_OFFSET;
+  reading.axes[Gyroscope::axes[0]] = Gyroscope::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[0];
+  reading.axes[Gyroscope::axes[1]] = Gyroscope::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[1];
+  reading.axes[Gyroscope::axes[2]] = Gyroscope::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[2];
 
   // Poll temp
   txbuf[0] = mpu9250::TEMP_OUT_H | (1<<7);
@@ -82,9 +82,9 @@ AccelerometerReading MPU9250::readAccel() {
   // Get data
   txbuf[0] = mpu9250::ACCEL_XOUT_H | (1<<7);
   exchange(7);
-  reading.axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0 + unit_config::ACC_X_OFFSET;
-  reading.axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0 + unit_config::ACC_Y_OFFSET;
-  reading.axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0 + unit_config::ACC_Z_OFFSET;
+  reading.axes[Accelerometer::axes[0]] = Accelerometer::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0 - Accelerometer::offsets[0];
+  reading.axes[Accelerometer::axes[1]] = Accelerometer::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0 - Accelerometer::offsets[1];
+  reading.axes[Accelerometer::axes[2]] = Accelerometer::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0 - Accelerometer::offsets[2];
 
   return reading;
 }
@@ -96,4 +96,19 @@ MagnetometerReading MPU9250::readMag() {
   // TODO(yoos)
 
   return reading;
+}
+
+bool MPU9250::healthy() {
+  // Check WHO_AM_I
+  txbuf[0] = mpu9250::WHO_AM_I | (1<<7);
+  txbuf[1] = 0x00;
+  exchange(2);
+
+  if (rxbuf[1] == 0x71) {
+    return true;
+  }
+
+  // TODO(yoos): check gyr/acc self-test registers
+
+  return false;
 }

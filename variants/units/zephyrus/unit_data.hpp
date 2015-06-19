@@ -5,10 +5,10 @@
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "motor/multirotor_tri_motor_mapper.hpp"
+#include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/accelerometer.hpp"
+#include "motor/multirotor_tri_motor_mapper.hpp"
+#include "sensor/sensor_measurements.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
@@ -34,7 +34,7 @@ struct UnitData {
 
   MultirotorVehicleSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator)
+  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
         { 0, 1, 2 },                                 // channels
         { 0.0f, 0.0f, 0.0f },                        // offsets
@@ -47,15 +47,16 @@ struct UnitData {
         0.0f, 1.0f,                                  // input range
         SERVO_PWM_MIN, SERVO_PWM_MAX, SERVO_PWM_SAFE // output range
       ),
-      motorMapper(motors, servos, communicator),
-      location(communicator),
-      attitude(communicator),
-      world(location, attitude, communicator),
+      motorMapper(motors, servos, communicator, logger),
+      location(communicator, logger),
+      attitude(communicator, logger),
+      world(location, attitude, communicator, logger),
       inputSource(communicator),
       system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
-             std::experimental::nullopt,
-             std::experimental::nullopt,
-             world, inputSource, motorMapper, communicator) {
+             std::experimental::make_optional(&platform.get<Barometer>()),
+             std::experimental::make_optional(&platform.get<GPS>()),
+             std::experimental::nullopt,   // No magnetometer
+             world, inputSource, motorMapper, communicator, logger, platform) {
   }
 };
 

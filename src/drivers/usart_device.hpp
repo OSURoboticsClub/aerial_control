@@ -14,13 +14,21 @@ public:
 
 protected:
   /**
-   * Continue appending to the internal buffer until the `stop` byte is
-   * encountered.
+   * While data is available in the serial buffer, continue appending to the
+   * internal buffer until the `stop` byte is encountered. Does not block.
    *
    * Returns the number of bytes available if the the `stop` byte was found.
    * Otherwise, return 0.
    */
   std::size_t readUntil(std::uint8_t stop);
+
+  /**
+   * Read up to maxBytes bytes. If maxBytes is 0, read all available bytes. Does not
+   * block.
+   *
+   * Returns the number of bytes available.
+   */
+  std::size_t read(std::uint8_t maxBytes);
 
   void write(std::size_t count);
 

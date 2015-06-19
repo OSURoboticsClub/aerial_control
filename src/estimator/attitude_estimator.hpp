@@ -4,6 +4,10 @@
 #include "sensor/sensor_measurements.hpp"
 
 struct AttitudeEstimate {
+  uint32_t time;
+
+  float dcm[9];
+
   float roll;
   float pitch;
   float yaw;

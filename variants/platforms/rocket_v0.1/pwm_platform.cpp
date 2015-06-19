@@ -61,7 +61,7 @@ PWMPlatform::PWMPlatform() {
   // TIM4
   pwmStart(&PWMD4, &PWMD4_CONFIG);
   palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(2));
-  palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 7, PAL_MODE_INPUT_PULLUP);
   palSetPadMode(GPIOB, 8, PAL_MODE_ALTERNATE(2));
   palSetPadMode(GPIOB, 9, PAL_MODE_ALTERNATE(2));
 }
@@ -79,4 +79,13 @@ void PWMPlatform::set(std::uint8_t ch, float dc) {
     pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD3, dc * 10000.0f);
     pwmEnableChannel(&PWMD3, ch-8, width);
   }
+}
+
+float PWMPlatform::get(std::uint8_t ch) {
+  if (ch == 0) {
+    if (palReadPad(GPIOB, 7)) {
+      return 1.0;
+    }
+  }
+  return 0.0;
 }

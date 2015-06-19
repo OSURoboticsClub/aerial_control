@@ -49,6 +49,7 @@ public:
 
   void init() override;
   AccelerometerReading readAccel() override;
+  bool healthy() override;
 
 private:
   uint8_t readRegister(uint8_t reg);

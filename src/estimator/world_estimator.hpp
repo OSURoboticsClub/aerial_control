@@ -5,17 +5,20 @@
 #include "communication/rate_limited_stream.hpp"
 #include "estimator/location_estimator.hpp"
 #include "estimator/attitude_estimator.hpp"
+#include "filesystem/logger.hpp"
+#include "sensor/sensor_measurements.hpp"
 
 #include "util/optional.hpp"
 
 struct WorldEstimate {
+  SensorMeasurements sensors;
   LocationEstimate loc;
   AttitudeEstimate att;
 };
 
 class WorldEstimator {
 public:
-  WorldEstimator(LocationEstimator& locEstimator, AttitudeEstimator& attEstimator, Communicator& communicator);
+  WorldEstimator(LocationEstimator& locEstimator, AttitudeEstimator& attEstimator, Communicator& communicator, Logger& logger);
 
   LocationEstimator& locEstimator;
   AttitudeEstimator& attEstimator;
@@ -27,7 +30,10 @@ public:
   WorldEstimate update(const SensorMeasurements& meas);
 
 private:
-  RateLimitedStream worldMessageStream;
+  RateLimitedStream raw1000MessageStream;
+  RateLimitedStream raw50MessageStream;
+  RateLimitedStream raw10MessageStream;
+  Logger& logger;
 };
 
 #endif
