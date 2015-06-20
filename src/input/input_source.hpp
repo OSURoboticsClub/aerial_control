@@ -9,6 +9,9 @@ struct ControllerInput {
   float pitch;
   float yaw;
   float throttle;
+  int mode;
+  bool velocityMode;
+  bool armed;
 };
 
 /**

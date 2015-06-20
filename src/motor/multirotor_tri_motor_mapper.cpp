@@ -16,28 +16,33 @@ MultirotorTriMotorMapper::MultirotorTriMotorMapper(PWMDeviceGroup<3>& motors, PW
 void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // TODO(yoos): comment on motor indexing convention starting from positive
   // X in counterclockwise order.
-  // Calculate motor outputs
-  std::array<float, 3> mOutputs;
-  mOutputs[0] = input.throttle + input.roll - input.pitch;   // Left
-  mOutputs[1] = input.throttle              + input.pitch;   // Tail
-  mOutputs[2] = input.throttle - input.roll - input.pitch;   // Right
-  motors.set(armed, mOutputs);
-
   // Calculate servo output
   std::array<float, 1> sOutputs;
-  sOutputs[0] = 0.5 + input.yaw;
+  sOutputs[0] = 0.540 - 0.5*input.yaw;   // Magic number servo bias for pusher yaw prop.
+  sOutputs[0] = std::min(1.0, std::max(-1.0, sOutputs[0]));
   servos.set(armed, sOutputs);
 
+  // Calculate motor outputs
+  std::array<float, 3> mOutputs;
+  mOutputs[0] = input.throttle + 0.866025*input.roll - 0.5*input.pitch;   // Left
+  mOutputs[1] = input.throttle                       +     input.pitch;   // Tail
+  mOutputs[2] = input.throttle - 0.866025*input.roll - 0.5*input.pitch;   // Right
+  motors.set(armed, mOutputs);
+
+  // Scale tail thrust per servo tilt
+  // TODO(yoos): Again, resolve magic number.
+  mOutputs[1] /= std::cos(3.1415926535/4*input.yaw);
+
   // DEBUG
-  static int loop=0;
-  if (loop == 0) {
-    chprintf((BaseSequentialStream*)&SD4, "MM %f %f %f %f\r\n", mOutputs[0], mOutputs[1], mOutputs[2], sOutputs[0]);
-  }
-  loop = (loop+1) % 50;
+  //static int loop=0;
+  //if (loop == 0) {
+  //  chprintf((BaseSequentialStream*)&SD4, "MM %f %f %f %f\r\n", mOutputs[0], mOutputs[1], mOutputs[2], sOutputs[0]);
+  //}
+  //loop = (loop+1) % 50;
 
   protocol::message::motor_throttle_message_t m {
     .time = ST2MS(chibios_rt::System::getTime()),
-    .throttles = { mOutputs[0], mOutputs[1], mOutputs[2], sOutputs[3] }
+    .throttles = { mOutputs[0], mOutputs[1], mOutputs[2], sOutputs[0] }
   };
 
   if(throttleStream.ready()) {

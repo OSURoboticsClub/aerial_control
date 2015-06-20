@@ -23,37 +23,8 @@ class PPMInputSource : public InputSource {
 public:
   PPMInputSource();
 
-  void trigger();
+  static void trigger(ICUDriver *icup);
   ControllerInput read() override;
-
-private:
-  constexpr static int MAX_CHANNELS = 12;
-  constexpr static int MIN_START_WIDTH = 2500;
-  constexpr static int MIN_CHANNEL_WIDTH = 800;
-  constexpr static int MAX_CHANNEL_WIDTH = 2200;
-
-  constexpr static int CHANNEL_ROLL = 2;
-  constexpr static int CHANNEL_PITCH = 3;
-  constexpr static int CHANNEL_YAW = 1;
-  constexpr static int CHANNEL_THROTTLE = 0;
-
-  /**
-   * The current decoder state.
-   */
-  PPMState state;
-
-  /**
-   * The current channel.
-   */
-  int currentChannel;
-
-  /**
-   * The time of the last trigger.
-   */
-  systime_t lastFrameStart;
-
-  std::array<unsigned int, MAX_CHANNELS> channelBuffer;
-  std::array<unsigned int, MAX_CHANNELS> channelTempBuffer;
 };
 
 #endif

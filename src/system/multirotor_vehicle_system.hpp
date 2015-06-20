@@ -37,6 +37,7 @@
 #include "sensor/magnetometer.hpp"
 
 enum class MultirotorControlMode {
+  DISARMED,
   POSITION,
   VELOCITY,
   ANGULAR_POS,
@@ -80,9 +81,18 @@ private:
 
   MotorMapper& motorMapper;
   Platform& platform;
+  RateLimitedStream stream;
   Logger& logger;
 
   MultirotorControlMode mode;
+
+  bool calibrated;
+  void calibrate(SensorMeasurements meas);
+
+  void DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
 
   /**
    * RGB LED stuff.

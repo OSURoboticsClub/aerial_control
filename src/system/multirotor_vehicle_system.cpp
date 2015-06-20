@@ -19,18 +19,20 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     inputSource(inputSource),
     motorMapper(motorMapper),
     platform(platform),
-    logger(logger),
-    mode(MultirotorControlMode::ANGULAR_POS) {
+    stream(communicator, 10), logger(logger),
+    mode(MultirotorControlMode::DISARMED),
+    calibrated(false) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
   gyr.setAxisConfig(unit_config::GYR_AXES);
   acc.setAxisConfig(unit_config::ACC_AXES);
+  gyr.setOffsets(unit_config::GYR_OFFSETS);
   acc.setOffsets(unit_config::ACC_OFFSETS);
 }
 
 void MultirotorVehicleSystem::update() {
-  // Poll the gyroscope and accelerometer
+  // Poll sensors
   GyroscopeReading gyroReading = gyr.readGyro();
   AccelerometerReading accelReading = acc.readAccel();
   optional<BarometerReading> barReading;
@@ -52,60 +54,51 @@ void MultirotorVehicleSystem::update() {
     .mag    = magReading
   };
 
-  // Update estimates
-  WorldEstimate world = estimator.update(meas);
+  // Update world estimate
+  WorldEstimate estimate = estimator.update(meas);
 
   // Poll for controller input
   ControllerInput input = inputSource.read();
 
-  // Run the controllers
-  ActuatorSetpoint actuatorSp;
-  if (isArmed() && input.valid) {
-    // Run the controller pipeline as determined by the subclass
-    switch(mode) {
-      case MultirotorControlMode::POSITION: {
-        SetLED(0,1,1);
-        PositionSetpoint sp {
-          .lat = input.roll,
-          .lon = input.pitch,
-          .yawPos = input.yaw,
-          .alt = input.throttle
-        };
-        actuatorSp = pipeline.run(world, sp, posController, attPosController, attVelController, attAccController);
-        break;
+  // Set mode
+  if (calibrated && input.valid) {
+    setArmed(input.armed);
+
+    if (isArmed()) {
+      if (input.mode == 0) {
+        if (input.velocityMode) {
+          mode = MultirotorControlMode::ANGULAR_RATE;
+        }
+        else {
+          mode = MultirotorControlMode::ANGULAR_POS;
+        }
       }
-      case MultirotorControlMode::VELOCITY: {
-        // TODO: implement
-        // actuatorSp = pipeline.run(world, sp, velController, attPosController, attVelController, attAccController);
-        break;
-      }
-      case MultirotorControlMode::ANGULAR_POS: {
-        SetLED(0,1,0);
-        AngularPositionSetpoint sp {
-          .rollPos = input.roll,
-          .pitchPos = input.pitch,
-          .yawPos = input.yaw,
-          .throttle = input.throttle
-        };
-        actuatorSp = pipeline.run(world, sp, attPosController, attVelController, attAccController);
-        break;
-      }
-      case MultirotorControlMode::ANGULAR_RATE: {
-        SetLED(1,0,1);
-        AngularVelocitySetpoint sp {
-          .rollVel = input.roll,
-          .pitchVel = input.pitch,
-          .yawVel = input.yaw,
-          .throttle = input.throttle
-        };
-        actuatorSp = pipeline.run(world, sp, attVelController, attAccController);
-        break;
+      else {
+        mode = MultirotorControlMode::POSITION;
       }
     }
-  } else {
-    PulseLED(0,1,0,0.5);
-    // Run the zero controller
-    actuatorSp = zeroController.run(world, actuatorSp);
+    else {
+      mode = MultirotorControlMode::DISARMED;
+    }
+  }
+
+  // Run the controllers
+  ActuatorSetpoint actuatorSp;
+  switch (mode) {
+    case MultirotorControlMode::DISARMED:
+      DisarmedMode(meas, estimate, input, actuatorSp);
+      break;
+    case MultirotorControlMode::ANGULAR_RATE:
+      AngularRateMode(meas, estimate, input, actuatorSp);
+      break;
+    case MultirotorControlMode::ANGULAR_POS:
+      AngularPosMode(meas, estimate, input, actuatorSp);
+      break;
+    case MultirotorControlMode::POSITION:
+      PosMode(meas, estimate, input, actuatorSp);
+      break;
+    default:
+      break;
   }
 
   // Update motor outputs
@@ -133,6 +126,92 @@ bool MultirotorVehicleSystem::healthy() {
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }
+
+void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
+  PulseLED(0,1,0,4);
+  static int calibCount = 0;
+  static std::array<float, 3> gyrOffsets  = unit_config::GYR_OFFSETS;
+
+  // Calibrate ground altitude
+  //groundAltitude = est.loc.alt;
+
+  // Calibrate gyroscope
+  for (int i=0; i<3; i++) {
+    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
+  }
+  calibCount++;
+
+  // Reset calibration on excessive gyration
+  if (fabs((*meas.gyro).axes[0] > 0.1) ||
+      fabs((*meas.gyro).axes[1] > 0.1) ||
+      fabs((*meas.gyro).axes[2] > 0.1)) {
+    calibCount = 0;
+  }
+
+  // Run calibration for 5 seconds
+  if (calibCount == 5000) {
+    gyr.setOffsets(gyrOffsets);
+    protocol::message::sensor_calibration_response_message_t m_gyrcal {
+      .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
+      .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
+    };
+    logger.write(m_gyrcal);
+    if (stream.ready()) {
+      stream.publish(m_gyrcal);
+    }
+
+    calibrated = true;
+  }
+}
+
+void MultirotorVehicleSystem::DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
+  PulseLED(0,1,0,1);
+  if (!calibrated) {
+    calibrate(meas);
+  }
+
+  // Run the zero controller
+  ActuatorSetpoint zSp = {0, 0, 0, 0};
+  sp = zeroController.run(est, zSp);
+}
+
+void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
+  PulseLED(0,0,1,8);
+  AngularVelocitySetpoint avSp {
+    .rollVel  = 4*3.1415926535*input.roll,   // TODO(yoos): These ranges should be put in the input source.
+    .pitchVel = 4*3.1415926535*input.pitch,
+    .yawVel   = input.yaw,
+    .throttle = input.throttle
+  };
+  sp = pipeline.run(est, avSp, attVelController, attAccController);
+}
+
+void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
+  SetLED(0,0,1);
+  AngularPositionSetpoint apSp {
+    .rollPos  = input.roll,
+    .pitchPos = input.pitch,
+    .yawPos   = input.yaw,
+    .throttle = input.throttle
+  };
+
+  // TODO(yoos): Adjust roll based on yaw. Servo angle is coupled with
+  // roll. That is, we need the output of the acceleration controller to
+  // change the input to the position controller. How can we do this?
+  sp = pipeline.run(est, apSp, attPosController, attVelController, attAccController);
+}
+
+void MultirotorVehicleSystem::PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
+  SetLED(0,1,1);
+  PositionSetpoint pSp {
+    .lat    = est.loc.lat,
+    .lon    = est.loc.lon,
+    .yawPos = input.yaw,
+    .alt    = est.loc.alt
+  };
+  sp = pipeline.run(est, pSp, posController, attPosController, attVelController, attAccController);
+}
+
 void MultirotorVehicleSystem::SetLED(float r, float g, float b) {
   platform.get<PWMPlatform>().set(9,  r);
   platform.get<PWMPlatform>().set(10, g);
