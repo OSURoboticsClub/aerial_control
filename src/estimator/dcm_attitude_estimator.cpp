@@ -24,7 +24,9 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   // If an accelerometer is available, use the provided gravity vector to
   // correct for drift in the DCM.
   if(meas.accel) {
-    Eigen::Vector3f accel((*meas.accel).axes.data());
+    static Eigen::Vector3f accel({0,0,0});
+    Eigen::Vector3f newAccel((*meas.accel).axes.data());
+    accel = 0.99*accel + 0.01*newAccel;
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
@@ -104,7 +106,7 @@ void DCMAttitudeEstimator::orthonormalize() {
 
 float DCMAttitudeEstimator::getAccelWeight(Eigen::Vector3f accel) const {
   // TODO(kyle): Pull these out as parameters
-  float maxAccelWeight = 0.005f; // Accelerometer weight at exactly 1g
+  float maxAccelWeight = 0.002f; // Accelerometer weight at exactly 1g
   float validAccelRange = 0.2f; // Maximum additional acceleration until accelWeight goes to 0
 
   // Deweight accelerometer as a linear function of the reading's difference
