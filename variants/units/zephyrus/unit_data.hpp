@@ -13,14 +13,14 @@
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
 
-static const float MOTOR_PWM_MIN = 0.53f;
+static const float MOTOR_PWM_MIN = 0.50f;
 static const float MOTOR_PWM_MAX = 0.93f;
 static const float MOTOR_PWM_SAFE = 0.30f;
 
 // TODO(yoos): Use actual values.
-static const float SERVO_PWM_MIN = 0.53f;
-static const float SERVO_PWM_MAX = 0.93f;
-static const float SERVO_PWM_SAFE = 0.30f;
+static const float SERVO_PWM_MIN = 0.033f;
+static const float SERVO_PWM_MAX = 0.083f;
+static const float SERVO_PWM_SAFE = 0.058f;
 
 struct UnitData {
   PWMDeviceGroup<3> motors;
@@ -42,7 +42,7 @@ struct UnitData {
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range
       ),
       servos(platform.get<PWMPlatform>(),
-        { 4 },                                       // channels
+        { 7 },                                       // channels
         { 0.0f },                                    // offsets
         0.0f, 1.0f,                                  // input range
         SERVO_PWM_MIN, SERVO_PWM_MAX, SERVO_PWM_SAFE // output range
