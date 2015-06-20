@@ -26,7 +26,7 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   if(meas.accel) {
     static Eigen::Vector3f accel({0,0,0});
     Eigen::Vector3f newAccel((*meas.accel).axes.data());
-    accel = 0.99*accel + 0.01*newAccel;
+    accel = 0.999*accel + 0.001*newAccel;   // Prevent orientation drift under vibration
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
