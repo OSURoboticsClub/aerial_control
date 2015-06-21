@@ -90,8 +90,14 @@ AccelerometerReading MPU6000::readAccel() {
 }
 
 bool MPU6000::healthy() {
-  // TODO: What is `expected`?
-  /* return readRegister(mpu6000::REG_WHO_AM_I & ~(1 << 0) & ~(1 << 7)) == expected; */
+  // Check WHO_AM_I
+  txbuf[0] = mpu9250::WHO_AM_I | (1<<7);
+  txbuf[1] = 0x00;
+  exchange(2);
 
-  return true;
+  if (rxbuf[1] == 0x68) {
+    return true;
+  }
+
+  return false;
 }
