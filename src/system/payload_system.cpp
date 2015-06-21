@@ -28,6 +28,9 @@ PayloadSystem::PayloadSystem(
   gyr.setAxisConfig(unit_config::GYR_AXES);
   accel.setAxisConfig(unit_config::ACC_AXES);
   (*accelH)->setAxisConfig(unit_config::ACCH_AXES);
+  gyr.setOffsets(unit_config::GYR_OFFSETS);
+  accel.setOffsets(unit_config::ACC_OFFSETS);
+  (*accelH)->setOffsets(unit_config::ACCH_OFFSETS);
 }
 
 void PayloadSystem::update() {
@@ -158,19 +161,14 @@ PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate
 
   static bool calibrated = false;
   static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets  = unit_config::GYR_OFFSETS;
+  static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
 
   // Calibrate ground altitude
   groundAltitude = est.loc.alt;
 
-  // Calibrate accelerometers
-  // TODO(yoos): Implement calibration routine once we have persistent params
-  accel.setOffsets(unit_config::ACC_OFFSETS);
-  (*accelH)->setOffsets(unit_config::ACCH_OFFSETS);
-
   // Calibrate gyroscope
   for (int i=0; i<3; i++) {
-    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i])/(calibCount+1);
+    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
   }
   calibCount++;
 

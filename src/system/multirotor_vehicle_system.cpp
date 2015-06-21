@@ -133,7 +133,7 @@ void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_
 void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
   PulseLED(0,1,0,4);
   static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets  = unit_config::GYR_OFFSETS;
+  static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
 
   // Calibrate ground altitude
   //groundAltitude = est.loc.alt;
