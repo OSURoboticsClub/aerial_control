@@ -1,5 +1,7 @@
 #include "system/multirotor_vehicle_system.hpp"
 
+constexpr double M_PI = 3.1415926535;
+
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyr,
     Accelerometer& acc,
@@ -21,7 +23,8 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     platform(platform),
     stream(communicator, 10), logger(logger),
     mode(MultirotorControlMode::DISARMED),
-    calibrated(false) {
+    calibrated(false),
+    yawPosSp(0.0) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -177,6 +180,8 @@ void MultirotorVehicleSystem::DisarmedMode(SensorMeasurements meas, WorldEstimat
 
 void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   PulseLED(0,0,1,8);
+  yawPosSp = est.att.yaw;   // Reset yaw position setpoint to current yaw position while in velocity mode
+
   AngularVelocitySetpoint avSp {
     .rollVel  = input.roll,
     .pitchVel = input.pitch,
@@ -188,10 +193,14 @@ void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEsti
 
 void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   SetLED(0,0,1);
+  yawPosSp += input.yaw * unit_config::DT;
+  if (yawPosSp > M_PI)  {yawPosSp -= 2*M_PI;}
+  if (yawPosSp < -M_PI) {yawPosSp += 2*M_PI;}
+
   AngularPositionSetpoint apSp {
     .rollPos  = input.roll,
     .pitchPos = input.pitch,
-    .yawPos   = input.yaw,
+    .yawPos   = yawPosSp,
     .throttle = input.throttle
   };
 
@@ -203,10 +212,14 @@ void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstim
 
 void MultirotorVehicleSystem::PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   SetLED(0,1,1);
+  yawPosSp += input.yaw * unit_config::DT;
+  if (yawPosSp > M_PI)  {yawPosSp -= 2*M_PI;}
+  if (yawPosSp < -M_PI) {yawPosSp += 2*M_PI;}
+
   PositionSetpoint pSp {
     .lat    = est.loc.lat,
     .lon    = est.loc.lon,
-    .yawPos = input.yaw,
+    .yawPos = yawPosSp,
     .alt    = est.loc.alt
   };
   sp = pipeline.run(est, pSp, posController, attPosController, attVelController, attAccController);
