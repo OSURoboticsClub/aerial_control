@@ -361,7 +361,8 @@ void PayloadSystem::SetLED(float r, float g, float b) {
   platform.get<PWMPlatform>().set(11, 0.1*b);
 }
 
-void PayloadSystem::BlinkLED(float r, float g, float b, float freq) { static int count = 0;
+void PayloadSystem::BlinkLED(float r, float g, float b, float freq) {
+  static int count = 0;
   int period = 1000 / freq;
   if (count % period < period/2) {
     SetLED(r,g,b);
