@@ -38,9 +38,6 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
 
   // Calculate altitude only if barometer present
   if(meas.bar) {
-    static float lastAlt = 0.0;
-    lastAlt = loc.alt;
-
     // Barometer-based estimate
     static float barAlt = 0.0;   // Barometric altitude
     static float barVel = 0.0;

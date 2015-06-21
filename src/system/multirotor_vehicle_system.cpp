@@ -67,7 +67,7 @@ void MultirotorVehicleSystem::update() {
     if (isArmed()) {
       if (input.mode == 0) {
         if (input.velocityMode) {
-          mode = MultirotorControlMode::ANGULAR_RATE;
+          mode = MultirotorControlMode::ANGULAR_VEL;
         }
         else {
           mode = MultirotorControlMode::ANGULAR_POS;
@@ -88,7 +88,7 @@ void MultirotorVehicleSystem::update() {
     case MultirotorControlMode::DISARMED:
       DisarmedMode(meas, estimate, input, actuatorSp);
       break;
-    case MultirotorControlMode::ANGULAR_RATE:
+    case MultirotorControlMode::ANGULAR_VEL:
       AngularRateMode(meas, estimate, input, actuatorSp);
       break;
     case MultirotorControlMode::ANGULAR_POS:
@@ -178,8 +178,8 @@ void MultirotorVehicleSystem::DisarmedMode(SensorMeasurements meas, WorldEstimat
 void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   PulseLED(0,0,1,8);
   AngularVelocitySetpoint avSp {
-    .rollVel  = 4*3.1415926535*input.roll,   // TODO(yoos): These ranges should be put in the input source.
-    .pitchVel = 4*3.1415926535*input.pitch,
+    .rollVel  = input.roll,
+    .pitchVel = input.pitch,
     .yawVel   = input.yaw,
     .throttle = input.throttle
   };
@@ -218,7 +218,8 @@ void MultirotorVehicleSystem::SetLED(float r, float g, float b) {
   platform.get<PWMPlatform>().set(11, b);
 }
 
-void MultirotorVehicleSystem::BlinkLED(float r, float g, float b, float freq) { static int count = 0;
+void MultirotorVehicleSystem::BlinkLED(float r, float g, float b, float freq) {
+  static int count = 0;
   int period = 1000 / freq;
   if (count % period < period/2) {
     SetLED(r,g,b);

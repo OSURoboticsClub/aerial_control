@@ -1,8 +1,10 @@
 #include <input/ppm_input_source.hpp>
 
+#include <unit_config.hpp>
 #include <util/time.hpp>
 #include <chprintf.h>
 
+static constexpr double M_PI = 3.1415926535;
 static constexpr int MAX_CHANNELS = 12;
 static constexpr int MIN_START_WIDTH = 2500;
 static constexpr int MIN_CHANNEL_WIDTH = 1106;   // 1116 - 10
@@ -15,8 +17,11 @@ static constexpr int CHANNEL_THROTTLE = 2;
 static constexpr int CHANNEL_ROLL     = 3;
 static constexpr int CHANNEL_ARM      = 4;
 static constexpr int CHANNEL_VELMODE  = 5;
-static constexpr int CHANNEL_UNUSED   = 6;
+static constexpr int CHANNEL_RANGE    = 6;
 static constexpr int CHANNEL_MODE     = 7;
+
+static constexpr int MODE_MANUAL = 0;
+static constexpr int MODE_AUTO   = 1;
 
 /**
  * The current decoder state.
@@ -56,10 +61,11 @@ PPMInputSource::PPMInputSource() {
   channelBuffer[CHANNEL_THROTTLE] = MIN_CHANNEL_WIDTH;
   channelBuffer[CHANNEL_MODE]     = MAX_CHANNEL_WIDTH;
   channelBuffer[CHANNEL_VELMODE]  = MIN_CHANNEL_WIDTH;
+  channelBuffer[CHANNEL_RANGE]    = MIN_CHANNEL_WIDTH;
   channelBuffer[CHANNEL_ARM]      = MAX_CHANNEL_WIDTH;
 
   icuInit();
-  icuStart(&ICUD2, &ICUD2_CONFIG); // TODO
+  icuStart(&ICUD2, &ICUD2_CONFIG);
   palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_PULLDOWN | PAL_MODE_ALTERNATE(1));
   icuEnable(&ICUD2);
 }
@@ -109,17 +115,44 @@ void PPMInputSource::trigger(ICUDriver *icup) {
 ControllerInput PPMInputSource::read() {
   ControllerInput input = {
     .valid = (state == PPMState::SYNCED),
-    .roll     = ((float) channelBuffer[CHANNEL_ROLL]     - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,
-    .pitch    = ((float) channelBuffer[CHANNEL_PITCH]    - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,
-    .yaw      = ((float) channelBuffer[CHANNEL_YAW]      - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,
-    .throttle = ((float) channelBuffer[CHANNEL_THROTTLE] - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH),
-    .mode = (channelBuffer[CHANNEL_MODE] > MID_CHANNEL_WIDTH) ? 0 : 1,
+    .roll     = ((float) channelBuffer[CHANNEL_ROLL]     - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,   // [-1,1]
+    .pitch    = ((float) channelBuffer[CHANNEL_PITCH]    - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,   // [-1,1]
+    .yaw      = ((float) channelBuffer[CHANNEL_YAW]      - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,   // [-1,1]
+    .throttle = ((float) channelBuffer[CHANNEL_THROTTLE] - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH),           // [0,1]
+    .mode     = (channelBuffer[CHANNEL_MODE] > MID_CHANNEL_WIDTH) ? MODE_MANUAL : MODE_AUTO,
     .velocityMode = (channelBuffer[CHANNEL_VELMODE] > MID_CHANNEL_WIDTH),
     .armed = (channelBuffer[CHANNEL_ARM] < MID_CHANNEL_WIDTH)
   };
 
+  bool highRange = (channelBuffer[CHANNEL_RANGE] > MID_CHANNEL_WIDTH);
+
   // Flip yaw
   input.yaw *= -1;
+
+  if (input.mode == MODE_MANUAL) {
+    if (highRange) {
+      if (input.velocityMode) {
+        input.roll  *= unit_config::MAX_PITCH_ROLL_VEL;
+        input.pitch *= unit_config::MAX_PITCH_ROLL_VEL;
+      }
+      else {
+        input.roll  *= unit_config::MAX_PITCH_ROLL_POS;
+        input.pitch *= unit_config::MAX_PITCH_ROLL_POS;
+      }
+      input.yaw *= 2*M_PI;
+    }
+    else {
+      if (input.velocityMode) {
+        input.roll  *= M_PI/2;
+        input.pitch *= M_PI/2;
+      }
+      else {
+        input.roll  *= M_PI/6;
+        input.pitch *= M_PI/6;
+      }
+      input.yaw *= M_PI/2;
+    }
+  }
 
   // DEBUG
   //static int loop=0;

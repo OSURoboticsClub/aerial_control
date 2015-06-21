@@ -144,7 +144,7 @@ void PayloadSystem::on(const protocol::message::set_arm_state_message_t& m) {
 void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   protocol::message::system_message_t m {
     .time = ST2MS(chibios_rt::System::getTime()),
-    .state = (int) state,
+    .state = (uint8_t) state,
     .motorDC = sp.throttle
   };
   logger.write(m);

@@ -41,7 +41,7 @@ enum class MultirotorControlMode {
   POSITION,
   VELOCITY,
   ANGULAR_POS,
-  ANGULAR_RATE,
+  ANGULAR_VEL,
 };
 
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
