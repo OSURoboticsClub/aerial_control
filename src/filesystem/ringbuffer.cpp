@@ -17,7 +17,7 @@ void rb_init(rb_t *buf, std::size_t size, uint8_t *elems)
 
 std::size_t rb_add(rb_t *buf, std::size_t num_bytes, uint8_t *input)
 {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
   /* Check if buffer is too full. */
   if (buf->size - buf->count < num_bytes) {
     overflowCount++;
@@ -45,7 +45,7 @@ std::size_t rb_add(rb_t *buf, std::size_t num_bytes, uint8_t *input)
 
 std::size_t rb_remove(rb_t *buf, std::size_t num_bytes, uint8_t *output)
 {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
   /* Check if buffer does not contain enough data. */
   if (buf->count < num_bytes) {
     num_bytes = buf->count;
