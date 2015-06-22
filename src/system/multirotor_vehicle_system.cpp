@@ -68,16 +68,18 @@ void MultirotorVehicleSystem::update() {
     setArmed(input.armed);
 
     if (isArmed()) {
-      if (input.mode == 0) {
+      // AUTO
+      if (input.mode == 2) {
+        mode = MultirotorControlMode::POSITION;
+      }
+      // MANUAL or ALTCTL
+      else {
         if (input.velocityMode) {
           mode = MultirotorControlMode::ANGULAR_VEL;
         }
         else {
           mode = MultirotorControlMode::ANGULAR_POS;
         }
-      }
-      else {
-        mode = MultirotorControlMode::POSITION;
       }
     }
     else {

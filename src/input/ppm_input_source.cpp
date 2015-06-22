@@ -9,7 +9,9 @@ static constexpr int MAX_CHANNELS = 12;
 static constexpr int MIN_START_WIDTH = 2500;
 static constexpr int MIN_CHANNEL_WIDTH = 1106;   // 1116 - 10
 static constexpr int MAX_CHANNEL_WIDTH = 1926;   // 1916 + 10
-static constexpr int MID_CHANNEL_WIDTH = (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH)/2;
+static constexpr int MID_CHANNEL_WIDTH = 0.50 * (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH);
+static constexpr int LOWER_CHANNEL_WIDTH = 0.25 * (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH);
+static constexpr int UPPER_CHANNEL_WIDTH = 0.75 * (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH);
        
 static constexpr int CHANNEL_YAW      = 0;
 static constexpr int CHANNEL_PITCH    = 1;
@@ -21,7 +23,8 @@ static constexpr int CHANNEL_RANGE    = 6;
 static constexpr int CHANNEL_MODE     = 7;
 
 static constexpr int MODE_MANUAL = 0;
-static constexpr int MODE_AUTO   = 1;
+static constexpr int MODE_ALTCTL = 1;
+static constexpr int MODE_AUTO   = 2;
 
 /**
  * The current decoder state.
@@ -119,7 +122,7 @@ ControllerInput PPMInputSource::read() {
     .pitch    = ((float) channelBuffer[CHANNEL_PITCH]    - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,   // [-1,1]
     .yaw      = ((float) channelBuffer[CHANNEL_YAW]      - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,   // [-1,1]
     .throttle = ((float) channelBuffer[CHANNEL_THROTTLE] - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH),           // [0,1]
-    .mode     = (channelBuffer[CHANNEL_MODE] > MID_CHANNEL_WIDTH) ? MODE_MANUAL : MODE_AUTO,
+    .mode     = (channelBuffer[CHANNEL_MODE] > UPPER_CHANNEL_WIDTH) ? MODE_MANUAL : ((channelBuffer[CHANNEL_MODE] > LOWER_CHANNEL_WIDTH) ? MODE_ALTCTL : MODE_AUTO),
     .velocityMode = (channelBuffer[CHANNEL_VELMODE] > MID_CHANNEL_WIDTH),
     .armed = (channelBuffer[CHANNEL_ARM] < MID_CHANNEL_WIDTH)
   };
