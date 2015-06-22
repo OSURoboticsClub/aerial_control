@@ -52,8 +52,8 @@ WorldEstimate WorldEstimator::update(const SensorMeasurements& meas) {
   //static uint32_t calibCount = 0;
   //static std::array<float, 3> calib = {0,0,0};
   //for (int i=0; i<3; i++) {
-  //  calib[i] = (calib[i]*calibCount + (*meas.accelH).axes[i])/(calibCount+1);
-  //  //calib[i] = (*meas.accelH).axes[i];
+  //  calib[i] = (calib[i]*calibCount + (*meas.accelH).axes[i]+unit_config::ACCH_OFFSETS[i])/(calibCount+1);
+  //  calib[i] = (*meas.accelH).axes[i];
   //}
   //calibCount++;
 
