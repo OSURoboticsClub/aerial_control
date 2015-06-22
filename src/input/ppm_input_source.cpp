@@ -127,12 +127,12 @@ ControllerInput PPMInputSource::read() {
     .armed = (channelBuffer[CHANNEL_ARM] < MID_CHANNEL_WIDTH)
   };
 
-  bool highRange = (channelBuffer[CHANNEL_RANGE] > MID_CHANNEL_WIDTH);
+  bool highRange = (channelBuffer[CHANNEL_RANGE] < MID_CHANNEL_WIDTH);
 
   // Flip yaw
   input.yaw *= -1;
 
-  if (input.mode == MODE_MANUAL) {
+  if (input.mode == MODE_MANUAL || input.mode == MODE_ALTCTL) {
     if (highRange) {
       if (input.velocityMode) {
         input.roll  *= unit_config::MAX_PITCH_ROLL_VEL;
