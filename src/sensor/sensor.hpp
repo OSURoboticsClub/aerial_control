@@ -16,6 +16,7 @@ public:
    */
   void setAxisConfig(std::array<int, 3> newAxisConfig);
   void setOffsets(std::array<float, 3> newOffsets);
+  std::array<float, 3> getOffsets(void);
 
 protected:
   std::array<int, 3> axes;

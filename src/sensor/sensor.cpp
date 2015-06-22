@@ -18,3 +18,7 @@ void Sensor::setOffsets(std::array<float, 3> newOffsets) {
     offsets[i] = newOffsets[i];
   }
 }
+
+std::array<float, 3> Sensor::getOffsets(void) {
+  return offsets;
+}
