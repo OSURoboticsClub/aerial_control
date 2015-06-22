@@ -17,12 +17,12 @@ const float MAX_PITCH_ROLL_VEL = 100.0 * PI / 180.0;
 const float MAX_PITCH_ROLL_ACC = 4.0;   // TODO: calculate properly
 
 // Sensor config
-const std::array<int, 3>   GYR_AXES  = {-1, -2, -3};
-const std::array<int, 3>   ACC_AXES  = {-1, -2, -3};
-const std::array<int, 3>   ACCH_AXES = { 1,  2, -3};
-const std::array<float, 3> GYR_OFFSETS  = {0.0, 0.0, 0.0};
-const std::array<float, 3> ACC_OFFSETS  = {0.0, 0.0, 0.0};
-const std::array<float, 3> ACCH_OFFSETS = {0.0, 0.0, 0.0};
+const std::array<int, 3>   GYR_AXES  = {-1,  2, -3};
+const std::array<int, 3>   ACC_AXES  = {-1,  2, -3};
+const std::array<int, 3>   ACCH_AXES = { 1, -2, -3};
+const std::array<float, 3> GYR_OFFSETS  = {-0.00247, 0.01872, -0.00430};
+const std::array<float, 3> ACC_OFFSETS  = {-0.027, -0.008, 0.094};
+const std::array<float, 3> ACCH_OFFSETS = {0.129, 0.631, 0.395};
 
 // Initial angular position controller gains
 const float ANGPOS_X_KP = 1.0;
