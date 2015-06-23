@@ -22,10 +22,6 @@ static constexpr int CHANNEL_VELMODE  = 5;
 static constexpr int CHANNEL_RANGE    = 6;
 static constexpr int CHANNEL_MODE     = 7;
 
-static constexpr int MODE_MANUAL = 0;
-static constexpr int MODE_ALTCTL = 1;
-static constexpr int MODE_AUTO   = 2;
-
 /**
  * The current decoder state.
  */

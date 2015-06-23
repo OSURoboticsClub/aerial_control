@@ -7,6 +7,10 @@
 
 #include <input/input_source.hpp>
 
+static constexpr int MODE_MANUAL = 0;
+static constexpr int MODE_ALTCTL = 1;
+static constexpr int MODE_AUTO   = 2;
+
 enum class PPMState {
   /**
    * No start frame found.

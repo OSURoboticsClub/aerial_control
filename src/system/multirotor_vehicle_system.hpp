@@ -89,6 +89,7 @@ private:
   bool calibrated;
   void calibrate(SensorMeasurements meas);
 
+  float altSp;
   float yawPosSp;
 
   void DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);

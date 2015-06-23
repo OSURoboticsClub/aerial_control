@@ -1,5 +1,7 @@
 #include "system/multirotor_vehicle_system.hpp"
 
+#include <input/ppm_input_source.hpp>
+
 constexpr double M_PI = 3.1415926535;
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
@@ -24,6 +26,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     stream(communicator, 10), logger(logger),
     mode(MultirotorControlMode::DISARMED),
     calibrated(false),
+    altSp(0.0),
     yawPosSp(0.0) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
@@ -69,8 +72,8 @@ void MultirotorVehicleSystem::update() {
 
     if (isArmed()) {
       // AUTO
-      if (input.mode == 2) {
-        mode = MultirotorControlMode::POSITION;
+      if (input.mode == MODE_AUTO) {
+        mode = MultirotorControlMode::ANGULAR_POS;   // TODO(yoos): AUTO disabled until we implement controller
       }
       // MANUAL or ALTCTL
       else {
@@ -182,6 +185,7 @@ void MultirotorVehicleSystem::DisarmedMode(SensorMeasurements meas, WorldEstimat
 
 void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   PulseLED(0,0,1,8);
+  altSp = est.loc.alt;   // Reset altitude setpoint
   yawPosSp = est.att.yaw;   // Reset yaw position setpoint to current yaw position while in velocity mode
 
   AngularVelocitySetpoint avSp {
@@ -205,6 +209,17 @@ void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstim
     .yawPos   = yawPosSp,
     .throttle = input.throttle
   };
+
+  // Reset altitude setpoint only if not in ALTCTL mode
+  if (input.mode != MODE_ALTCTL) {
+    altSp = est.loc.alt;
+  }
+  // Somewhat hacky way to achieve altitude hold. Pilot should first find
+  // a good hover throttle, then switch to ALTCTL.
+  else {
+    float throttleShift = std::min(std::max(altSp - est.loc.alt, -0.2), 0.2);
+    apSp.throttle += throttleShift;
+  }
 
   // TODO(yoos): Adjust roll based on yaw. Servo angle is coupled with
   // roll. That is, we need the output of the acceleration controller to
