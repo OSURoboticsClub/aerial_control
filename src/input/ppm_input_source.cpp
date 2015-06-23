@@ -10,8 +10,8 @@ static constexpr int MIN_START_WIDTH = 2500;
 static constexpr int MIN_CHANNEL_WIDTH = 1106;   // 1116 - 10
 static constexpr int MAX_CHANNEL_WIDTH = 1926;   // 1916 + 10
 static constexpr int MID_CHANNEL_WIDTH = 0.50 * (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH);
-static constexpr int LOWER_CHANNEL_WIDTH = 0.25 * (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH);
-static constexpr int UPPER_CHANNEL_WIDTH = 0.75 * (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH);
+static constexpr int LOWER_CHANNEL_WIDTH = 0.75*MIN_CHANNEL_WIDTH + 0.25*MAX_CHANNEL_WIDTH;
+static constexpr int UPPER_CHANNEL_WIDTH = 0.25*MIN_CHANNEL_WIDTH + 0.75*MAX_CHANNEL_WIDTH;
        
 static constexpr int CHANNEL_YAW      = 0;
 static constexpr int CHANNEL_PITCH    = 1;
