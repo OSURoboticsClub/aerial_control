@@ -4,6 +4,8 @@
 
 #include "unit_config.hpp"
 
+constexpr double M_PI = 3.1415926535;
+
 AngularPositionController::AngularPositionController()
   : rollPosPid(unit_config::ANGPOS_X_KP, unit_config::ANGPOS_X_KI, unit_config::ANGPOS_X_KD),
     pitchPosPid(unit_config::ANGPOS_Y_KP, unit_config::ANGPOS_Y_KI, unit_config::ANGPOS_Y_KD),
@@ -14,6 +16,15 @@ AngularVelocitySetpoint AngularPositionController::run(const WorldEstimate& worl
   // Limit to maximum angles
   float rollPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.rollPos));
   float pitchPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.pitchPos));
+  float yawPosSp = input.yawPos;
+
+  // Favor the short rotation (less than 180 deg) to target
+  if      (rollPosSp  - world.att.roll  >  M_PI) rollPosSp  -= 2*M_PI;
+  else if (rollPosSp  - world.att.roll  < -M_PI) rollPosSp  += 2*M_PI;
+  if      (pitchPosSp - world.att.pitch >  M_PI) pitchPosSp -= 2*M_PI;
+  else if (pitchPosSp - world.att.pitch < -M_PI) pitchPosSp += 2*M_PI;
+  if      (yawPosSp   - world.att.yaw   >  M_PI) yawPosSp   -= 2*M_PI;
+  else if (yawPosSp   - world.att.yaw   < -M_PI) yawPosSp   += 2*M_PI;
 
   // Run PID controllers
   float rollVelSp = rollPosPid.calculate(rollPosSp, world.att.roll, unit_config::DT);
