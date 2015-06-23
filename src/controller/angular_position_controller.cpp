@@ -29,7 +29,7 @@ AngularVelocitySetpoint AngularPositionController::run(const WorldEstimate& worl
   // Run PID controllers
   float rollVelSp = rollPosPid.calculate(rollPosSp, world.att.roll, unit_config::DT);
   float pitchVelSp = pitchPosPid.calculate(pitchPosSp, world.att.pitch, unit_config::DT);
-  float yawVelSp = yawPosPid.calculate(input.yawPos, world.att.yaw, unit_config::DT);
+  float yawVelSp = yawPosPid.calculate(yawPosSp, world.att.yaw, unit_config::DT);
 
   // Output
   AngularVelocitySetpoint setpoint {
