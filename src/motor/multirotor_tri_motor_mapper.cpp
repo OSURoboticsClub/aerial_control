@@ -4,6 +4,7 @@
 #include <cstddef>
 #include "protocol/messages.hpp"
 #include "util/time.hpp"
+#include <unit_config.hpp>
 #include <chprintf.h>
 
 MultirotorTriMotorMapper::MultirotorTriMotorMapper(PWMDeviceGroup<3>& motors, PWMDeviceGroup<1>& servos, Communicator& communicator, Logger& logger)
@@ -21,6 +22,11 @@ void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   sOutputs[0] = 0.540 - 0.5*input.yaw;   // Magic number servo bias for pusher yaw prop.
   sOutputs[0] = std::min(1.0, std::max(-1.0, sOutputs[0]));
   servos.set(armed, sOutputs);
+
+  // Scale throttle to compensate for roll and pitch up to max angles
+  input.throttle /= std::cos(std::min(std::fabs(input.roll), unit_config::MAX_PITCH_ROLL_POS));
+  input.throttle /= std::cos(std::min(std::fabs(input.pitch), unit_config::MAX_PITCH_ROLL_POS));
+  input.throttle = std::min(input.throttle, 1.0);   // Not entirely necessary, but perhaps preserve some control authority.
 
   // Calculate motor outputs
   std::array<float, 3> mOutputs;
