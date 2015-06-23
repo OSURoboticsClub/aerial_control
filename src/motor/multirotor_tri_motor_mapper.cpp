@@ -4,8 +4,9 @@
 #include <cstddef>
 #include "protocol/messages.hpp"
 #include "util/time.hpp"
-#include <unit_config.hpp>
 #include <chprintf.h>
+
+constexpr float M_PI = 3.1415926535;
 
 MultirotorTriMotorMapper::MultirotorTriMotorMapper(PWMDeviceGroup<3>& motors, PWMDeviceGroup<1>& servos, Communicator& communicator, Logger& logger)
   : motors(motors),
@@ -24,8 +25,8 @@ void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   servos.set(armed, sOutputs);
 
   // Scale throttle to compensate for roll and pitch up to max angles
-  input.throttle /= std::cos(std::min(std::fabs(input.roll), unit_config::MAX_PITCH_ROLL_POS));
-  input.throttle /= std::cos(std::min(std::fabs(input.pitch), unit_config::MAX_PITCH_ROLL_POS));
+  input.throttle /= std::cos(std::min(std::fabs(input.roll), M_PI/3));
+  input.throttle /= std::cos(std::min(std::fabs(input.pitch), M_PI/3));
   input.throttle = std::min(input.throttle, 1.0);   // Not entirely necessary, but perhaps preserve some control authority.
 
   // Calculate motor outputs
