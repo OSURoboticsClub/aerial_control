@@ -4,6 +4,8 @@
 #include "ch.hpp"
 #include "chprintf.h"
 
+constexpr double M_PI = 3.1415926535;
+
 PayloadSystem::PayloadSystem(
     Accelerometer& accel,
     optional<Accelerometer *> accelH,

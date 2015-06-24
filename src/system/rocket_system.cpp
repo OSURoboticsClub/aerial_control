@@ -4,6 +4,8 @@
 #include "ch.hpp"
 #include "chprintf.h"
 
+constexpr double M_PI = 3.1415926535;
+
 RocketSystem::RocketSystem(
     Accelerometer& accel,
     optional<Accelerometer *> accelH,
@@ -324,7 +326,7 @@ RocketState RocketSystem::RecoveryState(SensorMeasurements meas, WorldEstimate e
 
   // Turn things off
   platform.get<DigitalPlatform>().set(PIN_MAIN_CH, false);
-  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
+  //platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, false);
 
   return RocketState::RECOVERY;
 }
