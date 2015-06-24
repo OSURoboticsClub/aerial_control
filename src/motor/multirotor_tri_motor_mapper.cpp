@@ -38,7 +38,7 @@ void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
 
   // Scale tail thrust per servo tilt
   // TODO(yoos): Again, resolve magic number.
-  mOutputs[1] /= std::cos(3.1415926535/4*sOutputs[0]);
+  mOutputs[1] /= std::cos(M_PI/4*sOutputs[0]);
 
   // DEBUG
   //static int loop=0;
