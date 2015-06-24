@@ -157,7 +157,7 @@ void PayloadSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Ac
 }
 
 PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(0,1,0,1);   // Green 1 Hz
+  PulseLED(0,1,0,4);   // Green 4 Hz
 
   static bool calibrated = false;
   static int calibCount = 0;
@@ -200,7 +200,7 @@ PayloadState PayloadSystem::DisarmedState(SensorMeasurements meas, WorldEstimate
 }
 
 PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(0,1,0,4);   // Green 4 Hz
+  PulseLED(0,1,0,1);   // Green 1 Hz
 
   // Proceed to ARMED if all sensors are healthy and GS arm signal received.
   if (healthy() && isArmed()) {
