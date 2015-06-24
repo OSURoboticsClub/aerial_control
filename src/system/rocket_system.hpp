@@ -92,7 +92,7 @@ private:
   // ADC
   const uint8_t PIN_EXT_TEMP_THERM_CH = 0;   // PC0
   // Digital
-  const uint8_t PIN_DROGUE_CH = 2;   // PC4
+  //const uint8_t PIN_DROGUE_CH = 2;   // PC4
   const uint8_t PIN_MAIN_CH   = 3;   // PC5
 
   /**
