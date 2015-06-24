@@ -82,7 +82,7 @@ LocationEstimate AtmosphericLocationEstimator::makeEstimate(const SensorMeasurem
   }
 
   // Jerk
-  static float lastAcc[3];
+  static float lastAcc[3] = {0,0,0};
   for (int i=0; i<3; i++) {
     loc.jerk[i] = ((*meas.accel).axes[i]) - lastAcc[i];
     lastAcc[i] = (*meas.accel).axes[i];
