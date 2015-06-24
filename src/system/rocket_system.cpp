@@ -257,8 +257,8 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
 
-  // Fire drogue pyro
-  platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
+  // Drogue pyro disabled until more test launches verify FSM.
+  //platform.get<DigitalPlatform>().set(PIN_DROGUE_CH, true);
 
   // Count continuous time under drogue
   // TODO(yoos): We might still see this if partially deployed and spinning
@@ -278,7 +278,8 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
     }
   }
   else {
-    platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
+    // Emergency main deployment disabled until further FSM verification
+    //platform.get<DigitalPlatform>().set(PIN_MAIN_CH, true);
     return RocketState::DESCENT;
   }
 

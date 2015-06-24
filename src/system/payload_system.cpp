@@ -257,17 +257,12 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
   PulseLED(0,0,1,2);   // Blue 2 Hz
   static float sTime = 0.0;   // State time
 
-  // Wait for separation event to complete
-  if (sTime < 0.5) {
+  // Wait to clear rocket
+  if (sTime < 2.0) {
     // Noop
   }
-  // Check for microswitch
-  else if (platform.get<PWMPlatform>().get(0) == 1.0) {
-    return PayloadState::MICROGRAVITY;
-  }
-  // Something's wrong, skip microgravity
   else {
-    return PayloadState::DESCENT;
+    return PayloadState::MICROGRAVITY;
   }
 
   sTime += unit_config::DT;
@@ -279,12 +274,8 @@ PayloadState PayloadSystem::MicrogravityState(SensorMeasurements meas, WorldEsti
   static float sTime = 0.0;   // State time
   static float throttle = 0.0;
 
-  // Wait to clear rocket
-  if (sTime < 2.0) {
-    // Noop
-  }
   // Run microgravity maneuver for 6 s.
-  else if (sTime < 6.0) {
+  if (sTime < 4.0) {
     if ((*meas.accel).axes[0] < 0.0 && throttle < 1.0) {
       throttle += 0.001;
     }
@@ -294,7 +285,7 @@ PayloadState PayloadSystem::MicrogravityState(SensorMeasurements meas, WorldEsti
     if (throttle < 0.0) throttle = 0.0;
     if (throttle > 1.0) throttle = 1.0;
   }
-  else if (sTime < 7.0) {
+  else if (sTime < 5.0) {
     throttle = 0.0;
   }
   else if (sTime < 10.0) {
