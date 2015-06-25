@@ -24,9 +24,9 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   // If an accelerometer is available, use the provided gravity vector to
   // correct for drift in the DCM.
   if(meas.accel) {
-    static Eigen::Vector3f accel({0,0,0});
-    Eigen::Vector3f newAccel((*meas.accel).axes.data());
-    accel = 0.999*accel + 0.001*newAccel;   // Prevent orientation drift under vibration
+    //static Eigen::Vector3f accel({0,0,0});
+    Eigen::Vector3f accel((*meas.accel).axes.data());
+    //accel = 0.999*accel + 0.001*newAccel;   // Prevent orientation drift under vibration
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
@@ -141,6 +141,8 @@ AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& me
     // deviate more than perhaps 30 degrees away from horizontal.
     .roll = atan2(dcm(1,2), dcm(2,2)),
     .pitch = asin(-dcm(0,2)),
+    //.roll = -atan2(dcm(1,2), dcm(2,2)) * dcm(0,0) + atan2(dcm(0,2), dcm(2,2)) * dcm(1,0),
+    //.pitch = atan2(dcm(0,2), dcm(2,2)) * dcm(1,1) - atan2(dcm(1,2), dcm(2,2)) * dcm(0,1),
     .yaw = atan2(dcm(0,1), dcm(0,0)),
 
     // Velocities are set later if a gyro is available.
