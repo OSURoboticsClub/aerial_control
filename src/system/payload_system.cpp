@@ -206,7 +206,7 @@ PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate e
 
   // Proceed to ARMED if all sensors are healthy, arm signal is received, and
   // rocket is within 15 degrees of vertical.
-  if (healthy() && isArmed() && (est.att.pitch > M_PI/12)) {
+  if (healthy() && isArmed() && (est.att.pitch < -0.417*M_PI)) {
     return PayloadState::ARMED;
   }
 
@@ -216,8 +216,9 @@ PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate e
 PayloadState PayloadSystem::ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
   SetLED(0,1,0);   // Green
 
-  // Revert to PRE_ARM if any arm conditions are violated
-  if (!(healthy() && isArmed() && (est.att.pitch > M_PI/12))) {
+  // Disarm and revert to PRE_ARM if any arm conditions are violated
+  if (!(healthy() && isArmed() && (est.att.pitch < -0.417*M_PI))) {
+    setArmed(false);
     return PayloadState::PRE_ARM;
   }
 
