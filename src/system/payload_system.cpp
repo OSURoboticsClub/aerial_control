@@ -205,9 +205,12 @@ PayloadState PayloadSystem::PreArmState(SensorMeasurements meas, WorldEstimate e
   PulseLED(0,1,0,1);   // Green 1 Hz
 
   // Proceed to ARMED if all sensors are healthy, arm signal is received, and
-  // rocket is within 15 degrees of vertical.
+  // rocket is within 20 degrees of vertical.
   if (healthy() && isArmed() && (est.att.pitch < -0.349*M_PI)) {
     return PayloadState::ARMED;
+  }
+  else {
+    setArmed(false);
   }
 
   return PayloadState::PRE_ARM;
