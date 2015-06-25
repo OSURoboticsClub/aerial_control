@@ -203,7 +203,7 @@ RocketState RocketSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
 
   // Proceed to ARMED if all sensors are healthy, arm signal is received, and
   // rocket is within 15 degrees of vertical.
-  if (healthy() && isArmed() && (est.att.pitch < -0.417*M_PI)) {
+  if (healthy() && isArmed() && (est.att.pitch < -0.349*M_PI)) {
     return RocketState::ARMED;
   }
 
@@ -214,7 +214,7 @@ RocketState RocketSystem::ArmedState(SensorMeasurements meas, WorldEstimate est,
   SetLED(0,1,0);   // Green
 
   // Disarm and revert to PRE_ARM if any arm conditions are violated
-  if (!(healthy() && isArmed() && (est.att.pitch < -0.417*M_PI))) {
+  if (!(healthy() && isArmed() && (est.att.pitch < -0.349*M_PI))) {
     setArmed(false);
     return RocketState::PRE_ARM;
   }
