@@ -17,7 +17,7 @@ ARCHFLAGS += $(FPFLAGS)
 CFLAGS += -O2 -g
 CFLAGS += -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
 CFLAGS += -fomit-frame-pointer -falign-functions=16 -ffunction-sections
-CFLAGS += -fdata-sections -fno-common -fsingle-precision-constant
+CFLAGS += -fdata-sections -fno-common
 CFLAGS += -DCORTEX_USE_FPU=TRUE -DCHPRINTF_USE_FLOAT=TRUE -DTHUMB_PRESENT -DTHUMB
 CFLAGS += -DEIGEN_NO_DEBUG=1
 
