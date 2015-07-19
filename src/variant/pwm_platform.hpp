@@ -5,9 +5,18 @@
 
 class PWMPlatform {
 public:
-  PWMPlatform();
+  /**
+   * Get the singleton instance.
+   */
+  static PWMPlatform& getInstance() {
+    static PWMPlatform platform;
+    return platform;
+  }
 
   void set(std::uint8_t ch, float dc);
+
+private:
+  PWMPlatform();
 };
 
 #endif

@@ -3,6 +3,15 @@
 
 class SPIPlatform {
 public:
+  /**
+   * Get the singleton instance.
+   */
+  static SPIPlatform& getInstance() {
+    static SPIPlatform platform;
+    return platform;
+  }
+
+private:
   SPIPlatform();
 };
 
