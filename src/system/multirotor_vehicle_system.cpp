@@ -60,6 +60,10 @@ void MultirotorVehicleSystem::update() {
   // Poll for controller input
   ControllerInput input = inputSource.read();
 
+  if(input.valid) {
+    setArmed(input.armed);
+  }
+
   // Run the controllers
   ActuatorSetpoint actuatorSp;
   if(isArmed() && input.valid) {

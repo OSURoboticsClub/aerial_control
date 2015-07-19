@@ -1,67 +1,12 @@
-#include <input/ppm_input_source.hpp>
+#include "input/ppm_input_source.hpp"
 
-#include <util/time.hpp>
-#include <chprintf.h>
+#include "util/time.hpp"
 
-static constexpr int MAX_CHANNELS = 12;
-static constexpr int MIN_START_WIDTH = 2500;
-static constexpr int MIN_CHANNEL_WIDTH = 800;   // 1116 - 10
-static constexpr int MAX_CHANNEL_WIDTH = 2200;   // 1916 + 10
-static constexpr int MID_CHANNEL_WIDTH = (MIN_CHANNEL_WIDTH+MAX_CHANNEL_WIDTH)/2;
-
-static constexpr int CHANNEL_YAW      = 3;
-static constexpr int CHANNEL_PITCH    = 2;
-static constexpr int CHANNEL_THROTTLE = 0;
-static constexpr int CHANNEL_ROLL     = 1;
-static constexpr int CHANNEL_ARM      = 4;
-static constexpr int CHANNEL_VELMODE  = 5;
-static constexpr int CHANNEL_UNUSED   = 6;
-static constexpr int CHANNEL_MODE     = 7;
-
-/**
- * The current decoder state.
- */
-static PPMState state;
-
-/**
- * The current channel.
- */
-static int currentChannel;
-
-/**
- * The time of the last trigger.
- */
-static systime_t lastPulseStart;
-
-static std::array<unsigned int, MAX_CHANNELS> channelBuffer;
-static std::array<unsigned int, MAX_CHANNELS> channelTempBuffer;
-
-static const ICUConfig ICUD2_CONFIG = {
-  ICU_INPUT_ACTIVE_HIGH,
-  200000,   // 200 kHz ICU clock frequency
-  NULL,
-  PPMInputSource::trigger,
-  NULL,
-  ICU_CHANNEL_1,
-  0
-};
-
-PPMInputSource::PPMInputSource() {
-  state = PPMState::UNSYNCED;
-  currentChannel = 0;
-  lastPulseStart = 0;
-  channelBuffer[CHANNEL_ROLL]     = MID_CHANNEL_WIDTH;
-  channelBuffer[CHANNEL_PITCH]    = MID_CHANNEL_WIDTH;
-  channelBuffer[CHANNEL_YAW]      = MID_CHANNEL_WIDTH;
-  channelBuffer[CHANNEL_THROTTLE] = MIN_CHANNEL_WIDTH;
-  channelBuffer[CHANNEL_MODE]     = MAX_CHANNEL_WIDTH;
-  channelBuffer[CHANNEL_VELMODE]  = MIN_CHANNEL_WIDTH;
-  channelBuffer[CHANNEL_ARM]      = MAX_CHANNEL_WIDTH;
-
-  icuInit();
-  icuStart(&ICUD2, &ICUD2_CONFIG); // TODO
-  palSetPadMode(GPIOA, 15, PAL_MODE_INPUT_PULLDOWN | PAL_MODE_ALTERNATE(1));
-  icuEnable(&ICUD2);
+PPMInputSource::PPMInputSource(ICUPlatform& icu, const PPMInputSourceConfig config)
+  : config(config), state(PPMState::UNSYNCED),
+    currentChannel(0), lastPulseStart(0),
+    channelBuffer{0} {
+  icu.registerTrigger(this);
 }
 
 void PPMInputSource::trigger(ICUDriver *icup) {
@@ -73,20 +18,20 @@ void PPMInputSource::trigger(ICUDriver *icup) {
     case PPMState::UNSYNCED:
       // If this frame looks like a start frame, ignore it and move to the
       // LOCKED state.
-      if (lastPulseWidth > MIN_START_WIDTH) {
+      if (lastPulseWidth > config.minStartWidth) {
         state = PPMState::SYNCED;
       }
 
       break;
     case PPMState::SYNCED:
-      if (lastPulseWidth > MIN_START_WIDTH) {
+      if (lastPulseWidth > config.minStartWidth) {
         // Start frame. Reset channel counter and flip the buffer.
         currentChannel = 0;
         channelBuffer = channelTempBuffer; // copy
 
         state = PPMState::SYNCED;
-      } else if (lastPulseWidth > MIN_CHANNEL_WIDTH &&
-                 lastPulseWidth < MAX_CHANNEL_WIDTH) {
+      } else if (lastPulseWidth > config.minChannelWidth &&
+                 lastPulseWidth < config.maxChannelWidth) {
         // Channel frame. Only store if we have room.
         if (currentChannel < MAX_CHANNELS) {
           channelTempBuffer[currentChannel] = lastPulseWidth;
@@ -105,16 +50,28 @@ void PPMInputSource::trigger(ICUDriver *icup) {
 }
 
 ControllerInput PPMInputSource::read() {
+  bool armed = scaleChannel(PPMChannelType::HALF_SCALE, channelBuffer[config.channelArmed]) > 0.5;
+
   ControllerInput input = {
-    .valid = (state == PPMState::SYNCED),
-    .roll     = ((float) channelBuffer[CHANNEL_ROLL]     - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,
-    .pitch    = ((float) channelBuffer[CHANNEL_PITCH]    - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,
-    .yaw      = ((float) channelBuffer[CHANNEL_YAW]      - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH) * 2 - 1,
-    .throttle = ((float) channelBuffer[CHANNEL_THROTTLE] - MIN_CHANNEL_WIDTH) / (MAX_CHANNEL_WIDTH-MIN_CHANNEL_WIDTH),
-    // .mode = (channelBuffer[CHANNEL_MODE] > MID_CHANNEL_WIDTH) ? 0 : 1,
-    // .velocityMode = (channelBuffer[CHANNEL_VELMODE] > MID_CHANNEL_WIDTH),
-    .armed = (channelBuffer[CHANNEL_ARM] > MID_CHANNEL_WIDTH)
+    .valid    = (state == PPMState::SYNCED),
+    .roll     = scaleChannel(PPMChannelType::FULL_SCALE, channelBuffer[config.channelRoll]),
+    .pitch    = scaleChannel(PPMChannelType::FULL_SCALE, channelBuffer[config.channelPitch]),
+    .yaw      = scaleChannel(PPMChannelType::FULL_SCALE, channelBuffer[config.channelYaw]),
+    .throttle = scaleChannel(PPMChannelType::HALF_SCALE, channelBuffer[config.channelThrottle]),
+    .armed    = armed
   };
 
   return input;
+}
+
+float PPMInputSource::scaleChannel(PPMChannelType type, ChannelWidth input) {
+  float mid = (config.minChannelWidth + config.maxChannelWidth) / 2.0;
+  float width = config.maxChannelWidth - config.minChannelWidth;
+  float halfScale = (input - config.minChannelWidth) / width;
+
+  if(type == PPMChannelType::FULL_SCALE) {
+    return halfScale * 2.0 - 1.0;
+  } else { // type == PPMChannelType::HALF_SCALE
+    return halfScale;
+  }
 }

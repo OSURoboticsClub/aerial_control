@@ -9,6 +9,7 @@
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
 #include "variant/i2c_platform.hpp"
+#include "variant/icu_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/spi_platform.hpp"
 #include "variant/usart_platform.hpp"
@@ -60,6 +61,11 @@ I2CPlatform& Platform::get() {
 }
 
 template <>
+ICUPlatform& Platform::get() {
+  return ICUPlatform::getInstance();
+}
+
+template <>
 PWMPlatform& Platform::get() {
   static PWMPlatform pwmPlatform;
   return pwmPlatform;
@@ -79,6 +85,7 @@ USARTPlatform& Platform::get() {
 
 void Platform::init() {
   get<I2CPlatform>();
+  get<ICUPlatform>().init();
   get<PWMPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();
