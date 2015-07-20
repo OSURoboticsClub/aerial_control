@@ -30,6 +30,7 @@ struct UnitData {
   WorldEstimator world;
   AtmosphericLocationEstimator location;
   DCMAttitudeEstimator attitude;
+  PPMInputSourceConfig ppmConfig;
   PPMInputSource inputSource;
 
   MultirotorVehicleSystem system;
@@ -51,7 +52,20 @@ struct UnitData {
       location(communicator, logger),
       attitude(communicator, logger),
       world(location, attitude, communicator, logger),
-      inputSource(),
+      ppmConfig{
+        .minStartWidth   = 2500,
+        .minChannelWidth = 1106,
+        .maxChannelWidth = 1926,
+        .channelThrottle = 2,
+        .channelRoll     = 3,
+        .channelPitch    = 1,
+        .channelYaw      = 0,
+        .channelArmed    = 4,
+        .channelVelocityMode = 5,
+        .channelRange = 6,
+        .channelControlMode = 7
+      },
+      inputSource(platform.get<ICUPlatform>(), ppmConfig),
       system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::make_optional(&platform.get<Barometer>()),
              std::experimental::make_optional(&platform.get<GPS>()),
