@@ -13,6 +13,7 @@ public:
 class ICUPlatform {
 public:
   ICUPlatform();
+  void init();
 
   /**
    * Get the singleton instance.

@@ -65,7 +65,7 @@ struct UnitData {
         .channelRange = 6,
         .channelControlMode = 7
       },
-      inputSource(platform.get<ICUPlatform>(), ppmConfig),
+      inputSource(ppmConfig),
       system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::make_optional(&platform.get<Barometer>()),
              std::experimental::make_optional(&platform.get<GPS>()),
