@@ -3,6 +3,8 @@
 
 class I2CPlatform {
 public:
+  I2CPlatform();
+
   /**
    * Get the singleton instance.
    */
@@ -10,9 +12,6 @@ public:
     static I2CPlatform platform;
     return platform;
   }
-
-private:
-  I2CPlatform();
 };
 
 #endif

@@ -12,6 +12,8 @@ public:
 
 class ICUPlatform {
 public:
+  ICUPlatform();
+
   /**
    * Get the singleton instance.
    */
@@ -33,8 +35,6 @@ public:
   }
 
 private:
-  ICUPlatform();
-
   static const unsigned int MAX_TRIGGERS = 1;
 
   unsigned int triggerIndex = 0;
