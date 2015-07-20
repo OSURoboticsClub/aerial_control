@@ -17,6 +17,9 @@ public:
 
 private:
   PWMPlatform();
+
+  PWMPlatform(PWMPlatform& platform) = delete;
+  void operator=(PWMPlatform& platform) = delete;
 };
 
 #endif

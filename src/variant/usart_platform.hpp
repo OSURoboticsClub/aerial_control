@@ -18,6 +18,9 @@ public:
 
 private:
   USARTPlatform();
+
+  USARTPlatform(USARTPlatform& platform) = delete;
+  void operator=(USARTPlatform& platform) = delete;
 };
 
 #endif

@@ -13,6 +13,9 @@ public:
 
 private:
   SPIPlatform();
+
+  SPIPlatform(SPIPlatform& platform) = delete;
+  void operator=(SPIPlatform& platform) = delete;
 };
 
 #endif
