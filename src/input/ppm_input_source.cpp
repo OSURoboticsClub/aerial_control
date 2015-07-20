@@ -2,10 +2,12 @@
 
 #include "util/time.hpp"
 
-PPMInputSource::PPMInputSource(ICUPlatform& icu, const PPMInputSourceConfig config)
+PPMInputSource::PPMInputSource(const PPMInputSourceConfig config)
   : config(config), state(PPMState::UNSYNCED),
     currentChannel(0), lastPulseStart(0),
     channelBuffer{0} {
+
+  auto& icu = ICUPlatform::getInstance();
   icu.registerTrigger(this);
 }
 

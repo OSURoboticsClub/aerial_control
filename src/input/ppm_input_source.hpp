@@ -53,7 +53,7 @@ enum class PPMState {
 
 class PPMInputSource : public InputSource, ICUTriggerable {
 public:
-  PPMInputSource(ICUPlatform& icu, const PPMInputSourceConfig config);
+  PPMInputSource(const PPMInputSourceConfig config);
 
   /**
    * Called to signal the start of a pulse.
