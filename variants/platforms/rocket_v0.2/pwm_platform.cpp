@@ -76,12 +76,3 @@ void PWMPlatform::set(std::uint8_t ch, float dc) {
     pwmEnableChannel(&PWMD3, ch-8, width);
   }
 }
-
-float PWMPlatform::get(std::uint8_t ch) {
-  if (ch == 0) {
-    if (palReadPad(GPIOB, 7)) {
-      return 1.0;
-    }
-  }
-  return 0.0;
-}
