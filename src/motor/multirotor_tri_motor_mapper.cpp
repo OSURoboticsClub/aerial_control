@@ -4,6 +4,7 @@
 #include <cstddef>
 #include "protocol/messages.hpp"
 #include "util/time.hpp"
+#include <util/math.hpp>
 #include <chprintf.h>
 
 constexpr float M_PI = 3.1415926535;
@@ -20,8 +21,7 @@ void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // X in counterclockwise order.
   // Calculate servo output
   std::array<float, 1> sOutputs;
-  sOutputs[0] = 0.540 - 0.5*input.yaw;   // Magic number servo bias for pusher yaw prop.
-  sOutputs[0] = std::min(1.0, std::max(-1.0, sOutputs[0]));
+  sOutputs[0] = clip(0.540 - 0.5*input.yaw, -1.0, 1.0);   // Magic number servo bias for pusher yaw prop.
   servos.set(armed, sOutputs);
 
   // Scale throttle to compensate for roll and pitch up to max angles
