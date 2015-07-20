@@ -12,8 +12,6 @@ public:
 
 class ICUPlatform {
 public:
-  void init();
-
   /**
    * Get the singleton instance.
    */
