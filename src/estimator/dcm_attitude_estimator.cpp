@@ -119,9 +119,9 @@ AttitudeEstimate DCMAttitudeEstimator::makeEstimate(const SensorMeasurements& me
     // TODO(yoos): Due to singularities, this is really only safe for
     // visualization. We can use this for position control but should not
     // deviate more than perhaps 30 degrees away from horizontal.
-    .roll = atan2(dcm(1,2), dcm(2,2)),
-    .pitch = asin(-dcm(0,2)),
-    .yaw = atan2(dcm(0,1), dcm(0,0)),
+    .roll = atan2f(dcm(1,2), dcm(2,2)),
+    .pitch = asinf(-dcm(0,2)),
+    .yaw = atan2f(dcm(0,1), dcm(0,0)),
 
     // Velocities are set later if a gyro is available.
     .rollVel = 0.0f,
