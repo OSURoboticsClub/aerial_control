@@ -66,9 +66,15 @@ void MultirotorVehicleSystem::update() {
   // Poll for controller input
   ControllerInput input = inputSource.read();
 
-  // Set armed
-  if (calibrated && healthy() && input.valid) {
-    setArmed(input.armed);
+  // Ensure sensors are calibrated and healthy before arming, but don't disarm
+  // if sensors become unhealthy.
+  if (input.valid) {
+    if (calibrated && healthy()) {
+      setArmed(input.armed);
+    }
+    else if (input.armed == false) {
+      setArmed(false);
+    }
   }
   else {
     setArmed(false);
