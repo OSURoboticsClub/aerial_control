@@ -17,12 +17,9 @@ static const ICUConfig ICU_CONFIG = {
   0
 };
 
-void ICUPlatform::init() {
+ICUPlatform::ICUPlatform() {
   icuInit();
   icuStart(&ICUD2, &ICU_CONFIG);
   palSetPadMode(GPIOA, 15, PAL_MODE_INPUT_PULLDOWN | PAL_MODE_ALTERNATE(1));
   icuEnable(&ICUD2);
-}
-
-ICUPlatform::ICUPlatform() {
 }

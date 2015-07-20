@@ -17,6 +17,10 @@ public:
   }
 
   chibios_rt::BaseSequentialStreamInterface& getPrimaryStream();
+
+private:
+  USARTPlatform(USARTPlatform& platform) = delete;
+  void operator=(USARTPlatform& platform) = delete;
 };
 
 #endif

@@ -2,10 +2,12 @@
 
 #include "util/time.hpp"
 
-PPMInputSource::PPMInputSource(ICUPlatform& icu, const PPMInputSourceConfig config)
+PPMInputSource::PPMInputSource(const PPMInputSourceConfig config)
   : config(config), state(PPMState::UNSYNCED),
     currentChannel(0), lastPulseStart(0),
     channelBuffer{0} {
+
+  auto& icu = ICUPlatform::getInstance();
   icu.registerTrigger(this);
 
   // TODO(yoos): Set defaults in unit
@@ -78,6 +80,11 @@ ControllerInput PPMInputSource::read() {
 }
 
 float PPMInputSource::scaleChannel(PPMChannelType type, ChannelWidth input) {
+  // Don't try to scale invalid inputs.
+  if(input < config.minChannelWidth || input > config.maxChannelWidth) {
+    return 0.0;
+  }
+
   float mid = (config.minChannelWidth + config.maxChannelWidth) / 2.0;
   float width = config.maxChannelWidth - config.minChannelWidth;
   float halfScale = (input - config.minChannelWidth) / width;

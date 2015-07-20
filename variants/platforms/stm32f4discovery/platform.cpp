@@ -12,26 +12,22 @@ Platform::Platform() {
 
 template <>
 I2CPlatform& Platform::get() {
-  static I2CPlatform i2cPlatform;
-  return i2cPlatform;
+  return I2CPlatform::getInstance();
 }
 
 template <>
 PWMPlatform& Platform::get() {
-  static PWMPlatform pwmPlatform;
-  return pwmPlatform;
+  return PWMPlatform::getInstance();
 }
 
 template <>
 SPIPlatform& Platform::get() {
-  static SPIPlatform spiPlatform;
-  return spiPlatform;
+  return SPIPlatform::getInstance();
 }
 
 template <>
 USARTPlatform& Platform::get() {
-  static USARTPlatform usartPlatform;
-  return usartPlatform;
+  return USARTPlatform::getInstance();
 }
 
 void Platform::init() {
@@ -39,4 +35,6 @@ void Platform::init() {
   get<PWMPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();
+
+  get<ICUPlatform>().init();
 }

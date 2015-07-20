@@ -52,7 +52,7 @@ struct UnitData {
         .channelYaw      = 3,
         .channelArmed    = 4,
       },
-      inputSource(platform.get<ICUPlatform>(), ppmConfig),
+      inputSource(ppmConfig),
       system(platform.get<Gyroscope>(),
              platform.get<Accelerometer>(),
              std::experimental::nullopt,

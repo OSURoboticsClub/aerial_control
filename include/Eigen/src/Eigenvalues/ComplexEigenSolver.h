@@ -104,7 +104,7 @@ template<typename _MatrixType> class ComplexEigenSolver
       * according to the specified problem \a size.
       * \sa ComplexEigenSolver()
       */
-    explicit ComplexEigenSolver(Index size)
+    ComplexEigenSolver(Index size)
             : m_eivec(size, size),
               m_eivalues(size),
               m_schur(size),
@@ -122,7 +122,7 @@ template<typename _MatrixType> class ComplexEigenSolver
       *
       * This constructor calls compute() to compute the eigendecomposition.
       */
-    explicit ComplexEigenSolver(const MatrixType& matrix, bool computeEigenvectors = true)
+      ComplexEigenSolver(const MatrixType& matrix, bool computeEigenvectors = true)
             : m_eivec(matrix.rows(),matrix.cols()),
               m_eivalues(matrix.cols()),
               m_schur(matrix.rows()),
@@ -234,6 +234,12 @@ template<typename _MatrixType> class ComplexEigenSolver
     }
 
   protected:
+    
+    static void check_template_parameters()
+    {
+      EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar);
+    }
+    
     EigenvectorType m_eivec;
     EigenvalueType m_eivalues;
     ComplexSchur<MatrixType> m_schur;
@@ -251,6 +257,8 @@ template<typename MatrixType>
 ComplexEigenSolver<MatrixType>& 
 ComplexEigenSolver<MatrixType>::compute(const MatrixType& matrix, bool computeEigenvectors)
 {
+  check_template_parameters();
+  
   // this code is inspired from Jampack
   eigen_assert(matrix.cols() == matrix.rows());
 

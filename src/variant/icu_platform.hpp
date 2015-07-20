@@ -22,8 +22,6 @@ public:
     return platform;
   }
 
-  void init();
-
   void registerTrigger(ICUTriggerable *instance) {
     instances[triggerIndex++] = instance;
   }
@@ -35,6 +33,9 @@ public:
   }
 
 private:
+  ICUPlatform(ICUPlatform& platform) = delete;
+  void operator=(ICUPlatform& platform) = delete;
+
   static const unsigned int MAX_TRIGGERS = 1;
 
   unsigned int triggerIndex = 0;

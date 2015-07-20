@@ -84,7 +84,6 @@
         THIS_EXPRESSION_IS_NOT_A_LVALUE__IT_IS_READ_ONLY,
         YOU_ARE_TRYING_TO_USE_AN_INDEX_BASED_ACCESSOR_ON_AN_EXPRESSION_THAT_DOES_NOT_SUPPORT_THAT,
         THIS_METHOD_IS_ONLY_FOR_1x1_EXPRESSIONS,
-        THIS_METHOD_IS_ONLY_FOR_INNER_OR_LAZY_PRODUCTS,
         THIS_METHOD_IS_ONLY_FOR_EXPRESSIONS_OF_BOOL,
         THIS_METHOD_IS_ONLY_FOR_ARRAYS_NOT_MATRICES,
         YOU_PASSED_A_ROW_VECTOR_BUT_A_COLUMN_VECTOR_WAS_EXPECTED,
@@ -92,7 +91,8 @@
         THE_INDEX_TYPE_MUST_BE_A_SIGNED_TYPE,
         THE_STORAGE_ORDER_OF_BOTH_SIDES_MUST_MATCH,
         OBJECT_ALLOCATED_ON_STACK_IS_TOO_BIG,
-        IMPLICIT_CONVERSION_TO_SCALAR_IS_FOR_INNER_PRODUCT_ONLY
+        IMPLICIT_CONVERSION_TO_SCALAR_IS_FOR_INNER_PRODUCT_ONLY,
+        STORAGE_LAYOUT_DOES_NOT_MATCH
       };
     };
 
@@ -109,9 +109,9 @@
         {Eigen::internal::static_assertion<bool(CONDITION)>::MSG;}
 
     #else
-      // In some cases clang interprets bool(CONDITION) as function declaration
+
       #define EIGEN_STATIC_ASSERT(CONDITION,MSG) \
-        if (Eigen::internal::static_assertion<static_cast<bool>(CONDITION)>::MSG) {}
+        if (Eigen::internal::static_assertion<bool(CONDITION)>::MSG) {}
 
     #endif
 
@@ -159,7 +159,7 @@
 
 #define EIGEN_PREDICATE_SAME_MATRIX_SIZE(TYPE0,TYPE1) \
      ( \
-        (int(internal::size_of_xpr_at_compile_time<TYPE0>::ret)==0 && int(internal::size_of_xpr_at_compile_time<TYPE1>::ret)==0) \
+        (int(TYPE0::SizeAtCompileTime)==0 && int(TYPE1::SizeAtCompileTime)==0) \
     || (\
           (int(TYPE0::RowsAtCompileTime)==Eigen::Dynamic \
         || int(TYPE1::RowsAtCompileTime)==Eigen::Dynamic \
@@ -170,8 +170,13 @@
        ) \
      )
 
-#define EIGEN_STATIC_ASSERT_NON_INTEGER(TYPE) \
+#ifdef EIGEN2_SUPPORT
+  #define EIGEN_STATIC_ASSERT_NON_INTEGER(TYPE) \
+    eigen_assert(!NumTraits<Scalar>::IsInteger);
+#else
+  #define EIGEN_STATIC_ASSERT_NON_INTEGER(TYPE) \
     EIGEN_STATIC_ASSERT(!NumTraits<TYPE>::IsInteger, THIS_FUNCTION_IS_NOT_FOR_INTEGER_NUMERIC_TYPES)
+#endif
 
 
 // static assertion failing if it is guaranteed at compile-time that the two matrix expression types have different sizes

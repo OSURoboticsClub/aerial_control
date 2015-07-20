@@ -13,7 +13,7 @@
 
 #define EIGEN_WORLD_VERSION 3
 #define EIGEN_MAJOR_VERSION 2
-#define EIGEN_MINOR_VERSION 90
+#define EIGEN_MINOR_VERSION 5
 
 #define EIGEN_VERSION_AT_LEAST(x,y,z) (EIGEN_WORLD_VERSION>x || (EIGEN_WORLD_VERSION>=x && \
                                       (EIGEN_MAJOR_VERSION>y || (EIGEN_MAJOR_VERSION>=y && \
@@ -66,24 +66,13 @@
   #define EIGEN_ARCH_WANTS_STACK_ALIGNMENT 0
 #endif
 
-// Defined the boundary (in bytes) on which the data needs to be aligned. Note
-// that unless EIGEN_ALIGN is defined and not equal to 0, the data may not be
-// aligned at all regardless of the value of this #define.
-#define EIGEN_ALIGN_BYTES 16
-
 #ifdef EIGEN_DONT_ALIGN
   #ifndef EIGEN_DONT_ALIGN_STATICALLY
     #define EIGEN_DONT_ALIGN_STATICALLY
   #endif
   #define EIGEN_ALIGN 0
-#elif !defined(EIGEN_DONT_VECTORIZE)
-  #if defined(__AVX__)
-    #undef EIGEN_ALIGN_BYTES
-    #define EIGEN_ALIGN_BYTES 32
-  #endif
-  #define EIGEN_ALIGN 1
 #else
-  #define EIGEN_ALIGN 0
+  #define EIGEN_ALIGN 1
 #endif
 
 // EIGEN_ALIGN_STATICALLY is the true test whether we want to align arrays on the stack or not. It takes into account both the user choice to explicitly disable
@@ -98,9 +87,9 @@
 #endif
 
 #ifdef EIGEN_DEFAULT_TO_ROW_MAJOR
-#define EIGEN_DEFAULT_MATRIX_STORAGE_ORDER_OPTION Eigen::RowMajor
+#define EIGEN_DEFAULT_MATRIX_STORAGE_ORDER_OPTION RowMajor
 #else
-#define EIGEN_DEFAULT_MATRIX_STORAGE_ORDER_OPTION Eigen::ColMajor
+#define EIGEN_DEFAULT_MATRIX_STORAGE_ORDER_OPTION ColMajor
 #endif
 
 #ifndef EIGEN_DEFAULT_DENSE_INDEX_TYPE
@@ -112,20 +101,6 @@
 #  define EIGEN_HAS_BUILTIN(x) __has_builtin(x)
 #else
 #  define EIGEN_HAS_BUILTIN(x) 0
-#endif
-
-// A Clang feature extension to determine compiler features.
-// We use it to determine 'cxx_rvalue_references'
-#ifndef __has_feature
-# define __has_feature(x) 0
-#endif
-
-// Do we support r-value references?
-#if (__has_feature(cxx_rvalue_references) || \
-    (defined(__cplusplus) && __cplusplus >= 201103L) || \
-     defined(__GXX_EXPERIMENTAL_CXX0X__) || \
-    (defined(_MSC_VER) && _MSC_VER >= 1600))
-  #define EIGEN_HAVE_RVALUE_REFERENCES
 #endif
 
 /** Allows to disable some optimizations which might affect the accuracy of the result.
@@ -303,20 +278,15 @@ namespace Eigen {
   #error Please tell me what is the equivalent of __attribute__((aligned(n))) for your compiler
 #endif
 
+#define EIGEN_ALIGN8  EIGEN_ALIGN_TO_BOUNDARY(8)
 #define EIGEN_ALIGN16 EIGEN_ALIGN_TO_BOUNDARY(16)
-#define EIGEN_ALIGN32 EIGEN_ALIGN_TO_BOUNDARY(32)
-#define EIGEN_ALIGN_DEFAULT EIGEN_ALIGN_TO_BOUNDARY(EIGEN_ALIGN_BYTES)
 
 #if EIGEN_ALIGN_STATICALLY
 #define EIGEN_USER_ALIGN_TO_BOUNDARY(n) EIGEN_ALIGN_TO_BOUNDARY(n)
 #define EIGEN_USER_ALIGN16 EIGEN_ALIGN16
-#define EIGEN_USER_ALIGN32 EIGEN_ALIGN32
-#define EIGEN_USER_ALIGN_DEFAULT EIGEN_ALIGN_DEFAULT
 #else
 #define EIGEN_USER_ALIGN_TO_BOUNDARY(n)
 #define EIGEN_USER_ALIGN16
-#define EIGEN_USER_ALIGN32
-#define EIGEN_USER_ALIGN_DEFAULT
 #endif
 
 #ifdef EIGEN_DONT_USE_RESTRICT_KEYWORD
@@ -344,27 +314,30 @@ namespace Eigen {
 // just an empty macro !
 #define EIGEN_EMPTY
 
-#if defined(_MSC_VER) && (!defined(__INTEL_COMPILER))
+#if defined(_MSC_VER) && (_MSC_VER < 1800) && (!defined(__INTEL_COMPILER))
 #define EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived) \
   using Base::operator =;
 #elif defined(__clang__) // workaround clang bug (see http://forum.kde.org/viewtopic.php?f=74&t=102653)
 #define EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived) \
   using Base::operator =; \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const Derived& other) { Base::operator=(other); return *this; } \
+  EIGEN_STRONG_INLINE Derived& operator=(const Derived& other) { Base::operator=(other); return *this; } \
   template <typename OtherDerived> \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const DenseBase<OtherDerived>& other) { Base::operator=(other.derived()); return *this; }
+  EIGEN_STRONG_INLINE Derived& operator=(const DenseBase<OtherDerived>& other) { Base::operator=(other.derived()); return *this; }
 #else
 #define EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived) \
   using Base::operator =; \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& operator=(const Derived& other) \
+  EIGEN_STRONG_INLINE Derived& operator=(const Derived& other) \
   { \
     Base::operator=(other); \
     return *this; \
   }
 #endif
 
-#define EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Derived) \
-  EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived)
+/** \internal
+ * \brief Macro to manually inherit assignment operators.
+ * This is necessary, because the implicitly defined assignment operator gets deleted when a custom operator= is defined.
+ */
+#define EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Derived) EIGEN_INHERIT_ASSIGNMENT_EQUAL_OPERATOR(Derived)
 
 /**
 * Just a side note. Commenting within defines works only by documenting
@@ -374,8 +347,6 @@ namespace Eigen {
 * documentation in a single line.
 **/
 
-// TODO The EIGEN_DENSE_PUBLIC_INTERFACE should not exists anymore
-  
 #define EIGEN_GENERIC_PUBLIC_INTERFACE(Derived) \
   typedef typename Eigen::internal::traits<Derived>::Scalar Scalar; /*!< \brief Numeric type, e.g. float, double, int or std::complex<float>. */ \
   typedef typename Eigen::NumTraits<Scalar>::Real RealScalar; /*!< \brief The underlying numeric type for composed scalar types. \details In cases where Scalar is e.g. std::complex<T>, T were corresponding to RealScalar. */ \
@@ -386,6 +357,7 @@ namespace Eigen {
   enum { RowsAtCompileTime = Eigen::internal::traits<Derived>::RowsAtCompileTime, \
         ColsAtCompileTime = Eigen::internal::traits<Derived>::ColsAtCompileTime, \
         Flags = Eigen::internal::traits<Derived>::Flags, \
+        CoeffReadCost = Eigen::internal::traits<Derived>::CoeffReadCost, \
         SizeAtCompileTime = Base::SizeAtCompileTime, \
         MaxSizeAtCompileTime = Base::MaxSizeAtCompileTime, \
         IsVectorAtCompileTime = Base::IsVectorAtCompileTime };
@@ -404,11 +376,13 @@ namespace Eigen {
         MaxRowsAtCompileTime = Eigen::internal::traits<Derived>::MaxRowsAtCompileTime, \
         MaxColsAtCompileTime = Eigen::internal::traits<Derived>::MaxColsAtCompileTime, \
         Flags = Eigen::internal::traits<Derived>::Flags, \
+        CoeffReadCost = Eigen::internal::traits<Derived>::CoeffReadCost, \
         SizeAtCompileTime = Base::SizeAtCompileTime, \
         MaxSizeAtCompileTime = Base::MaxSizeAtCompileTime, \
         IsVectorAtCompileTime = Base::IsVectorAtCompileTime }; \
   using Base::derived; \
-  using Base::const_cast_derived;  
+  using Base::const_cast_derived;
+
 
 #define EIGEN_PLAIN_ENUM_MIN(a,b) (((int)a <= (int)b) ? (int)a : (int)b)
 #define EIGEN_PLAIN_ENUM_MAX(a,b) (((int)a >= (int)b) ? (int)a : (int)b)
@@ -441,7 +415,7 @@ namespace Eigen {
 
 #define EIGEN_MAKE_CWISE_BINARY_OP(METHOD,FUNCTOR) \
   template<typename OtherDerived> \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const CwiseBinaryOp<FUNCTOR<Scalar>, const Derived, const OtherDerived> \
+  EIGEN_STRONG_INLINE const CwiseBinaryOp<FUNCTOR<Scalar>, const Derived, const OtherDerived> \
   (METHOD)(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const \
   { \
     return CwiseBinaryOp<FUNCTOR<Scalar>, const Derived, const OtherDerived>(derived(), other.derived()); \
@@ -457,17 +431,5 @@ namespace Eigen {
       const LHS, \
       const RHS \
     >
-
-#ifdef EIGEN_EXCEPTIONS
-#  define EIGEN_THROW_X(X) throw X
-#  define EIGEN_THROW throw
-#  define EIGEN_TRY try
-#  define EIGEN_CATCH(X) catch (X)
-#else
-#  define EIGEN_THROW_X(X) std::abort()
-#  define EIGEN_THROW std::abort()
-#  define EIGEN_TRY if (true)
-#  define EIGEN_CATCH(X) else
-#endif
 
 #endif // EIGEN_MACROS_H

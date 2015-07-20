@@ -12,6 +12,10 @@ public:
     static I2CPlatform platform;
     return platform;
   }
+
+private:
+  I2CPlatform(I2CPlatform& platform) = delete;
+  void operator=(I2CPlatform& platform) = delete;
 };
 
 #endif

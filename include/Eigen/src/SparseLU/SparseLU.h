@@ -2,7 +2,7 @@
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
-// Copyright (C) 2012-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
+// Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -70,14 +70,9 @@ template <typename MatrixLType, typename MatrixUType> struct SparseLUMatrixURetu
   * \sa \ref OrderingMethods_Module
   */
 template <typename _MatrixType, typename _OrderingType>
-class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, public internal::SparseLUImpl<typename _MatrixType::Scalar, typename _MatrixType::Index>
+class SparseLU : public internal::SparseLUImpl<typename _MatrixType::Scalar, typename _MatrixType::Index>
 {
-  protected:
-    typedef SparseSolverBase<SparseLU<_MatrixType,_OrderingType> > APIBase;
-    using APIBase::m_isInitialized;
   public:
-    using APIBase::_solve_impl;
-    
     typedef _MatrixType MatrixType; 
     typedef _OrderingType OrderingType;
     typedef typename MatrixType::Scalar Scalar; 
@@ -91,11 +86,11 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     typedef internal::SparseLUImpl<Scalar, Index> Base;
     
   public:
-    SparseLU():m_lastError(""),m_Ustore(0,0,0,0,0,0),m_symmetricmode(false),m_diagpivotthresh(1.0),m_detPermR(1)
+    SparseLU():m_isInitialized(true),m_lastError(""),m_Ustore(0,0,0,0,0,0),m_symmetricmode(false),m_diagpivotthresh(1.0),m_detPermR(1)
     {
       initperfvalues(); 
     }
-    explicit SparseLU(const MatrixType& matrix):m_lastError(""),m_Ustore(0,0,0,0,0,0),m_symmetricmode(false),m_diagpivotthresh(1.0),m_detPermR(1)
+    SparseLU(const MatrixType& matrix):m_isInitialized(true),m_lastError(""),m_Ustore(0,0,0,0,0,0),m_symmetricmode(false),m_diagpivotthresh(1.0),m_detPermR(1)
     {
       initperfvalues(); 
       compute(matrix);
@@ -173,7 +168,6 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
       m_diagpivotthresh = thresh; 
     }
 
-#ifdef EIGEN_PARSED_BY_DOXYGEN
     /** \returns the solution X of \f$ A X = B \f$ using the current decomposition of A.
       *
       * \warning the destination matrix X in X = this->solve(B) must be colmun-major.
@@ -181,8 +175,26 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
       * \sa compute()
       */
     template<typename Rhs>
-    inline const Solve<SparseLU, Rhs> solve(const MatrixBase<Rhs>& B) const;
-#endif // EIGEN_PARSED_BY_DOXYGEN
+    inline const internal::solve_retval<SparseLU, Rhs> solve(const MatrixBase<Rhs>& B) const 
+    {
+      eigen_assert(m_factorizationIsOk && "SparseLU is not initialized."); 
+      eigen_assert(rows()==B.rows()
+                    && "SparseLU::solve(): invalid number of rows of the right hand side matrix B");
+          return internal::solve_retval<SparseLU, Rhs>(*this, B.derived());
+    }
+
+    /** \returns the solution X of \f$ A X = B \f$ using the current decomposition of A.
+      *
+      * \sa compute()
+      */
+    template<typename Rhs>
+    inline const internal::sparse_solve_retval<SparseLU, Rhs> solve(const SparseMatrixBase<Rhs>& B) const 
+    {
+      eigen_assert(m_factorizationIsOk && "SparseLU is not initialized."); 
+      eigen_assert(rows()==B.rows()
+                    && "SparseLU::solve(): invalid number of rows of the right hand side matrix B");
+          return internal::sparse_solve_retval<SparseLU, Rhs>(*this, B.derived());
+    }
     
     /** \brief Reports whether previous computation was successful.
       *
@@ -207,7 +219,7 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     }
 
     template<typename Rhs, typename Dest>
-    bool _solve_impl(const MatrixBase<Rhs> &B, MatrixBase<Dest> &X_base) const
+    bool _solve(const MatrixBase<Rhs> &B, MatrixBase<Dest> &X_base) const
     {
       Dest& X(X_base.derived());
       eigen_assert(m_factorizationIsOk && "The matrix should be factorized first");
@@ -243,58 +255,55 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
       *
       * \sa logAbsDeterminant(), signDeterminant()
       */
-    Scalar absDeterminant()
+     Scalar absDeterminant()
     {
-      using std::abs;
       eigen_assert(m_factorizationIsOk && "The matrix should be factorized first.");
       // Initialize with the determinant of the row matrix
       Scalar det = Scalar(1.);
-      //Note that the diagonal blocks of U are stored in supernodes,
+      // Note that the diagonal blocks of U are stored in supernodes,
       // which are available in the  L part :)
       for (Index j = 0; j < this->cols(); ++j)
       {
         for (typename SCMatrix::InnerIterator it(m_Lstore, j); it; ++it)
         {
-          if(it.row() < j) continue;
-          if(it.row() == j)
+          if(it.index() == j)
           {
+            using std::abs;
             det *= abs(it.value());
             break;
           }
         }
-      }
-      return det;
-    }
+       }
+       return det;
+     }
 
-    /** \returns the natural log of the absolute value of the determinant of the matrix
-      * of which **this is the QR decomposition
-      *
-      * \note This method is useful to work around the risk of overflow/underflow that's
-      * inherent to the determinant computation.
-      *
-      * \sa absDeterminant(), signDeterminant()
-      */
-    Scalar logAbsDeterminant() const
-    {
-      using std::log;
-      using std::abs;
-
-      eigen_assert(m_factorizationIsOk && "The matrix should be factorized first.");
-      Scalar det = Scalar(0.);
-      for (Index j = 0; j < this->cols(); ++j)
-      {
-        for (typename SCMatrix::InnerIterator it(m_Lstore, j); it; ++it)
-        {
-          if(it.row() < j) continue;
-          if(it.row() == j)
-          {
-            det += log(abs(it.value()));
-            break;
-          }
-        }
-      }
-      return det;
-    }
+     /** \returns the natural log of the absolute value of the determinant of the matrix
+       * of which **this is the QR decomposition
+       *
+       * \note This method is useful to work around the risk of overflow/underflow that's
+       * inherent to the determinant computation.
+       *
+       * \sa absDeterminant(), signDeterminant()
+       */
+     Scalar logAbsDeterminant() const
+     {
+       eigen_assert(m_factorizationIsOk && "The matrix should be factorized first.");
+       Scalar det = Scalar(0.);
+       for (Index j = 0; j < this->cols(); ++j)
+       {
+         for (typename SCMatrix::InnerIterator it(m_Lstore, j); it; ++it)
+         {
+           if(it.row() < j) continue;
+           if(it.row() == j)
+           {
+             using std::log; using std::abs;
+             det += log(abs(it.value()));
+             break;
+           }
+         }
+       }
+       return det;
+     }
 
     /** \returns A number representing the sign of the determinant
       *
@@ -303,14 +312,57 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     Scalar signDeterminant()
     {
       eigen_assert(m_factorizationIsOk && "The matrix should be factorized first.");
-      return Scalar(m_detPermR);
+      // Initialize with the determinant of the row matrix
+      Index det = 1;
+      // Note that the diagonal blocks of U are stored in supernodes,
+      // which are available in the  L part :)
+      for (Index j = 0; j < this->cols(); ++j)
+      {
+        for (typename SCMatrix::InnerIterator it(m_Lstore, j); it; ++it)
+        {
+          if(it.index() == j)
+          {
+            if(it.value()<0)
+              det = -det;
+            else if(it.value()==0)
+              return 0;
+            break;
+          }
+        }
+      }
+      return det * m_detPermR * m_detPermC;
+    }
+    
+    /** \returns The determinant of the matrix.
+      *
+      * \sa absDeterminant(), logAbsDeterminant()
+      */
+    Scalar determinant()
+    {
+      eigen_assert(m_factorizationIsOk && "The matrix should be factorized first.");
+      // Initialize with the determinant of the row matrix
+      Scalar det = Scalar(1.);
+      // Note that the diagonal blocks of U are stored in supernodes,
+      // which are available in the  L part :)
+      for (Index j = 0; j < this->cols(); ++j)
+      {
+        for (typename SCMatrix::InnerIterator it(m_Lstore, j); it; ++it)
+        {
+          if(it.index() == j)
+          {
+            det *= it.value();
+            break;
+          }
+        }
+      }
+      return det * Scalar(m_detPermR * m_detPermC);
     }
 
   protected:
     // Functions 
     void initperfvalues()
     {
-      m_perfv.panel_size = 1;
+      m_perfv.panel_size = 16;
       m_perfv.relax = 1; 
       m_perfv.maxsuper = 128; 
       m_perfv.rowblk = 16; 
@@ -320,6 +372,7 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
       
     // Variables 
     mutable ComputationInfo m_info;
+    bool m_isInitialized;
     bool m_factorizationIsOk;
     bool m_analysisIsOk;
     std::string m_lastError;
@@ -337,8 +390,8 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     // values for performance 
     internal::perfvalues<Index> m_perfv; 
     RealScalar m_diagpivotthresh; // Specifies the threshold used for a diagonal entry to be an acceptable pivot
-    Index m_nnzL, m_nnzU; // Nonzeros in L and U factors 
-    Index m_detPermR; // Determinant of the coefficient matrix
+    Index m_nnzL, m_nnzU; // Nonzeros in L and U factors
+    Index m_detPermR, m_detPermC; // Determinants of the permutation matrices
   private:
     // Disable copy constructor 
     SparseLU (const SparseLU& );
@@ -449,8 +502,6 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix)
   eigen_assert((matrix.rows() == matrix.cols()) && "Only for squared matrices");
   
   typedef typename IndexVector::Scalar Index; 
-  
-  m_isInitialized = true;
   
   
   // Apply the column permutation computed in analyzepattern()
@@ -616,7 +667,8 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix)
       }
       
       // Update the determinant of the row permutation matrix
-      if (pivrow != jj) m_detPermR *= -1;
+      // FIXME: the following test is not correct, we should probably take iperm_c into account and pivrow is not directly the row pivot.
+      if (pivrow != jj) m_detPermR = -m_detPermR;
 
       // Prune columns (0:jj-1) using column jj
       Base::pruneL(jj, m_perm_r.indices(), pivrow, nseg, segrep, repfnz_k, xprune, m_glu); 
@@ -631,10 +683,13 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix)
     jcol += panel_size;  // Move to the next panel
   } // end for -- end elimination 
   
+  m_detPermR = m_perm_r.determinant();
+  m_detPermC = m_perm_c.determinant();
+  
   // Count the number of nonzeros in factors 
   Base::countnz(n, m_nnzL, m_nnzU, m_glu); 
   // Apply permutation  to the L subscripts 
-  Base::fixupL(n, m_perm_r.indices(), m_glu); 
+  Base::fixupL(n, m_perm_r.indices(), m_glu);
   
   // Create supernode matrix L 
   m_Lstore.setInfos(m, n, m_glu.lusup, m_glu.xlusup, m_glu.lsub, m_glu.xlsub, m_glu.supno, m_glu.xsup); 
@@ -650,7 +705,7 @@ struct SparseLUMatrixLReturnType : internal::no_assignment_operator
 {
   typedef typename MappedSupernodalType::Index Index;
   typedef typename MappedSupernodalType::Scalar Scalar;
-  explicit SparseLUMatrixLReturnType(const MappedSupernodalType& mapL) : m_mapL(mapL)
+  SparseLUMatrixLReturnType(const MappedSupernodalType& mapL) : m_mapL(mapL)
   { }
   Index rows() { return m_mapL.rows(); }
   Index cols() { return m_mapL.cols(); }
@@ -667,7 +722,7 @@ struct SparseLUMatrixUReturnType : internal::no_assignment_operator
 {
   typedef typename MatrixLType::Index Index;
   typedef typename MatrixLType::Scalar Scalar;
-  explicit SparseLUMatrixUReturnType(const MatrixLType& mapL, const MatrixUType& mapU)
+  SparseLUMatrixUReturnType(const MatrixLType& mapL, const MatrixUType& mapU)
   : m_mapL(mapL),m_mapU(mapU)
   { }
   Index rows() { return m_mapL.rows(); }
@@ -675,11 +730,8 @@ struct SparseLUMatrixUReturnType : internal::no_assignment_operator
 
   template<typename Dest>   void solveInPlace(MatrixBase<Dest> &X) const
   {
-    /* Explicit type conversion as the Index type of MatrixBase<Dest> may be wider than Index */
-    eigen_assert(X.rows() <= NumTraits<Index>::highest());
-    eigen_assert(X.cols() <= NumTraits<Index>::highest());
-    Index nrhs = Index(X.cols());
-    Index n    = Index(X.rows());
+    Index nrhs = X.cols();
+    Index n = X.rows();
     // Backward solve with U
     for (Index k = m_mapL.nsuper(); k >= 0; k--)
     {
@@ -719,6 +771,35 @@ struct SparseLUMatrixUReturnType : internal::no_assignment_operator
   const MatrixLType& m_mapL;
   const MatrixUType& m_mapU;
 };
+
+namespace internal {
+  
+template<typename _MatrixType, typename Derived, typename Rhs>
+struct solve_retval<SparseLU<_MatrixType,Derived>, Rhs>
+  : solve_retval_base<SparseLU<_MatrixType,Derived>, Rhs>
+{
+  typedef SparseLU<_MatrixType,Derived> Dec;
+  EIGEN_MAKE_SOLVE_HELPERS(Dec,Rhs)
+
+  template<typename Dest> void evalTo(Dest& dst) const
+  {
+    dec()._solve(rhs(),dst);
+  }
+};
+
+template<typename _MatrixType, typename Derived, typename Rhs>
+struct sparse_solve_retval<SparseLU<_MatrixType,Derived>, Rhs>
+  : sparse_solve_retval_base<SparseLU<_MatrixType,Derived>, Rhs>
+{
+  typedef SparseLU<_MatrixType,Derived> Dec;
+  EIGEN_MAKE_SPARSE_SOLVE_HELPERS(Dec,Rhs)
+
+  template<typename Dest> void evalTo(Dest& dst) const
+  {
+    this->defaultEvalTo(dst);
+  }
+};
+} // end namespace internal
 
 } // End namespace Eigen 
 

@@ -16,6 +16,10 @@ public:
   }
 
   void set(std::uint8_t ch, float dc);
+
+private:
+  PWMPlatform(PWMPlatform& platform) = delete;
+  void operator=(PWMPlatform& platform) = delete;
 };
 
 #endif

@@ -81,7 +81,7 @@ USARTPlatform& Platform::get() {
 
 void Platform::init() {
   get<I2CPlatform>();
-  get<ICUPlatform>().init();
+  get<ICUPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();

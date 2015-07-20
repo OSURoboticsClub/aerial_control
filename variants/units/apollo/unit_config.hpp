@@ -25,10 +25,10 @@ const float ACC_Y_OFFSET = 0.0;
 const float ACC_Z_OFFSET = 0.0;
 
 // Initial angular position controller gains
-const float ANGPOS_X_KP = 1.0;
+const float ANGPOS_X_KP = 3.0;
 const float ANGPOS_X_KI = 0.0;
 const float ANGPOS_X_KD = 0.0;
-const float ANGPOS_Y_KP = 1.0;
+const float ANGPOS_Y_KP = 3.0;
 const float ANGPOS_Y_KI = 0.0;
 const float ANGPOS_Y_KD = 0.0;
 const float ANGPOS_Z_KP = 0.0;

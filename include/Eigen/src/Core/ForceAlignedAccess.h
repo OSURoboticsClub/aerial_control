@@ -39,7 +39,7 @@ template<typename ExpressionType> class ForceAlignedAccess
     typedef typename internal::dense_xpr_base<ForceAlignedAccess>::type Base;
     EIGEN_DENSE_PUBLIC_INTERFACE(ForceAlignedAccess)
 
-    explicit inline ForceAlignedAccess(const ExpressionType& matrix) : m_expression(matrix) {}
+    inline ForceAlignedAccess(const ExpressionType& matrix) : m_expression(matrix) {}
 
     inline Index rows() const { return m_expression.rows(); }
     inline Index cols() const { return m_expression.cols(); }
@@ -127,7 +127,7 @@ template<bool Enable>
 inline typename internal::add_const_on_value_type<typename internal::conditional<Enable,ForceAlignedAccess<Derived>,Derived&>::type>::type
 MatrixBase<Derived>::forceAlignedAccessIf() const
 {
-  return derived();  // FIXME This should not work but apparently is never used
+  return derived();
 }
 
 /** \returns an expression of *this with forced aligned access if \a Enable is true.
@@ -138,7 +138,7 @@ template<bool Enable>
 inline typename internal::conditional<Enable,ForceAlignedAccess<Derived>,Derived&>::type
 MatrixBase<Derived>::forceAlignedAccessIf()
 {
-  return derived();  // FIXME This should not work but apparently is never used
+  return derived();
 }
 
 } // end namespace Eigen

@@ -40,7 +40,7 @@ template<typename ExpressionType> class NestByValue
     typedef typename internal::dense_xpr_base<NestByValue>::type Base;
     EIGEN_DENSE_PUBLIC_INTERFACE(NestByValue)
 
-    explicit inline NestByValue(const ExpressionType& matrix) : m_expression(matrix) {}
+    inline NestByValue(const ExpressionType& matrix) : m_expression(matrix) {}
 
     inline Index rows() const { return m_expression.rows(); }
     inline Index cols() const { return m_expression.cols(); }

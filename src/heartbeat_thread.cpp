@@ -1,10 +1,13 @@
 #include "heartbeat_thread.hpp"
 
+#include "variant/indicator_platform.hpp"
+
 msg_t HeartbeatThread::main() {
+  auto& indicator = IndicatorPlatform::getInstance();
   while(true) {
-    // palSetPad(GPIOE, GPIOE_LED3_RED);
+    indicator.set(IndicatorIntent::HEARTBEAT, true);
     sleep(MS2ST(500));
-    // palClearPad(GPIOE, GPIOE_LED3_RED);
+    indicator.set(IndicatorIntent::HEARTBEAT, false);
     sleep(MS2ST(500));
   }
 

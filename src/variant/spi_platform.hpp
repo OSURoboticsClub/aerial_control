@@ -12,6 +12,10 @@ public:
     static SPIPlatform platform;
     return platform;
   }
+
+private:
+  SPIPlatform(SPIPlatform& platform) = delete;
+  void operator=(SPIPlatform& platform) = delete;
 };
 
 #endif
