@@ -6,9 +6,18 @@
 
 class USARTPlatform {
 public:
-  USARTPlatform();
+  /**
+   * Get the singleton instance.
+   */
+  static USARTPlatform& getInstance() {
+    static USARTPlatform platform;
+    return platform;
+  }
 
   chibios_rt::BaseSequentialStreamInterface& getPrimaryStream();
+
+private:
+  USARTPlatform();
 };
 
 #endif

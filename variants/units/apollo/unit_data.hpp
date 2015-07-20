@@ -6,13 +6,14 @@
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "motor/multirotor_quad_x_motor_mapper.hpp"
-#include "input/offboard_input_source.hpp"
+#include "input/ppm_input_source.hpp"
 #include "sensor/accelerometer.hpp"
 #include "sensor/gyroscope.hpp"
 #include "sensor/magnetometer.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
+#include "variant/icu_platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.532f;
 static const float MOTOR_PWM_MAX = 0.932f;
@@ -22,10 +23,11 @@ struct UnitData {
   PWMDeviceGroup<4> motors;
   MultirotorQuadXMotorMapper motorMapper;
 
-  WorldEstimator world;
   AtmosphericLocationEstimator location;
   DCMAttitudeEstimator attitude;
-  OffboardInputSource inputSource;
+  WorldEstimator world;
+  PPMInputSourceConfig ppmConfig;
+  PPMInputSource inputSource;
 
   MultirotorVehicleSystem system;
 
@@ -40,7 +42,17 @@ struct UnitData {
       location(communicator),
       attitude(communicator),
       world(location, attitude, communicator),
-      inputSource(communicator),
+      ppmConfig{
+        .minStartWidth   = 2500,
+        .minChannelWidth = 800,
+        .maxChannelWidth = 2200,
+        .channelThrottle = 0,
+        .channelRoll     = 1,
+        .channelPitch    = 2,
+        .channelYaw      = 3,
+        .channelArmed    = 4,
+      },
+      inputSource(platform.get<ICUPlatform>(), ppmConfig),
       system(platform.get<Gyroscope>(),
              platform.get<Accelerometer>(),
              std::experimental::nullopt,

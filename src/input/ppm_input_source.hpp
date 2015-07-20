@@ -5,11 +5,39 @@
 
 #include <hal.h>
 
-#include <input/input_source.hpp>
+#include "input/input_source.hpp"
+#include "variant/icu_platform.hpp"
 
-static constexpr int MODE_MANUAL = 0;
-static constexpr int MODE_ALTCTL = 1;
-static constexpr int MODE_AUTO   = 2;
+/**
+ * The width, in microseconds, of a pulse on a particular channel.
+ */
+using ChannelWidth = unsigned int;
+
+/**
+ * A chanel's index into the internal channel buffer. These are ordered as they
+ * arrive in the PPM signal.
+ */
+using ChannelIndex = unsigned int;
+
+struct PPMInputSourceConfig {
+  ChannelWidth minStartWidth;
+  ChannelWidth minChannelWidth;
+  ChannelWidth maxChannelWidth;
+
+  ChannelIndex channelThrottle;
+  ChannelIndex channelRoll;
+  ChannelIndex channelPitch;
+  ChannelIndex channelYaw;
+  ChannelIndex channelArmed;
+};
+
+/**
+ * Whether a channel's range is -1..1 (full scale) or 0..1 (half scale).
+ */
+enum class PPMChannelType {
+  FULL_SCALE,
+  HALF_SCALE
+};
 
 enum class PPMState {
   /**
@@ -23,12 +51,48 @@ enum class PPMState {
   SYNCED
 };
 
-class PPMInputSource : public InputSource {
+class PPMInputSource : public InputSource, ICUTriggerable {
 public:
-  PPMInputSource();
+  PPMInputSource(ICUPlatform& icu, const PPMInputSourceConfig config);
 
-  static void trigger(ICUDriver *icup);
+  /**
+   * Called to signal the start of a pulse.
+   */
+  void trigger(ICUDriver *icup);
+
   ControllerInput read() override;
+
+private:
+  /**
+   * The maximum number of supported PPM channels. Note that this is constrained
+   * by the PPM frame width.
+   */
+  static const ChannelIndex MAX_CHANNELS = 12;
+
+  /**
+   * Scale a channel's raw pulse width to either -1..1 or 0..1.
+   */
+  float scaleChannel(PPMChannelType type, ChannelWidth input);
+
+  const PPMInputSourceConfig config;
+
+  /**
+   * The current decoder state.
+   */
+  PPMState state;
+
+  /**
+   * The current channel.
+   */
+  ChannelIndex currentChannel;
+
+  /**
+   * The time of the last trigger.
+   */
+  systime_t lastPulseStart;
+
+  std::array<ChannelIndex, MAX_CHANNELS> channelBuffer;
+  std::array<ChannelIndex, MAX_CHANNELS> channelTempBuffer;
 };
 
 #endif
