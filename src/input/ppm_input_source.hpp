@@ -29,6 +29,9 @@ struct PPMInputSourceConfig {
   ChannelIndex channelPitch;
   ChannelIndex channelYaw;
   ChannelIndex channelArmed;
+  ChannelIndex channelVelocityMode;
+  ChannelIndex channelRange;
+  ChannelIndex channelControlMode;
 };
 
 /**
@@ -49,6 +52,13 @@ enum class PPMState {
    * Start frame found. Reading data frames.
    */
   SYNCED
+};
+
+// TODO: This should probably be configurable
+enum class InputControlMode {
+  MANUAL,
+  ALTCTL,
+  AUTO
 };
 
 class PPMInputSource : public InputSource, ICUTriggerable {
@@ -73,6 +83,13 @@ private:
    * Scale a channel's raw pulse width to either -1..1 or 0..1.
    */
   float scaleChannel(PPMChannelType type, ChannelWidth input);
+
+  /**
+   * Map channel to index values
+   *
+   * @param divisions Number of indices to chop up the channel into.
+   */
+  uint8_t channelToIndex(ChannelWidth input, uint8_t divisions);
 
   const PPMInputSourceConfig config;
 
