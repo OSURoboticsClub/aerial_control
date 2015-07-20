@@ -20,8 +20,6 @@ public:
     return platform;
   }
 
-  void init();
-
   void registerTrigger(ICUTriggerable *instance) {
     instances[triggerIndex++] = instance;
   }

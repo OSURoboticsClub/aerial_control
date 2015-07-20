@@ -39,4 +39,6 @@ void Platform::init() {
   get<PWMPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();
+
+  get<ICUPlatform>().init();
 }
