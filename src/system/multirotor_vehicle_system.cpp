@@ -60,8 +60,14 @@ void MultirotorVehicleSystem::update() {
   // Poll for controller input
   ControllerInput input = inputSource.read();
 
-  if(input.valid) {
-    setArmed(input.armed);
+  if(input.valid && input.armed) {
+    // Ensure sensors are healthy before arming, but don't disarm if sensors
+    // become unhealthy.
+    if(healthy()) {
+      setArmed(true);
+    }
+  } else {
+    setArmed(false);
   }
 
   // Run the controllers
