@@ -66,28 +66,32 @@ void MultirotorVehicleSystem::update() {
   // Poll for controller input
   ControllerInput input = inputSource.read();
 
-  // Set mode
+  // Set armed
   if (calibrated && input.valid) {
     setArmed(input.armed);
+  }
+  else {
+    setArmed(false);
+  }
 
-    if (isArmed()) {
-      // AUTO
-      if (input.mode == (int)InputControlMode::AUTO) {
-        mode = MultirotorControlMode::ANGULAR_POS;   // TODO(yoos): AUTO disabled until we implement controller
-      }
-      // MANUAL or ALTCTL
-      else {
-        if (input.velocityMode) {
-          mode = MultirotorControlMode::ANGULAR_VEL;
-        }
-        else {
-          mode = MultirotorControlMode::ANGULAR_POS;
-        }
-      }
+  // Set mode
+  if (isArmed()) {
+    // AUTO
+    if (input.mode == (int)InputControlMode::AUTO) {
+      mode = MultirotorControlMode::ANGULAR_POS;   // TODO(yoos): AUTO disabled until we implement controller
     }
+    // MANUAL or ALTCTL
     else {
-      mode = MultirotorControlMode::DISARMED;
+      if (input.velocityMode) {
+        mode = MultirotorControlMode::ANGULAR_VEL;
+      }
+      else {
+        mode = MultirotorControlMode::ANGULAR_POS;
+      }
     }
+  }
+  else {
+    mode = MultirotorControlMode::DISARMED;
   }
 
   // Run the controllers
