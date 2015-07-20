@@ -67,7 +67,7 @@ void MultirotorVehicleSystem::update() {
   ControllerInput input = inputSource.read();
 
   // Set armed
-  if (calibrated && input.valid) {
+  if (calibrated && healthy() && input.valid) {
     setArmed(input.armed);
   }
   else {
