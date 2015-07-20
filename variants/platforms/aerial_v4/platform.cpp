@@ -58,14 +58,12 @@ template <> Gyroscope&     Platform::get() { return get<MPU9250>(); }
 
 template <>
 DigitalPlatform& Platform::get() {
-  static DigitalPlatform digPlatform;
-  return digPlatform;
+  return DigitalPlatform::getInstance();
 }
 
 template <>
 I2CPlatform& Platform::get() {
-  static I2CPlatform i2cPlatform;
-  return i2cPlatform;
+  return I2CPlatform::getInstance();
 }
 
 template <>
@@ -75,32 +73,28 @@ ICUPlatform& Platform::get() {
 
 template <>
 PWMPlatform& Platform::get() {
-  static PWMPlatform pwmPlatform;
-  return pwmPlatform;
+  return PWMPlatform::getInstance();
 }
 
 template <>
 SDCPlatform& Platform::get() {
-  static SDCPlatform sdcPlatform;
-  return sdcPlatform;
+  return SDCPlatform::getInstance();
 }
 
 template <>
 SPIPlatform& Platform::get() {
-  static SPIPlatform spiPlatform;
-  return spiPlatform;
+  return SPIPlatform::getInstance();
 }
 
 template <>
 USARTPlatform& Platform::get() {
-  static USARTPlatform usartPlatform;
-  return usartPlatform;
+  return USARTPlatform::getInstance();
 }
 
 void Platform::init() {
   get<DigitalPlatform>();
   get<I2CPlatform>();
-  get<ICUPlatform>().init();
+  get<ICUPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
   get<USARTPlatform>();
