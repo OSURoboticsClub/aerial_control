@@ -44,7 +44,14 @@ struct traits<Reverse<MatrixType, Direction> >
     ColsAtCompileTime = MatrixType::ColsAtCompileTime,
     MaxRowsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
     MaxColsAtCompileTime = MatrixType::MaxColsAtCompileTime,
-    Flags = _MatrixTypeNested::Flags & (RowMajorBit | LvalueBit)
+
+    // let's enable LinearAccess only with vectorization because of the product overhead
+    LinearAccess = ( (Direction==BothDirections) && (int(_MatrixTypeNested::Flags)&PacketAccessBit) )
+                 ? LinearAccessBit : 0,
+
+    Flags = int(_MatrixTypeNested::Flags) & (HereditaryBits | LvalueBit | PacketAccessBit | LinearAccess),
+
+    CoeffReadCost = _MatrixTypeNested::CoeffReadCost
   };
 };
 
@@ -67,7 +74,6 @@ template<typename MatrixType, int Direction> class Reverse
 
     typedef typename internal::dense_xpr_base<Reverse>::type Base;
     EIGEN_DENSE_PUBLIC_INTERFACE(Reverse)
-    typedef typename internal::remove_all<MatrixType>::type NestedExpression;
     using Base::IsRowMajor;
 
     // next line is necessary because otherwise const version of operator()
@@ -89,7 +95,7 @@ template<typename MatrixType, int Direction> class Reverse
     typedef internal::reverse_packet_cond<PacketScalar,ReversePacket> reverse_packet;
   public:
 
-    explicit inline Reverse(const MatrixType& matrix) : m_matrix(matrix) { }
+    inline Reverse(const MatrixType& matrix) : m_matrix(matrix) { }
 
     EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Reverse)
 
@@ -184,7 +190,7 @@ template<typename Derived>
 inline typename DenseBase<Derived>::ReverseReturnType
 DenseBase<Derived>::reverse()
 {
-  return ReverseReturnType(derived());
+  return derived();
 }
 
 /** This is the const version of reverse(). */
@@ -192,7 +198,7 @@ template<typename Derived>
 inline const typename DenseBase<Derived>::ConstReverseReturnType
 DenseBase<Derived>::reverse() const
 {
-  return ConstReverseReturnType(derived());
+  return derived();
 }
 
 /** This is the "in place" version of reverse: it reverses \c *this.
