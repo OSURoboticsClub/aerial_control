@@ -72,7 +72,7 @@ void MultirotorVehicleSystem::update() {
 
     if (isArmed()) {
       // AUTO
-      if (input.mode == MODE_AUTO) {
+      if (input.mode == (int)InputControlMode::AUTO) {
         mode = MultirotorControlMode::ANGULAR_POS;   // TODO(yoos): AUTO disabled until we implement controller
       }
       // MANUAL or ALTCTL
@@ -211,7 +211,7 @@ void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstim
   };
 
   // Reset altitude setpoint only if not in ALTCTL mode
-  if (input.mode != MODE_ALTCTL) {
+  if (input.mode != (int)InputControlMode::ALTCTL) {
     altSp = est.loc.alt;
   }
   // Somewhat hacky way to achieve altitude hold. Pilot should first find
