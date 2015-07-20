@@ -3,8 +3,6 @@
 
 class SPIPlatform {
 public:
-  SPIPlatform();
-
   /**
    * Get the singleton instance.
    */
@@ -14,6 +12,8 @@ public:
   }
 
 private:
+  SPIPlatform();
+
   SPIPlatform(SPIPlatform& platform) = delete;
   void operator=(SPIPlatform& platform) = delete;
 };

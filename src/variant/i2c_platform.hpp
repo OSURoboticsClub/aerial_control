@@ -3,8 +3,6 @@
 
 class I2CPlatform {
 public:
-  I2CPlatform();
-
   /**
    * Get the singleton instance.
    */
@@ -14,6 +12,8 @@ public:
   }
 
 private:
+  I2CPlatform();
+
   I2CPlatform(I2CPlatform& platform) = delete;
   void operator=(I2CPlatform& platform) = delete;
 };

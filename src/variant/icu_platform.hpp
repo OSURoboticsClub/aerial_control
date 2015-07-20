@@ -12,7 +12,6 @@ public:
 
 class ICUPlatform {
 public:
-  ICUPlatform();
   void init();
 
   /**
@@ -34,6 +33,8 @@ public:
   }
 
 private:
+  ICUPlatform();
+
   ICUPlatform(ICUPlatform& platform) = delete;
   void operator=(ICUPlatform& platform) = delete;
 

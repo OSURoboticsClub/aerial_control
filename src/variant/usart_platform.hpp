@@ -6,8 +6,6 @@
 
 class USARTPlatform {
 public:
-  USARTPlatform();
-
   /**
    * Get the singleton instance.
    */
@@ -19,6 +17,8 @@ public:
   chibios_rt::BaseSequentialStreamInterface& getPrimaryStream();
 
 private:
+  USARTPlatform();
+
   USARTPlatform(USARTPlatform& platform) = delete;
   void operator=(USARTPlatform& platform) = delete;
 };

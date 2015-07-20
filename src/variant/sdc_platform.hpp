@@ -6,9 +6,18 @@
 
 class SDCPlatform {
 public:
-  SDCPlatform();
+  /**
+   * Get the singleton instance.
+   */
+  static SDCPlatform& getInstance() {
+    static SDCPlatform platform;
+    return platform;
+  }
 
   SDCDriver& getSDCDriver();
+
+private:
+  SDCPlatform();
 };
 
 #endif

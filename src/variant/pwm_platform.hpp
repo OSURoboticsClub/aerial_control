@@ -5,8 +5,6 @@
 
 class PWMPlatform {
 public:
-  PWMPlatform();
-
   /**
    * Get the singleton instance.
    */
@@ -18,6 +16,8 @@ public:
   void set(std::uint8_t ch, float dc);
 
 private:
+  PWMPlatform();
+
   PWMPlatform(PWMPlatform& platform) = delete;
   void operator=(PWMPlatform& platform) = delete;
 };
