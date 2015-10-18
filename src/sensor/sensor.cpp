@@ -15,7 +15,7 @@ void Sensor::setAxisConfig(std::array<int, 3> newAxisConfig) {
 
 void Sensor::setOffsets(std::array<float, 3> newOffsets) {
   for (int i=0; i<3; i++) {
-    offsets[i] = newOffsets[i];
+    offsets[axes[i]] = newOffsets[i];
   }
 }
 
