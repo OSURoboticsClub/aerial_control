@@ -72,18 +72,20 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float F_L = torque / (F_NUM * F_D);   // Force required per fin (N)
 
   // Lift coefficient
-  v_rocket = std::max(20.0f, v_rocket);   // Prevent ridiculously large C_L
+  v_rocket = std::max(60.0f, v_rocket);   // Prevent ridiculously large C_L
   float C_L = 2*F_L/(p_air * pow(v_rocket,2) * F_AREA);   // Subsonic
   //float C_L = (2 * M_PI * m) / (E * beta);   // Supersonic
 
-  // Angle of attack (limit to 10 deg stall angle)
-  float alpha = C_L * 90/M_PI/M_PI;   // Radians
+  // Angle of attack (limit to 10 deg stall angle) based on lift slope of thin
+  // airfoil being approximately 2pi per radian
+  float alpha = C_L / (2*M_PI);   // Radians
   alpha = std::max(-M_PI/18, std::min(M_PI/18, alpha));   // [-pi/18, pi/18]
 
   // PWM duty cycle offset
   // Scale factor was obtained by measuring fin angle at 0.1 duty cycle away
-  // from center.
-  float dc_offset = alpha * 0.1 / 0.422854;   // [-0.5, 0.5]
+  // from center. Further scaled to duty cycle range of 0.14. Clusterfucky,
+  // I know.
+  float dc_offset = alpha * 0.1 / 0.422854 / 0.14;   // [-0.5, 0.5]
 
   // Fin controller
   float rollActuatorSp = 0.5 + dc_offset;
