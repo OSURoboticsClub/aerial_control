@@ -270,14 +270,10 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   }
 
   // Apogee occurs after motor cutoff
-  if (!powered) {
-    // We should see a sudden forward acceleration from the main separation
-    // event.
-    static int count = 100;
-    count = ((*meas.accel).axes[0] > 0.0) ? (count-1) : 10;
-    if (count == 0) {
-      return CanardState::APOGEE;
-    }
+  if (!powered &&
+      est.loc.dAlt < 2.0 &&
+      (*meas.accel).axes[0] > -0.2) {
+    return CanardState::APOGEE;
   }
 
   // Run controller
@@ -290,29 +286,9 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
     AngularVelocitySetpoint velSp { -3.14159, 0, 0, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
   }
-  else if (flightTime < 7.0) {
+  else if (flightTime < 10.0) {
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 8.0) {
-    AngularVelocitySetpoint velSp { 1, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 9.0) {
-    AngularVelocitySetpoint velSp { -1, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 11.0) {
-    AngularVelocitySetpoint velSp { 2, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 13.0) {
-    AngularPositionSetpoint posSp { 0, 0, 0, 0 };
-    sp = pipeline.run(est, posSp, attPosController, attVelController, attAccController);
-  }
-  else if (flightTime < 17.0) {
-    AngularPositionSetpoint posSp { 3.14159, 0, 0, 0 };
-    sp = pipeline.run(est, posSp, attPosController, attVelController, attAccController);
   }
   else {
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
