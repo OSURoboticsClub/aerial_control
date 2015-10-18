@@ -72,7 +72,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float F_L = torque / (F_NUM * F_D);   // Force required per fin (N)
 
   // Lift coefficient
-  v_rocket = std::max(100.0f, v_rocket);   // Prevent ridiculously large C_L
+  v_rocket = std::max(20.0f, v_rocket);   // Prevent ridiculously large C_L
   float C_L = 2*F_L/(p_air * pow(v_rocket,2) * F_AREA);   // Subsonic
   //float C_L = (2 * M_PI * m) / (E * beta);   // Supersonic
 
