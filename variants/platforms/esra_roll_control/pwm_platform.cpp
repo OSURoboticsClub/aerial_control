@@ -5,14 +5,14 @@
 // TODO(yoos): v4.0 will switch these around so we can share a 50 Hz timer
 // channel between servos and status LEDs.
 static const PWMConfig PWMD1_CONFIG {
-  2000000,    // 2 MHz PWM clock frequency.
-  1000,      // PWM period 500 us.
+  500000,    // 500 kHz PWM clock frequency.
+  1000,      // PWM period 2.0 ms.
   NULL,      // No callback.
   {
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL}
+    {PWM_OUTPUT_DISABLED, NULL},
+    {PWM_OUTPUT_DISABLED, NULL}
   },   // Channel configurations
   0,0   // HW dependent
 };
@@ -31,27 +31,14 @@ static const PWMConfig PWMD3_CONFIG {
 };
 
 static const PWMConfig PWMD4_CONFIG {
-  250000,    // 250 kHz PWM clock frequency.
-  1000,      // PWM period 4.0 ms.
+  500000,    // 500 kHz PWM clock frequency.
+  2000,      // PWM period 4.0 ms.
   NULL,      // No callback.
   {
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_DISABLED, NULL},
+    {PWM_OUTPUT_DISABLED, NULL},
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
     {PWM_OUTPUT_ACTIVE_HIGH, NULL}
-  },   // Channel configurations
-  0,0   // HW dependent
-};
-
-static const PWMConfig PWMD8_CONFIG {
-  2000000,    // 2 MHz PWM clock frequency.
-  1000,      // PWM period 500 us.
-  NULL,      // No callback.
-  {
-    {PWM_OUTPUT_ACTIVE_LOW, NULL},
-    {PWM_OUTPUT_DISABLED, NULL},
-    {PWM_OUTPUT_DISABLED, NULL},
-    {PWM_OUTPUT_DISABLED, NULL}
   },   // Channel configurations
   0,0   // HW dependent
 };
@@ -61,8 +48,6 @@ PWMPlatform::PWMPlatform() {
   pwmStart(&PWMD1, &PWMD1_CONFIG);
   palSetPadMode(GPIOA, 8, PAL_MODE_ALTERNATE(1));
   palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(1));
-  palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(1));
-  palSetPadMode(GPIOA, 11, PAL_MODE_ALTERNATE(1));
 
   // TIM3
   pwmStart(&PWMD3, &PWMD3_CONFIG);
@@ -73,14 +58,8 @@ PWMPlatform::PWMPlatform() {
 
   // TIM4
   pwmStart(&PWMD4, &PWMD4_CONFIG);
-  palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(2));
-  palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(2));
   palSetPadMode(GPIOB, 8, PAL_MODE_ALTERNATE(2));
   palSetPadMode(GPIOB, 9, PAL_MODE_ALTERNATE(2));
-
-  // TIM8
-  pwmStart(&PWMD8, &PWMD8_CONFIG);
-  palSetPadMode(GPIOA, 5, PAL_MODE_ALTERNATE(3));
 }
 
 void PWMPlatform::set(std::uint8_t ch, float dc) {
@@ -96,15 +75,13 @@ void PWMPlatform::set(std::uint8_t ch, float dc) {
     pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD3, dc * 10000.0f);
     pwmEnableChannel(&PWMD3, ch-8, width);
   }
-  else if (ch < 13) {
-    pwmcnt_t width = PWM_PERCENTAGE_TO_WIDTH(&PWMD8, dc * 10000.0f);
-    pwmEnableChannel(&PWMD8, 0, width);
-  }
 }
 
 float PWMPlatform::get(std::uint8_t ch) {
   if (ch == 0) {
-    // TODO(yoos): Get ch 4 through ICU
+    if (palReadPad(GPIOB, 7)) {
+      return 1.0;
+    }
   }
   return 0.0;
 }

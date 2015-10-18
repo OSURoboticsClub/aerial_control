@@ -2,6 +2,14 @@
 
 #include "hal.h"
 
+// UART1 configuration (Debug)
+static const SerialConfig UART1_CONFIG {
+  115200,
+  0,
+  USART_CR2_STOP1_BITS | USART_CR2_LINEN,
+  0
+};
+
 // UART2 configuration (XBee)
 static const SerialConfig UART2_CONFIG {
   38400,
@@ -10,9 +18,9 @@ static const SerialConfig UART2_CONFIG {
   0
 };
 
-// UART4 configuration (Unused)
+// UART4 configuration (Geiger counter)
 static const SerialConfig UART4_CONFIG {
-  115200,
+  9600,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
@@ -20,7 +28,7 @@ static const SerialConfig UART4_CONFIG {
 
 // UART6 configuration (GPS)
 static const SerialConfig UART6_CONFIG {
-  115200,
+  9600,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
@@ -31,6 +39,11 @@ USARTPlatform::USARTPlatform() {
   palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);   // RX
   palSetPad(GPIOA, 3);
   chThdSleepMilliseconds(500);
+
+  // UART1
+  sdStart(&SD1, &UART1_CONFIG);
+  palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(7));   // TX
+  palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(7));   // RX
 
   // UART2
   sdStart(&SD2, &UART2_CONFIG);

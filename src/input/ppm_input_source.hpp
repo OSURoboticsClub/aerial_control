@@ -23,6 +23,7 @@ enum class PPMState {
   SYNCED
 };
 
+#if HAL_USE_ICU
 class PPMInputSource : public InputSource {
 public:
   PPMInputSource();
@@ -30,5 +31,6 @@ public:
   static void trigger(ICUDriver *icup);
   ControllerInput read() override;
 };
+#endif // HAL_USE_ICU
 
 #endif

@@ -13,9 +13,9 @@
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
 
-static const float MOTOR_PWM_MIN = 0.275f;
-static const float MOTOR_PWM_MAX = 0.475f;
-static const float MOTOR_PWM_SAFE = 0.375f;
+static const float MOTOR_PWM_MIN = 0.320f;
+static const float MOTOR_PWM_MAX = 0.420f;
+static const float MOTOR_PWM_SAFE = 0.370f;
 
 struct UnitData {
   PWMDeviceGroup<1> motors;
@@ -44,6 +44,7 @@ struct UnitData {
           platform.getIdx<Accelerometer>(0),
           std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
           std::experimental::make_optional(&platform.get<Barometer>()),
+          std::experimental::nullopt,
           std::experimental::make_optional(&platform.get<GPS>()),
           platform.get<Gyroscope>(),
           std::experimental::nullopt,

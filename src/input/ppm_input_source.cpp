@@ -4,6 +4,8 @@
 #include <util/time.hpp>
 #include <chprintf.h>
 
+#if HAL_USE_ICU
+
 static constexpr double M_PI = 3.1415926535;
 static constexpr int MAX_CHANNELS = 12;
 static constexpr int MIN_START_WIDTH = 2500;
@@ -162,3 +164,5 @@ ControllerInput PPMInputSource::read() {
 
   return input;
 }
+
+#endif // HAL_USE_ICU

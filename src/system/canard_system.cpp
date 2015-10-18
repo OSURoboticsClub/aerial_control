@@ -63,7 +63,7 @@ void CanardSystem::update() {
   WorldEstimate estimate = estimator.update(meas);
 
   // Run the controllers
-  ActuatorSetpoint actuatorSp = {0,0,0,0};
+  ActuatorSetpoint actuatorSp = {0.5,0,0,0};
 
   // Run state machine
   switch (state) {

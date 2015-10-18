@@ -5,6 +5,7 @@
 #include "drivers/h3lis331dl.hpp"
 #include "drivers/mpu6000.hpp"
 #include "drivers/ms5611.hpp"
+#include "drivers/sfgeiger.hpp"
 #include "drivers/ublox_neo7.hpp"
 #include "variant/digital_platform.hpp"
 #include "variant/i2c_platform.hpp"
@@ -16,8 +17,8 @@
 // H3LIS331DL SPI configuration
 static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
-  GPIOA,
-  4,
+  GPIOC,
+  15,
   SPI_CR1_BR_1   // 21000000/2^2 = 5250000
 };
 
@@ -42,7 +43,7 @@ Platform::Platform() {
 
 template <>
 H3LIS331DL& Platform::get() {
-  static H3LIS331DL acc(&SPID2, &H3LIS331DL_CONFIG);
+  static H3LIS331DL acc(&SPID3, &H3LIS331DL_CONFIG);
   return acc;
 }
 
@@ -59,6 +60,12 @@ MS5611& Platform::get() {
 }
 
 template <>
+SFGeiger& Platform::get() {
+  static SFGeiger ggr(&SD4);
+  return ggr;
+}
+
+template <>
 UBloxNEO7& Platform::get() {
   static UBloxNEO7 gps(&SD6);
   return gps;
@@ -69,6 +76,7 @@ template <> Accelerometer& Platform::getIdx(int idx) {
   else                                    { return get<MPU6000>(); }
 }
 template <> Barometer&    Platform::get() { return get<MS5611>(); }
+template <> Geiger&       Platform::get() { return get<SFGeiger>(); }
 template <> GPS&          Platform::get() { return get<UBloxNEO7>(); }
 template <> Gyroscope&    Platform::get() { return get<MPU6000>(); }
 
@@ -121,5 +129,6 @@ void Platform::init() {
   get<H3LIS331DL>().init();
   get<MPU6000>().init();
   get<MS5611>().init();
+  get<SFGeiger>().init();
   get<UBloxNEO7>().init();
 }

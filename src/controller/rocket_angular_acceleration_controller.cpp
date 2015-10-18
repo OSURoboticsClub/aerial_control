@@ -81,7 +81,9 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   alpha = std::max(-M_PI/18, std::min(M_PI/18, alpha));   // [-pi/18, pi/18]
 
   // PWM duty cycle offset
-  float dc_offset = alpha / (2*M_PI/18);   // [-0.5, 0.5]
+  // Scale factor was obtained by measuring fin angle at 0.1 duty cycle away
+  // from center.
+  float dc_offset = alpha * 0.1 / 0.422854;   // [-0.5, 0.5]
 
   // Fin controller
   float rollActuatorSp = 0.5 + dc_offset;
