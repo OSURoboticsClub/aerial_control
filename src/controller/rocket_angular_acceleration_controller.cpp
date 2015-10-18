@@ -78,7 +78,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
 
   // Angle of attack (limit to 10 deg stall angle)
   float alpha = C_L * 90/M_PI/M_PI;   // Radians
-  alpha = max(-M_PI/18, min(M_PI/18, alpha));   // [-pi/18, pi/18]
+  alpha = std::max(-M_PI/18, std::min(M_PI/18, alpha));   // [-pi/18, pi/18]
 
   // PWM duty cycle offset
   float dc_offset = alpha / (2*M_PI/18);   // [-0.5, 0.5]
