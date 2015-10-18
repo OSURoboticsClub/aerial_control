@@ -25,6 +25,12 @@ CanardSystem::CanardSystem(
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
+  gyr.setAxisConfig(unit_config::GYR_AXES);
+  accel.setAxisConfig(unit_config::ACC_AXES);
+  (*accelH)->setAxisConfig(unit_config::ACCH_AXES);
+  gyr.setOffsets(unit_config::GYR_OFFSETS);
+  accel.setOffsets(unit_config::ACC_OFFSETS);
+  (*accelH)->setOffsets(unit_config::ACCH_OFFSETS);
 }
 
 void CanardSystem::update() {
@@ -92,6 +98,10 @@ void CanardSystem::update() {
     break;
   }
 
+  // DEBUG
+  //AngularPositionSetpoint posSp {0, 0, 0, 0};
+  //actuatorSp = pipeline.run(estimate, posSp, attPosController, attVelController, attAccController);
+
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
 
@@ -149,15 +159,14 @@ CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
 
   static bool calibrated = false;
   static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets {0,0,0};
-  static std::array<float, 3> accOffsets {0,0,0};
+  static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
 
   // Calibrate ground altitude
   groundAltitude = est.loc.alt;
 
   // Calibrate gyroscope
   for (int i=0; i<3; i++) {
-    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i])/(calibCount+1);
+    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
   }
   calibCount++;
 
