@@ -16,7 +16,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
 
   // Constants
-  const float M_PI = 3.1415926535;
+  const float M_PI   = 3.1415926535;
   const float F_LE   = M_PI * 7/18;    // Fin leading edge angle (rad)
   const float F_TR   = 0;              // Fin trailing edge distance past fin base (m)
   const float F_LEN  = 0.123;          // Fin length (m)
@@ -24,7 +24,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   const float F_CP   = 0.33 * F_LEN;   // Fin Cp (m)
   const float F_NUM  = 2;              // Number of fins
   const float F_D    = 0.06477;        // Distance from roll axis to fin Cp (m)
-  const float I      = 1;              // TODO: Rocket rotational inertia
+  const float I      = 1.45;           // Rocket rotational inertia (kg*m^2)
 
   // Sensor inputs
   //float alt = est.loc.alt;   // Altitude (m)
@@ -76,8 +76,15 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float C_L = 2*F_L/(p_air * pow(v_rocket,2) * F_AREA);   // Subsonic
   //float C_L = (2 * M_PI * m) / (E * beta);   // Supersonic
 
+  // Angle of attack (limit to 10 deg stall angle)
+  float alpha = C_L * 90/M_PI/M_PI;   // Radians
+  alpha = max(-M_PI/18, min(M_PI/18, alpha));   // [-pi/18, pi/18]
+
+  // PWM duty cycle offset
+  float dc_offset = alpha / (2*M_PI/18);   // [-0.5, 0.5]
+
   // Fin controller
-  float rollActuatorSp = 0.5 + C_L/(2*M_PI);   // Fin angle
+  float rollActuatorSp = 0.5 + dc_offset;
 
   // Output
   ActuatorSetpoint setpoint {
