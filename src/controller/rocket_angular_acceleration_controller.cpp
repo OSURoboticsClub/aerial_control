@@ -13,7 +13,7 @@ RocketAngularAccelerationController::RocketAngularAccelerationController()
 
 ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& est, const AngularAccelerationSetpoint& input) {
   // Limit to maximum angular accelerations
-  float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
+  float yawAccSp = std::max(-unit_config::MAX_YAW_ACC, std::min(unit_config::MAX_YAW_ACC, input.yawAcc));
 
   // Constants
   const float M_PI   = 3.1415926535;
@@ -68,7 +68,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   //}
 
   // Roll controller
-  float torque = I * rollAccSp;
+  float torque = I * yawAccSp;
   float F_L = torque / (F_NUM * F_D);   // Force required per fin (N)
 
   // Lift coefficient
@@ -92,9 +92,9 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
 
   // Output
   ActuatorSetpoint setpoint {
-    .roll = rollActuatorSp,
+    .roll = 0.0f,
     .pitch = 0.0f,
-    .yaw = 0.0f,
+    .yaw = rollActuatorSp,
     .throttle = input.throttle
   };
 
