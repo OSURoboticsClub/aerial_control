@@ -16,7 +16,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
 
   // Constants
-  const float M_PI = 3.1415926535;
+  const float M_PI   = 3.1415926535;
   const float F_LE   = M_PI * 7/18;    // Fin leading edge angle (rad)
   const float F_TR   = 0;              // Fin trailing edge distance past fin base (m)
   const float F_LEN  = 0.123;          // Fin length (m)
@@ -24,7 +24,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   const float F_CP   = 0.33 * F_LEN;   // Fin Cp (m)
   const float F_NUM  = 2;              // Number of fins
   const float F_D    = 0.06477;        // Distance from roll axis to fin Cp (m)
-  const float I      = 1;              // TODO: Rocket rotational inertia
+  const float I      = 1.45;              // TODO: Rocket rotational inertia
 
   // Sensor inputs
   //float alt = est.loc.alt;   // Altitude (m)
@@ -72,12 +72,23 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float F_L = torque / (F_NUM * F_D);   // Force required per fin (N)
 
   // Lift coefficient
-  v_rocket = std::max(100.0f, v_rocket);   // Prevent ridiculously large C_L
+  v_rocket = std::max(60.0f, v_rocket);   // Prevent ridiculously large C_L
   float C_L = 2*F_L/(p_air * pow(v_rocket,2) * F_AREA);   // Subsonic
   //float C_L = (2 * M_PI * m) / (E * beta);   // Supersonic
 
+  // Angle of attack (limit to 10 deg stall angle) based on lift slope of thin
+  // airfoil being approximately 2pi per radian
+  float alpha = C_L / 2*M_PI;   // Radians
+  alpha = std::max(-M_PI/18, std::min(M_PI/18, alpha));   // [-pi/18, pi/18]
+
+  // PWM duty cycle offset
+  // Scale factor was obtained by measuring fin angle at 0.1 duty cycle away
+  // from center. Further scaled to duty cycle range of 0.14. Clusterfucky,
+  // I know.
+  float dc_offset = alpha * 0.1 / 0.422854 / 0.14;   // [-0.5, 0.5]
+
   // Fin controller
-  float rollActuatorSp = 0.5 + C_L/(2*M_PI);   // Fin angle
+  float rollActuatorSp = 0.5 + dc_offset;
 
   // Output
   ActuatorSetpoint setpoint {

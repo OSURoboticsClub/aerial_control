@@ -16,8 +16,8 @@
 // H3LIS331DL SPI configuration
 static const SPIConfig H3LIS331DL_CONFIG {
   NULL,
-  GPIOA,
-  4,
+  GPIOC,
+  15,
   SPI_CR1_BR_1   // 21000000/2^2 = 5250000
 };
 
@@ -42,7 +42,7 @@ Platform::Platform() {
 
 template <>
 H3LIS331DL& Platform::get() {
-  static H3LIS331DL acc(&SPID2, &H3LIS331DL_CONFIG);
+  static H3LIS331DL acc(&SPID3, &H3LIS331DL_CONFIG);
   return acc;
 }
 
@@ -57,6 +57,7 @@ MS5611& Platform::get() {
   static MS5611 bar(&SPID3, &MS5611_CONFIG);
   return bar;
 }
+
 
 template <>
 UBloxNEO7& Platform::get() {
@@ -74,38 +75,32 @@ template <> Gyroscope&    Platform::get() { return get<MPU6000>(); }
 
 template <>
 DigitalPlatform& Platform::get() {
-  static DigitalPlatform digitalPlatform;
-  return digitalPlatform;
+  return DigitalPlatform::getInstance();
 }
 
 template <>
 I2CPlatform& Platform::get() {
-  static I2CPlatform i2cPlatform;
-  return i2cPlatform;
+  return I2CPlatform::getInstance();
 }
 
 template <>
 PWMPlatform& Platform::get() {
-  static PWMPlatform pwmPlatform;
-  return pwmPlatform;
+  return PWMPlatform::getInstance();
 }
 
 template <>
 SDCPlatform& Platform::get() {
-  static SDCPlatform sdcPlatform;
-  return sdcPlatform;
+  return SDCPlatform::getInstance();
 }
 
 template <>
 SPIPlatform& Platform::get() {
-  static SPIPlatform spiPlatform;
-  return spiPlatform;
+  return SPIPlatform::getInstance();
 }
 
 template <>
 USARTPlatform& Platform::get() {
-  static USARTPlatform usartPlatform;
-  return usartPlatform;
+  return USARTPlatform::getInstance();
 }
 
 void Platform::init() {

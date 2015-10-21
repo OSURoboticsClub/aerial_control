@@ -25,6 +25,12 @@ CanardSystem::CanardSystem(
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
+  gyr.setAxisConfig(unit_config::GYR_AXES);
+  accel.setAxisConfig(unit_config::ACC_AXES);
+  (*accelH)->setAxisConfig(unit_config::ACCH_AXES);
+  gyr.setOffsets(unit_config::GYR_OFFSETS);
+  accel.setOffsets(unit_config::ACC_OFFSETS);
+  (*accelH)->setOffsets(unit_config::ACCH_OFFSETS);
 }
 
 void CanardSystem::update() {
@@ -103,9 +109,7 @@ void CanardSystem::update() {
 }
 
 bool CanardSystem::healthy() {
-  // TODO(yoos): Most of the health checks here are disabled due to a broken av
-  // bay SPI bus. Reenable on next hardware revision.
-  bool healthy = true;//accel.healthy() && gyr.healthy();
+  bool healthy = accel.healthy() && gyr.healthy();
 
   if(accelH) {
     healthy &= (*accelH)->healthy();
@@ -135,36 +139,9 @@ void CanardSystem::on(const protocol::message::set_arm_state_message_t& m) {
 }
 
 void CanardSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  uint8_t stateNum = 0;
-  switch (state) {
-  case CanardState::DISARMED:
-    stateNum = 0;
-    break;
-  case CanardState::PRE_ARM:
-    stateNum = 1;
-    break;
-  case CanardState::ARMED:
-    stateNum = 2;
-    break;
-  case CanardState::FLIGHT:
-    stateNum = 3;
-    break;
-  case CanardState::APOGEE:
-    stateNum = 4;
-    break;
-  case CanardState::DESCENT:
-    stateNum = 6;
-    break;
-  case CanardState::RECOVERY:
-    stateNum = 7;
-    break;
-  default:
-    break;
-  }
-
   protocol::message::system_message_t m {
     .time = ST2MS(chibios_rt::System::getTime()),
-    .state = stateNum,
+    .state = (uint8_t) state,
     .motorDC = sp.throttle
   };
   logger.write(m);
@@ -174,19 +151,18 @@ void CanardSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Act
 }
 
 CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,0,1);   // Red 1 Hz
+  PulseLED(0,1,0,4);   // Green 4 Hz
 
   static bool calibrated = false;
   static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets {0,0,0};
-  static std::array<float, 3> accOffsets {0,0,0};
+  static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
 
   // Calibrate ground altitude
   groundAltitude = est.loc.alt;
 
   // Calibrate gyroscope
   for (int i=0; i<3; i++) {
-    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i])/(calibCount+1);
+    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
   }
   calibCount++;
 
@@ -249,7 +225,7 @@ CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
 }
 
 CanardState CanardSystem::PreArmState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,0,4);   // Red 4 Hz
+  PulseLED(0,1,0,1);   // Green 1 Hz
 
   static int buzzcount = 0;
   platform.get<PWMPlatform>().set(PIN_BUZZER, 0.05 * (buzzcount<50));
@@ -265,7 +241,7 @@ CanardState CanardSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
 }
 
 CanardState CanardSystem::ArmedState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  SetLED(1,0,0);   // Red
+  SetLED(0,1,0);   // Green
 
   // Turn off buzzer
   platform.get<PWMPlatform>().set(PIN_BUZZER, 0);
@@ -294,19 +270,15 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   // Check for motor cutoff. We should see negative acceleration due to drag.
   if (powered) {
     static int count = 100;
-    count = ((*meas.accel).axes[0] < -0.2) ? (count-1) : 100;
+    count = ((*meas.accel).axes[0] < -0.05) ? (count-1) : 100;
     powered = (count == 0) ? false : true;
   }
 
   // Apogee occurs after motor cutoff
-  if (!powered) {
-    // We should see a sudden forward acceleration from the main separation
-    // event.
-    static int count = 100;
-    count = ((*meas.accel).axes[0] > 0.0) ? (count-1) : 10;
-    if (count == 0) {
-      return CanardState::APOGEE;
-    }
+  if (!powered &&
+      est.loc.dAlt < 2.0 &&
+      (*meas.accel).axes[0] > -0.05) {
+    return CanardState::APOGEE;
   }
 
   // Run controller
@@ -319,29 +291,9 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
     AngularVelocitySetpoint velSp { -3.14159, 0, 0, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
   }
-  else if (flightTime < 7.0) {
+  else if (flightTime < 10.0) {
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 8.0) {
-    AngularVelocitySetpoint velSp { 1, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 9.0) {
-    AngularVelocitySetpoint velSp { -1, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 11.0) {
-    AngularVelocitySetpoint velSp { 2, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
-  }
-  else if (flightTime < 13.0) {
-    AngularPositionSetpoint posSp { 0, 0, 0, 0 };
-    sp = pipeline.run(est, posSp, attPosController, attVelController, attAccController);
-  }
-  else if (flightTime < 17.0) {
-    AngularPositionSetpoint posSp { 3.14159, 0, 0, 0 };
-    sp = pipeline.run(est, posSp, attPosController, attVelController, attAccController);
   }
   else {
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
@@ -384,7 +336,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
 }
 
 CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  SetLED(1,0,1);   // Violet
+  PulseLED(1,0,1,1);   // Violet 1 Hz
   static float sTime = 0.0;   // State time
 
   // Stay for at least 1 s
@@ -411,7 +363,7 @@ CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate es
 }
 
 CanardState CanardSystem::RecoveryState(SensorMeasurements meas, WorldEstimate est, ActuatorSetpoint& sp) {
-  PulseLED(1,0,1,2);   // Violet 2 Hz
+  PulseLED(1,1,1,2);   // White 2 Hz
 
   // Beep loudly
   static int buzzcount = 0;

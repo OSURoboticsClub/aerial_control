@@ -40,6 +40,7 @@ enum class CanardState {
   ARMED,
   FLIGHT,
   APOGEE,
+  UNUSED_MICROGRAVITY,
   DESCENT,
   RECOVERY
 };

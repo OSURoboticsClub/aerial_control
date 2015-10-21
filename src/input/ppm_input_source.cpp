@@ -1,3 +1,5 @@
+#ifdef HAL_USE_ICU
+
 #include "input/ppm_input_source.hpp"
 
 #include "util/time.hpp"
@@ -112,3 +114,5 @@ uint8_t PPMInputSource::channelToIndex(ChannelWidth input, uint8_t divisions) {
 
   return idx;
 }
+
+#endif // HAL_USE_ICU
