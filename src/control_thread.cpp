@@ -37,9 +37,7 @@ msg_t ControlThread::main() {
   while(true) {
     deadline += MS2ST(unit_config::DT * 1000);
 
-    palSetPad(GPIOB, 2);
     unit.getSystem().update();
-    palClearPad(GPIOB, 2);
 
     sleepUntil(deadline);
   }
