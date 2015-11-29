@@ -8,10 +8,10 @@ IndicatorPlatform::IndicatorPlatform() {
 void IndicatorPlatform::set(IndicatorIntent intent, bool value) {
   switch(intent) {
     case HEARTBEAT:
-      //palWritePad(GPIOE, GPIOE_LED3_RED, value);
+      palWritePad(GPIOB, 2, value);
       break;
     case VEHICLE_ARMED:
-      //palWritePad(GPIOE, GPIOE_LED4_BLUE, value);
+      palWritePad(GPIOA, 15, value);
       break;
   }
 }
