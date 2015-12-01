@@ -21,7 +21,7 @@ void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // X in counterclockwise order.
   // Calculate servo output
   std::array<float, 1> sOutputs;
-  sOutputs[0] = clip(0.540 - 0.5*input.yaw, -1.0, 1.0);   // Magic number servo bias for pusher yaw prop.
+  sOutputs[0] = clip(0.540 + 0.5*input.yaw, -1.0, 1.0);   // Magic number servo bias for pusher yaw prop.
   servos.set(armed, sOutputs);
 
   // Scale throttle to compensate for roll and pitch up to max angles
