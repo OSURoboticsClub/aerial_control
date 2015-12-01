@@ -77,14 +77,23 @@ GyroscopeReading MPU9250::readGyro() {
 }
 
 AccelerometerReading MPU9250::readAccel() {
-  AccelerometerReading reading;
-
   // Get data
   txbuf[0] = mpu9250::ACCEL_XOUT_H | (1<<7);
   exchange(7);
-  reading.axes[Accelerometer::axes[0]] = Accelerometer::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0 - Accelerometer::offsets[0];
-  reading.axes[Accelerometer::axes[1]] = Accelerometer::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0 - Accelerometer::offsets[1];
-  reading.axes[Accelerometer::axes[2]] = Accelerometer::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0 - Accelerometer::offsets[2];
+
+  AccelerometerReading meas;
+  meas.axes[Accelerometer::axes[0]] = Accelerometer::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0 - Accelerometer::offsets[0];
+  meas.axes[Accelerometer::axes[1]] = Accelerometer::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0 - Accelerometer::offsets[1];
+  meas.axes[Accelerometer::axes[2]] = Accelerometer::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0 - Accelerometer::offsets[2];
+
+  // Low-pass filter
+  const float ALPHA = 0.5;   // TODO(yoos): make configurable
+  static AccelerometerReading reading {
+    .axes = {0,0,0}
+  };
+  for (int i=0; i<3; i++) {
+    reading.axes[Accelerometer::axes[i]] = ALPHA * meas.axes[Accelerometer::axes[i]] + (1-ALPHA) * reading.axes[Accelerometer::axes[i]];
+  }
 
   return reading;
 }
