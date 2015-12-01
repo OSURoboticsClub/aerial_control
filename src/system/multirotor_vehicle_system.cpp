@@ -68,8 +68,9 @@ void MultirotorVehicleSystem::update() {
 
   // Ensure sensors are calibrated and healthy before arming, but don't disarm
   // if sensors become unhealthy.
+  // TODO(syoo): Checking health at 1kHz is expensive. Fix.
   if (input.valid) {
-    if (calibrated && healthy()) {
+    if (healthy() && calibrated) {
       setArmed(input.armed);
     }
     else if (input.armed == false) {
@@ -83,7 +84,8 @@ void MultirotorVehicleSystem::update() {
   // Set mode
   if (isArmed()) {
     // AUTO
-    if (input.mode == (int)InputControlMode::AUTO) {
+    //if (input.mode == (int)InputControlMode::AUTO) {
+    if (false) {
       mode = MultirotorControlMode::ANGULAR_POS;   // TODO(yoos): AUTO disabled until we implement controller
     }
     // MANUAL or ALTCTL
@@ -101,7 +103,7 @@ void MultirotorVehicleSystem::update() {
   }
 
   // Run the controllers
-  ActuatorSetpoint actuatorSp;
+  ActuatorSetpoint actuatorSp = {0, 0, 0, 0};
   switch (mode) {
     case MultirotorControlMode::DISARMED:
       DisarmedMode(meas, estimate, input, actuatorSp);
@@ -146,7 +148,7 @@ void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_
 }
 
 void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
-  PulseLED(0,1,0,4);
+  PulseLED(0,1,0,2);   // FIXME: This interferes with disarmed mode LED stuff..
   static int calibCount = 0;
   static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
 
@@ -199,9 +201,9 @@ void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEsti
   yawPosSp = est.att.yaw;   // Reset yaw position setpoint to current yaw position while in velocity mode
 
   AngularVelocitySetpoint avSp {
-    .rollVel  = input.roll,
-    .pitchVel = input.pitch,
-    .yawVel   = input.yaw,
+    .rollVel  = M_PI*input.roll,
+    .pitchVel = M_PI*input.pitch,
+    .yawVel   = M_PI*input.yaw,
     .throttle = input.throttle
   };
   sp = pipeline.run(est, avSp, attVelController, attAccController);
@@ -209,7 +211,7 @@ void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEsti
 
 void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   SetLED(0,0,1);
-  yawPosSp += input.yaw * unit_config::DT;
+  yawPosSp += M_PI * input.yaw * unit_config::DT;
   if (yawPosSp > M_PI)  {yawPosSp -= 2*M_PI;}
   if (yawPosSp < -M_PI) {yawPosSp += 2*M_PI;}
 
