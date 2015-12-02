@@ -2,8 +2,6 @@
 
 #include "unit_config.hpp"
 
-#include "chprintf.h"
-
 void MS5611::init() {
   // Reset device.
   txbuf[0] = ms5611::CMD_RESET;
@@ -81,7 +79,6 @@ BarometerReading MS5611::readBar() {
 }
 
 void MS5611::updatePT(void) {
-  BaseSequentialStream* chp = (BaseSequentialStream*)&SD4;
   // Calculate temperature (-40 to 85 deg C with 0.01 deg resolution)
   int32_t dT = D2 - (C5 << 8);   // Actual temp - Reference temp
   int32_t TEMP = 2000 + ((dT * C6) / 8388608);   // 100x actual temperature
@@ -112,8 +109,6 @@ void MS5611::updatePT(void) {
 
   pressure = P / 100.;
   temperature = TEMP / 100.;
-
-  //chprintf(chp, "%lu %ld %f %f\r\n", D1, P, temperature, pressure);
 }
 
 bool MS5611::healthy() {
