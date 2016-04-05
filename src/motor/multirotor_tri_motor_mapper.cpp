@@ -25,7 +25,7 @@ void MultirotorTriMotorMapper::run(bool armed, ActuatorSetpoint& input) {
   // Scale throttle to compensate for roll and pitch up to max angles
   input.throttle /= std::cos(std::min(std::fabs(input.roll), M_PI/3));
   input.throttle /= std::cos(std::min(std::fabs(input.pitch), M_PI/3));
-  input.throttle = std::min(input.throttle, 1.0);   // Not entirely necessary, but perhaps preserve some control authority.
+  input.throttle = std::min(input.throttle, 1.0f);   // Not entirely necessary, but perhaps preserve some control authority.
 
   // Calculate motor outputs
   std::array<float, 3> mOutputs;

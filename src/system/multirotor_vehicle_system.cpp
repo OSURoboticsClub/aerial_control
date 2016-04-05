@@ -228,7 +228,7 @@ void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstim
   // Somewhat hacky way to achieve altitude hold. Pilot should first find
   // a good hover throttle, then switch to ALTCTL.
   else {
-    float throttleShift = std::min(std::max(altSp - est.loc.alt, -0.2), 0.2);
+    float throttleShift = std::min(std::max(altSp - est.loc.alt, -0.2f), 0.2f);
     apSp.throttle += throttleShift;
   }
 
