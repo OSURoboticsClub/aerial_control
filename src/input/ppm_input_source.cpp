@@ -1,6 +1,6 @@
-#ifdef HAL_USE_ICU
-
 #include "input/ppm_input_source.hpp"
+
+#ifdef HAL_USE_ICU
 
 #include "util/time.hpp"
 
