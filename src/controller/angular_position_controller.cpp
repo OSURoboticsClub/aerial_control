@@ -2,9 +2,8 @@
 
 #include <algorithm>
 
+#include <util/math.hpp>
 #include "unit_config.hpp"
-
-constexpr double M_PI = 3.1415926535;
 
 AngularPositionController::AngularPositionController()
   : rollPosPid(unit_config::ANGPOS_X_KP, unit_config::ANGPOS_X_KI, unit_config::ANGPOS_X_KD),

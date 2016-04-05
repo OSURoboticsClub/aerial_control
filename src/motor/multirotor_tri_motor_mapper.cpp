@@ -7,8 +7,6 @@
 #include <util/math.hpp>
 #include <chprintf.h>
 
-constexpr float M_PI = 3.1415926535;
-
 MultirotorTriMotorMapper::MultirotorTriMotorMapper(PWMDeviceGroup<3>& motors, PWMDeviceGroup<1>& servos, Communicator& communicator, Logger& logger)
   : motors(motors),
     servos(servos),

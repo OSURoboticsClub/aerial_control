@@ -1,8 +1,7 @@
 #include "system/multirotor_vehicle_system.hpp"
 
 #include <input/ppm_input_source.hpp>
-
-constexpr double M_PI = 3.1415926535;
+#include <util/math.hpp>
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     Gyroscope& gyr,

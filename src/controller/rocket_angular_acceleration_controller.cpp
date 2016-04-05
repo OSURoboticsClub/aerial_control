@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <util/math.hpp>
 #include "unit_config.hpp"
 #include "chprintf.h"
 
@@ -16,7 +17,6 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
 
   // Constants
-  const float M_PI   = 3.1415926535;
   const float F_LE   = M_PI * 7/18;    // Fin leading edge angle (rad)
   const float F_TR   = 0;              // Fin trailing edge distance past fin base (m)
   const float F_LEN  = 0.123;          // Fin length (m)
