@@ -8,7 +8,7 @@
  * managing the heartbeat and communication subthreads, as well as running the
  * fixed interval control loop.
  */
-class ControlThread : public chibios_rt::BaseStaticThread<8192> {
+class ControlThread : public chibios_rt::BaseStaticThread<6000> {
 public:
   msg_t main() override;
 };
