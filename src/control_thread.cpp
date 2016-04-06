@@ -4,6 +4,7 @@
 #include "communication/communicator.hpp"
 #include "filesystem/filesystem.hpp"
 #include "filesystem/logger.hpp"
+#include "params/parameter_repository.hpp"
 
 #include "unit_config.hpp"
 #include "variant/platform.hpp"
@@ -19,8 +20,10 @@ msg_t ControlThread::main() {
   auto& primaryStream = platform.get<USARTPlatform>().getPrimaryStream();
   SDCDriver& sdcd = platform.get<SDCPlatform>().getSDCDriver();   // TODO(yoos): make optional
 
+  ParameterRepository params;
+
   // Start the background threads
-  static HeartbeatThread heartbeatThread;
+  static HeartbeatThread heartbeatThread(params);
   static Communicator communicator(primaryStream);
   static Logger logger(sdcd, communicator);
 

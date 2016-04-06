@@ -15,3 +15,5 @@ void _fstat() {while(1);}
 void _isatty() {while(1);}
 void _lseek() {while(1);}
 void _read() {while(1);}
+
+void *__dso_handle;

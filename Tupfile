@@ -22,6 +22,7 @@ CXXSRCS += src/estimator/*.cpp
 CXXSRCS += src/filesystem/*.cpp
 CXXSRCS += src/input/*.cpp
 CXXSRCS += src/motor/*.cpp
+CXXSRCS += src/params/*.cpp
 CXXSRCS += src/sensor/*.cpp
 CXXSRCS += src/system/*.cpp
 
