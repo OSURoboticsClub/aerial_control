@@ -16,4 +16,7 @@ void _isatty() {while(1);}
 void _lseek() {while(1);}
 void _read() {while(1);}
 
-void *__dso_handle;
+// Per GCC documentation, this should be a unique value for every shared object.
+// We don't have to worry about dynamic linking since this is a main program, so
+// we can just zero it.
+void *__dso_handle = 0;
