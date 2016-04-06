@@ -4,6 +4,7 @@
 #include "communication/communicator.hpp"
 #include "filesystem/filesystem.hpp"
 #include "filesystem/logger.hpp"
+#include "logger/logged_variable.hpp"
 
 #include "unit_config.hpp"
 #include "variant/platform.hpp"
@@ -31,12 +32,17 @@ msg_t ControlThread::main() {
   // Build the unit
   Unit unit(platform, communicator, logger);
 
+  // TODO: Test variable to ensure logging infrastructure is functioning.
+  LoggedVariableRegistry registry;
+  LoggedVariable<int> loopCounter(registry, 0);
+
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
   systime_t deadline = chibios_rt::System::getTime();
   while(true) {
     deadline += MS2ST(unit_config::DT * 1000);
 
+    loopCounter.update(loopCounter.get() + 1);
     unit.getSystem().update();
 
     sleepUntil(deadline);
