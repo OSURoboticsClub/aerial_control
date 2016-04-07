@@ -12,6 +12,7 @@ CarVehicleSystem::CarVehicleSystem(ParameterRepository& params, Gyroscope& gyros
     locEstimator(communicator, logger), attEstimator(params, communicator, logger),
     worldEstimator(locEstimator, attEstimator, communicator, logger),
     inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator, logger),
+    attVelController(params),
     attAccController(params) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.

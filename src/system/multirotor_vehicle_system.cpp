@@ -22,6 +22,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     gyr(gyr), acc(acc), bar(bar), gps(gps), mag(mag),
     estimator(estimator),
     inputSource(inputSource),
+    attVelController(params),
     attAccController(params),
     motorMapper(motorMapper),
     platform(platform),

@@ -4,6 +4,7 @@
 #include "global_parameters.hpp"
 #include "communication/communicator.hpp"
 #include "controller/angular_acceleration_controller.hpp"
+#include "controller/angular_velocity_controller.hpp"
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
@@ -79,6 +80,17 @@ struct UnitData {
     params.set(GlobalParameters::PARAM_DT, 0.001);
 
     // TODO: Set some real gains
+    params.set(AngularVelocityController::PARAM_PID_ROLL_KP, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_ROLL_KI, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_ROLL_KD, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_PITCH_KP, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_PITCH_KI, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_PITCH_KD, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_YAW_KP, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_YAW_KI, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_YAW_KD, 0.0);
+    params.set(AngularVelocityController::PARAM_MAX_PITCH_ROLL_VEL, 0.0);
+
     params.set(AngularAccelerationController::PARAM_PID_ROLL_KP, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_ROLL_KI, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_ROLL_KD, 0.0);

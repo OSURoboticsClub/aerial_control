@@ -5,6 +5,7 @@
 #include "chprintf.h"
 
 CanardSystem::CanardSystem(
+    ParameterRepository& params,
     Accelerometer& accel,
     optional<Accelerometer *> accelH,
     optional<Barometer *> bar,
@@ -18,6 +19,7 @@ CanardSystem::CanardSystem(
   : VehicleSystem(communicator), MessageListener(communicator),
     accel(accel), accelH(accelH), bar(bar), ggr(ggr), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
+    attVelController(params),
     motorMapper(motorMapper), platform(platform),
     systemStream(communicator, 10),
     logger(logger),

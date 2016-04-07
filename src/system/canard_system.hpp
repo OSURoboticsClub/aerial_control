@@ -1,6 +1,7 @@
 #ifndef ROCKET_SYSTEM_HPP_
 #define ROCKET_SYSTEM_HPP_
 
+#include "params/parameter_repository.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
 
@@ -48,6 +49,7 @@ enum class CanardState {
 class CanardSystem : public VehicleSystem, public MessageListener {
 public:
   CanardSystem(
+      ParameterRepository& params,
       Accelerometer& accel,
       optional<Accelerometer *> accelH,
       optional<Barometer *> bar,
