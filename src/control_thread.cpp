@@ -1,5 +1,6 @@
 #include "control_thread.hpp"
 
+#include "global_parameters.hpp"
 #include "heartbeat_thread.hpp"
 #include "communication/communicator.hpp"
 #include "filesystem/filesystem.hpp"
@@ -21,6 +22,7 @@ msg_t ControlThread::main() {
   SDCDriver& sdcd = platform.get<SDCPlatform>().getSDCDriver();   // TODO(yoos): make optional
 
   ParameterRepository params;
+  GlobalParameters globalParams(params);
 
   // Start the background threads
   static HeartbeatThread heartbeatThread(params);
@@ -32,7 +34,7 @@ msg_t ControlThread::main() {
   logger.start();
 
   // Build the unit
-  Unit unit(platform, communicator, logger);
+  Unit unit(platform, params, communicator, logger);
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.

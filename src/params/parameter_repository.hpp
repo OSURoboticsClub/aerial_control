@@ -13,7 +13,7 @@ public:
      * @param name the parameter name
      * @param value the default value
      */
-    void def(char const *name, const double value);
+    void def(char const *name, const float value);
 
     /**
      * Insert a value into the repository, overwriting any existing value.
@@ -21,7 +21,7 @@ public:
      * @param name the parameter name
      * @param value the new value
      */
-    void set(char const *name, const double value);
+    void set(char const *name, const float value);
 
     /**
      * Grabs a value from the repository. If the key does not exist then an
@@ -30,8 +30,8 @@ public:
      * @param name the parameter name
      * @return the set value
      */
-    double get(char const *name) const;
+    float get(char const *name) const;
 
 private:
-    std::unordered_map<char const*, double> parameters;
+    std::unordered_map<char const*, float> parameters;
 };

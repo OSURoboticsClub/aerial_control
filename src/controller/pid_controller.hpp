@@ -6,9 +6,12 @@
  */
 class PIDController {
 public:
+  PIDController();
   PIDController(float kp, float ki, float kd);
 
   float calculate(float sp, float pv, float dt);
+
+  void setGains(float kp, float ki, float kd);
 
 private:
   float kp;

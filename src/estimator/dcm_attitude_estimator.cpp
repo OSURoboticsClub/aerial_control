@@ -1,15 +1,15 @@
 #include "estimator/dcm_attitude_estimator.hpp"
-#include "util/time.hpp"
 
 #include "ch.hpp"
+#include "chprintf.h"
+
+#include "global_parameters.hpp"
 #include "protocol/messages.hpp"
+#include "util/time.hpp"
 
-#include "unit_config.hpp"
-
-#include <chprintf.h>
-
-DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator, Logger& logger)
-  : dcm(Eigen::Matrix3f::Identity()),
+DCMAttitudeEstimator::DCMAttitudeEstimator(ParameterRepository& params, Communicator& communicator, Logger& logger)
+  : params(params),
+    dcm(Eigen::Matrix3f::Identity()),
     attitudeMessageStream(communicator, 10),
     logger(logger) {
 }
@@ -60,7 +60,7 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   // add it to the correction vector.
   if(meas.gyro) {
     Eigen::Vector3f gyro((*meas.gyro).axes.data());
-    corr += gyro * unit_config::DT * (1.0f - accelWeight - magWeight);
+    corr += gyro * params.get(GlobalParameters::PARAM_DT) * (1.0f - accelWeight - magWeight);
   }
 
   // Use small angle approximations to build a rotation matrix modelling the

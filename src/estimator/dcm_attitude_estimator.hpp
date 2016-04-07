@@ -5,12 +5,13 @@
 
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
-#include "filesystem/logger.hpp"
 #include "estimator/attitude_estimator.hpp"
+#include "filesystem/logger.hpp"
+#include "params/parameter_repository.hpp"
 
 class DCMAttitudeEstimator : public AttitudeEstimator {
 public:
-  DCMAttitudeEstimator(Communicator& communicator, Logger& logger);
+  DCMAttitudeEstimator(ParameterRepository& params, Communicator& communicator, Logger& logger);
 
   /**
    * Update the internal DCM and return a new attitude estimate.
@@ -39,9 +40,11 @@ private:
    */
   void updateStream();
 
+  ParameterRepository& params;
+
   Eigen::Matrix3f dcm;
   RateLimitedStream attitudeMessageStream;
   Logger& logger;
 };
 
-#endif
+#endif // DCM_ATTITUDE_ESTIMATOR_HPP_

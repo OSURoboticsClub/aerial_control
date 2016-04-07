@@ -1,9 +1,10 @@
 #include "system/multirotor_vehicle_system.hpp"
 
-#include <input/ppm_input_source.hpp>
-#include <util/math.hpp>
+#include "input/ppm_input_source.hpp"
+#include "util/math.hpp"
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
+    ParameterRepository& params,
     Gyroscope& gyr,
     Accelerometer& acc,
     optional<Barometer *> bar,
@@ -17,9 +18,11 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     Platform& platform)
   : VehicleSystem(communicator),
     MessageListener(communicator),
+    params(params),
     gyr(gyr), acc(acc), bar(bar), gps(gps), mag(mag),
     estimator(estimator),
     inputSource(inputSource),
+    attAccController(params),
     motorMapper(motorMapper),
     platform(platform),
     stream(communicator, 10), logger(logger),

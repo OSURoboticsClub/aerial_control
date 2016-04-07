@@ -1,13 +1,16 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
+#include "global_parameters.hpp"
 #include "communication/communicator.hpp"
+#include "controller/angular_acceleration_controller.hpp"
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "filesystem/logger.hpp"
 #include "input/ppm_input_source.hpp"
 #include "motor/multirotor_tri_motor_mapper.hpp"
+#include "params/parameter_repository.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "util/optional.hpp"
@@ -35,7 +38,7 @@ struct UnitData {
 
   MultirotorVehicleSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
+  UnitData(Platform& platform, ParameterRepository& params, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
         { 0, 1, 2 },                                 // channels
         { 0.0f, 0.0f, 0.0f },                        // offsets
@@ -50,7 +53,7 @@ struct UnitData {
       ),
       motorMapper(motors, servos, communicator, logger),
       location(communicator, logger),
-      attitude(communicator, logger),
+      attitude(params, communicator, logger),
       world(location, attitude, communicator, logger),
       ppmConfig{
         .minStartWidth   = 2500,
@@ -66,11 +69,26 @@ struct UnitData {
         .channelControlMode = 5
       },
       inputSource(ppmConfig),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
+      system(params,
+             platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::make_optional(&platform.get<Barometer>()),
              std::experimental::make_optional(&platform.get<GPS>()),
              std::experimental::nullopt,   // No magnetometer
              world, inputSource, motorMapper, communicator, logger, platform) {
+
+    params.set(GlobalParameters::PARAM_DT, 0.001);
+
+    // TODO: Set some real gains
+    params.set(AngularAccelerationController::PARAM_PID_ROLL_KP, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_ROLL_KI, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_ROLL_KD, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_PITCH_KP, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_PITCH_KI, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_PITCH_KD, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_YAW_KP, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_YAW_KI, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_YAW_KD, 0.0);
+    params.set(AngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 0.0);
   }
 };
 
