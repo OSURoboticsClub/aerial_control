@@ -11,7 +11,8 @@
 DCMAttitudeEstimator::DCMAttitudeEstimator(Communicator& communicator, Logger& logger)
   : dcm(Eigen::Matrix3f::Identity()),
     attitudeMessageStream(communicator, 10),
-    logger(logger) {
+    logger(logger),
+    accelFilter(100.0), gyroFilter(500.0) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
@@ -26,7 +27,7 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   if(meas.accel) {
     //static Eigen::Vector3f accel({0,0,0});
     Eigen::Vector3f accel((*meas.accel).axes.data());
-    //accel = 0.999*accel + 0.001*newAccel;   // Prevent orientation drift under vibration
+    accel = accelFilter.apply(unit_config::DT, accel);
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
@@ -60,6 +61,7 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   // add it to the correction vector.
   if(meas.gyro) {
     Eigen::Vector3f gyro((*meas.gyro).axes.data());
+    gyro = gyroFilter.apply(unit_config::DT, gyro);
     corr += gyro * unit_config::DT * (1.0f - accelWeight - magWeight);
   }
 

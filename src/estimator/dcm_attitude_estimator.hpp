@@ -6,6 +6,7 @@
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
 #include "filesystem/logger.hpp"
+#include "filter/vector_low_pass_filter.hpp"
 #include "estimator/attitude_estimator.hpp"
 
 class DCMAttitudeEstimator : public AttitudeEstimator {
@@ -42,6 +43,9 @@ private:
   Eigen::Matrix3f dcm;
   RateLimitedStream attitudeMessageStream;
   Logger& logger;
+
+  VectorLowPassFilter accelFilter;
+  VectorLowPassFilter gyroFilter;
 };
 
 #endif
