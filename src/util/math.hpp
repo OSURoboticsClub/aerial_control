@@ -1,6 +1,8 @@
 #ifndef MATH_HPP
 #define MATH_HPP
 
+#include <algorithm>
+
 constexpr float M_PI = 3.14159265358979323846;
 
 template <typename T>
