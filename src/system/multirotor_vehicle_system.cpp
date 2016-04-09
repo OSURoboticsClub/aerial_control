@@ -254,9 +254,9 @@ void MultirotorVehicleSystem::PosMode(SensorMeasurements meas, WorldEstimate est
 }
 
 void MultirotorVehicleSystem::SetLED(float r, float g, float b) {
-  platform.get<PWMPlatform>().set(9,  r);
-  platform.get<PWMPlatform>().set(10, g);
-  platform.get<PWMPlatform>().set(11, b);
+  platform.get<PWMPlatform>().set(9,  r / 20.0);
+  platform.get<PWMPlatform>().set(10, g / 20.0);
+  platform.get<PWMPlatform>().set(11, b / 20.0);
 }
 
 void MultirotorVehicleSystem::BlinkLED(float r, float g, float b, float freq) {
