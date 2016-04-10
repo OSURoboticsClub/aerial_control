@@ -5,6 +5,8 @@
 
 #include "communication/communicator.hpp"
 #include "communication/rate_limited_stream.hpp"
+#include "filesystem/logger.hpp"
+#include "filter/vector_low_pass_filter.hpp"
 #include "estimator/attitude_estimator.hpp"
 #include "filesystem/logger.hpp"
 #include "params/parameter_repository.hpp"
@@ -45,6 +47,9 @@ private:
   Eigen::Matrix3f dcm;
   RateLimitedStream attitudeMessageStream;
   Logger& logger;
+
+  VectorLowPassFilter accelFilter;
+  VectorLowPassFilter gyroFilter;
 };
 
 #endif // DCM_ATTITUDE_ESTIMATOR_HPP_

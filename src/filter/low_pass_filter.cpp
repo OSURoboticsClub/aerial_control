@@ -9,8 +9,8 @@ LowPassFilter::LowPassFilter(float breakFrequency, float value) : breakFrequency
 }
 
 float LowPassFilter::apply(float dt, float x) {
-  float omega = 2.0 * M_PI * breakFrequency;
-  float alpha = omega / (omega + 1);
+  float rc = 1.0 / (2.0 * M_PI * breakFrequency);
+  float alpha = dt / (dt + rc);
   value = alpha * x + (1.0 - alpha) * value;
 
   return value;
