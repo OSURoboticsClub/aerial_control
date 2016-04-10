@@ -15,6 +15,7 @@
 #include "params/parameter_repository.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/multirotor_vehicle_system.hpp"
+#include "util/math.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
 
@@ -82,27 +83,38 @@ struct UnitData {
     params.set(HeartbeatThread::PARAM_BLINK_FREQUENCY, 5);
 
     // TODO: Set some real gains
-    params.set(AngularVelocityController::PARAM_PID_ROLL_KP, 0.0);
+    params.set(AngularPositionController::PARAM_PID_ROLL_KP, 1.2);
+    params.set(AngularPositionController::PARAM_PID_ROLL_KI, 0.0);
+    params.set(AngularPositionController::PARAM_PID_ROLL_KD, 0.0);
+    params.set(AngularPositionController::PARAM_PID_PITCH_KP, 1.2);
+    params.set(AngularPositionController::PARAM_PID_PITCH_KI, 0.0);
+    params.set(AngularPositionController::PARAM_PID_PITCH_KD, 0.0);
+    params.set(AngularPositionController::PARAM_PID_YAW_KP, 1.0);
+    params.set(AngularPositionController::PARAM_PID_YAW_KI, 0.0);
+    params.set(AngularPositionController::PARAM_PID_YAW_KD, 0.0);
+    params.set(AngularPositionController::PARAM_MAX_PITCH_ROLL_POS, M_PI / 3.0);
+
+    params.set(AngularVelocityController::PARAM_PID_ROLL_KP, 0.2);
     params.set(AngularVelocityController::PARAM_PID_ROLL_KI, 0.0);
     params.set(AngularVelocityController::PARAM_PID_ROLL_KD, 0.0);
-    params.set(AngularVelocityController::PARAM_PID_PITCH_KP, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_PITCH_KP, 0.2);
     params.set(AngularVelocityController::PARAM_PID_PITCH_KI, 0.0);
     params.set(AngularVelocityController::PARAM_PID_PITCH_KD, 0.0);
-    params.set(AngularVelocityController::PARAM_PID_YAW_KP, 0.0);
+    params.set(AngularVelocityController::PARAM_PID_YAW_KP, 0.2);
     params.set(AngularVelocityController::PARAM_PID_YAW_KI, 0.0);
     params.set(AngularVelocityController::PARAM_PID_YAW_KD, 0.0);
-    params.set(AngularVelocityController::PARAM_MAX_PITCH_ROLL_VEL, 0.0);
+    params.set(AngularVelocityController::PARAM_MAX_PITCH_ROLL_VEL, 4.0 * M_PI);
 
-    params.set(AngularAccelerationController::PARAM_PID_ROLL_KP, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_ROLL_KP, 1.0);
     params.set(AngularAccelerationController::PARAM_PID_ROLL_KI, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_ROLL_KD, 0.0);
-    params.set(AngularAccelerationController::PARAM_PID_PITCH_KP, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_PITCH_KP, 1.0);
     params.set(AngularAccelerationController::PARAM_PID_PITCH_KI, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_PITCH_KD, 0.0);
-    params.set(AngularAccelerationController::PARAM_PID_YAW_KP, 0.0);
+    params.set(AngularAccelerationController::PARAM_PID_YAW_KP, 1.0);
     params.set(AngularAccelerationController::PARAM_PID_YAW_KI, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_YAW_KD, 0.0);
-    params.set(AngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 0.0);
+    params.set(AngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 100.0);
   }
 };
 

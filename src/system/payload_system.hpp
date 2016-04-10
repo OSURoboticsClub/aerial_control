@@ -2,6 +2,7 @@
 #define PAYLOAD_SYSTEM_HPP_
 
 #include "unit_config.hpp"
+#include "params/parameter_repository.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
 
@@ -62,6 +63,7 @@ public:
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
+  ParameterRepository& params;
   Accelerometer& accel;
   optional<Accelerometer *> accelH;
   optional<Barometer *> bar;

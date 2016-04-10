@@ -2,6 +2,7 @@
 #define ROCKET_SYSTEM_HPP_
 
 #include "unit_config.hpp"
+#include "params/parameter_repository.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
 
@@ -10,7 +11,6 @@
 #include "communication/message_listener.hpp"
 
 // Control
-#include "controller/position_controller.hpp"
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
@@ -63,6 +63,7 @@ public:
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
+  ParameterRepository& params;
   Accelerometer& accel;
   optional<Accelerometer *> accelH;
   optional<Barometer *> bar;
@@ -74,7 +75,6 @@ private:
   WorldEstimator& estimator;
   InputSource& inputSource;
 
-  PositionController posController;
   ControllerPipeline<ActuatorSetpoint> pipeline;
 
   ZeroController<ActuatorSetpoint> zeroController;

@@ -1,3 +1,4 @@
+#include "global_parameters.hpp"
 #include "system/rocket_system.hpp"
 #include "util/time.hpp"
 
@@ -18,6 +19,7 @@ RocketSystem::RocketSystem(
     MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
     Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
+    params(params),
     accel(accel), accelH(accelH), bar(bar), ggr(ggr), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
@@ -272,7 +274,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   // around..
   static float drogueTime = 0.0;
   if ((*meas.accel).axes[0] > 0.3) {
-    drogueTime += unit_config::DT;
+    drogueTime += params.get(GlobalParameters::PARAM_DT);
   }
   else {
     drogueTime = 0.0;
@@ -290,7 +292,7 @@ RocketState RocketSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
     return RocketState::DESCENT;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
   return RocketState::APOGEE;
 }
 
@@ -321,7 +323,7 @@ RocketState RocketSystem::DescentState(SensorMeasurements meas, WorldEstimate es
     return RocketState::RECOVERY;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
   return RocketState::DESCENT;
 }
 
