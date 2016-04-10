@@ -4,6 +4,9 @@
 #include "ch.hpp"
 #include "hal.h"
 
+#if HAL_USE_SDC==TRUE
+#define USE_FILESYSTEM TRUE
+
 #include "ff.h"
 
 #include <cstdint>
@@ -102,5 +105,7 @@ private:
   uint32_t bytes_read;
   FILINFO filinfo;
 };
+
+#endif // HAL_USE_SDC==TRUE
 
 #endif

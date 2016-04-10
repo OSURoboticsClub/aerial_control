@@ -5,6 +5,9 @@
 
 #include <hal.h>
 
+#if HAL_USE_ICU==TRUE
+#define USE_INPUT_PPM TRUE
+
 #include "input/input_source.hpp"
 #include "variant/icu_platform.hpp"
 
@@ -111,5 +114,7 @@ private:
   std::array<ChannelIndex, MAX_CHANNELS> channelBuffer;
   std::array<ChannelIndex, MAX_CHANNELS> channelTempBuffer;
 };
+
+#endif // HAL_USE_ICU==TRUE
 
 #endif

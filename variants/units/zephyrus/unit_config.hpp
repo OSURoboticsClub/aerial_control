@@ -25,24 +25,24 @@ const std::array<float, 3> ACC_OFFSETS  = {0.0046, 0.0143, -0.0317};
 const std::array<float, 3> ACCH_OFFSETS = {0.0, 0.0, 0.0};
 
 // Initial angular position controller gains
-const float ANGPOS_X_KP = 1.2;
+const float ANGPOS_X_KP = 2.0;
 const float ANGPOS_X_KI = 0.0;
 const float ANGPOS_X_KD = 0.0;
-const float ANGPOS_Y_KP = 1.2;
+const float ANGPOS_Y_KP = 2.0;
 const float ANGPOS_Y_KI = 0.0;
 const float ANGPOS_Y_KD = 0.0;
-const float ANGPOS_Z_KP = 1.0;
+const float ANGPOS_Z_KP = 2.0;
 const float ANGPOS_Z_KI = 0.0;
 const float ANGPOS_Z_KD = 0.0;
 
 // Initial angular velocity controller gains
-const float ANGVEL_X_KP = 0.2;
+const float ANGVEL_X_KP = 0.20;
 const float ANGVEL_X_KI = 0.0;
-const float ANGVEL_X_KD = 0.0;
-const float ANGVEL_Y_KP = 0.2;
+const float ANGVEL_X_KD = 0.003;
+const float ANGVEL_Y_KP = 0.20;
 const float ANGVEL_Y_KI = 0.0;
-const float ANGVEL_Y_KD = 0.0;
-const float ANGVEL_Z_KP = 0.2;
+const float ANGVEL_Y_KD = 0.003;
+const float ANGVEL_Z_KP = 0.3;
 const float ANGVEL_Z_KI = 0.0;
 const float ANGVEL_Z_KD = 0.0;
 
