@@ -4,7 +4,7 @@
 #include "communication/communicator.hpp"
 #include "filesystem/filesystem.hpp"
 #include "filesystem/logger.hpp"
-#include "logger/logged_variable.hpp"
+#include "variable_registry/variable.hpp"
 
 #include "unit_config.hpp"
 #include "variant/platform.hpp"
@@ -42,8 +42,8 @@ msg_t ControlThread::main() {
   Unit unit(platform, communicator, logger);
 
   // TODO: Test variable to ensure logging infrastructure is functioning.
-  LoggedVariableRegistry registry;
-  LoggedVariable<int> loopCounter(registry, 0);
+  VariableRegistry registry;
+  RegisteredVariable<int> loopCounter(registry, 0);
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
