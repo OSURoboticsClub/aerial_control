@@ -2,6 +2,7 @@
 #define UNIT_DATA_HPP_
 
 #include "global_parameters.hpp"
+#include "heartbeat_thread.hpp"
 #include "communication/communicator.hpp"
 #include "controller/angular_acceleration_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
@@ -78,6 +79,7 @@ struct UnitData {
              world, inputSource, motorMapper, communicator, logger, platform) {
 
     params.set(GlobalParameters::PARAM_DT, 0.001);
+    params.set(HeartbeatThread::PARAM_BLINK_FREQUENCY, 5);
 
     // TODO: Set some real gains
     params.set(AngularVelocityController::PARAM_PID_ROLL_KP, 0.0);
