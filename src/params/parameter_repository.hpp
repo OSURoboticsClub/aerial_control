@@ -2,7 +2,6 @@
 
 #include <array>
 #include <utility>
-#include <vector>
 
 class ParameterRepository {
 public:

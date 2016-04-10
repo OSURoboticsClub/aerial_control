@@ -9,7 +9,6 @@
 #include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/esra_rocket_motor_mapper.hpp"
-#include "sensor/sensor_measurements.hpp"
 #include "system/canard_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
