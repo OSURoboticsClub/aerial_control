@@ -1,5 +1,7 @@
 #include "filesystem/logger.hpp"
 
+#if USE_FILESYSTEM==TRUE
+
 Logger::Logger(SDCDriver& sdcd, Communicator& communicator)
   : writer(sdcd, communicator) {
 }
@@ -16,3 +18,5 @@ bool Logger::ready(void) {
   // TODO(yoos)
   return true;
 }
+
+#endif

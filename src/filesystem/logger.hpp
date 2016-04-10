@@ -11,6 +11,8 @@
 #include "filesystem/filesystem.hpp"
 #include "filesystem/fs_writer_thread.hpp"
 
+#if USE_FILESYSTEM==TRUE
+
 class Logger {
 public:
   Logger(SDCDriver& sdcd, Communicator& communicator);
@@ -38,5 +40,7 @@ private:
 };
 
 #include "logger.tpp"
+
+#endif // USE_FILESYSTEM==TRUE
 
 #endif

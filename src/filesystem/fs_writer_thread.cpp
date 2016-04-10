@@ -1,5 +1,7 @@
 #include "filesystem/fs_writer_thread.hpp"
 
+#if USE_FILESYSTEM==TRUE
+
 #include "protocol/messages.hpp"
 #include "util/time.hpp"
 
@@ -43,3 +45,5 @@ msg_t FsWriterThread::main() {
   fs.umount();
   fs.disconnect();
 }
+
+#endif

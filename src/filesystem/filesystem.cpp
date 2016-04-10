@@ -1,5 +1,7 @@
 #include "filesystem/filesystem.hpp"
 
+#if USE_FILESYSTEM==TRUE
+
 #include "chprintf.h"
 #include "util/time.hpp"
 
@@ -288,3 +290,5 @@ void FileSystem::fillbuffers(uint8_t pattern) {
   fillbuffer(pattern, inbuf);
   fillbuffer(pattern, outbuf);
 }
+
+#endif
