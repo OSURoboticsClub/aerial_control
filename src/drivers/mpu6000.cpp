@@ -1,7 +1,5 @@
 #include "drivers/mpu6000.hpp"
 
-#include "unit_config.hpp"
-
 void MPU6000::init() {
   // Reset device.
   txbuf[0] = mpu6000::REG_PWR_MGMT_1;

@@ -1,6 +1,7 @@
 #ifndef MULTIROTOR_SYSTEM_HPP_
 #define MULTIROTOR_SYSTEM_HPP_
 
+#include "global_parameters.hpp"
 #include "params/parameter_repository.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"

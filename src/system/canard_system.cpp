@@ -1,3 +1,4 @@
+#include "unit_config.hpp"
 #include "system/canard_system.hpp"
 #include "util/time.hpp"
 
@@ -17,6 +18,7 @@ CanardSystem::CanardSystem(
     MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
     Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
+    params(params),
     accel(accel), accelH(accelH), bar(bar), ggr(ggr), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     attVelController(params),
@@ -301,7 +303,7 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
   }
-  flightTime += unit_config::DT;
+  flightTime += params.get(GlobalParameters::PARAM_DT);
 
   return CanardState::FLIGHT;
 }
@@ -315,7 +317,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   // around..
   static float drogueTime = 0.0;
   if ((*meas.accel).axes[0] < -0.3) {
-    drogueTime += unit_config::DT;
+    drogueTime += params.get(GlobalParameters::PARAM_DT);
   }
   else {
     drogueTime = 0.0;
@@ -332,7 +334,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
     return CanardState::DESCENT;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
   sp.roll = 0.5;
   return CanardState::APOGEE;
 }
@@ -359,7 +361,7 @@ CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate es
     return CanardState::RECOVERY;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
   sp.roll = 0.5;
   return CanardState::DESCENT;
 }

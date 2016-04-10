@@ -1,6 +1,7 @@
 #ifndef PAYLOAD_SYSTEM_HPP_
 #define PAYLOAD_SYSTEM_HPP_
 
+#include "unit_config.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
 
@@ -9,7 +10,6 @@
 #include "communication/message_listener.hpp"
 
 // Control
-#include "controller/position_controller.hpp"
 #include "controller/controller_pipeline.hpp"
 #include "controller/setpoint_types.hpp"
 #include "controller/zero_controller.hpp"
@@ -73,7 +73,6 @@ private:
   WorldEstimator& estimator;
   InputSource& inputSource;
 
-  PositionController posController;
   ControllerPipeline<ActuatorSetpoint> pipeline;
 
   ZeroController<ActuatorSetpoint> zeroController;

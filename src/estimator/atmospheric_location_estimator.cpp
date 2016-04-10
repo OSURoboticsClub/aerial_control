@@ -5,7 +5,6 @@
 #include "protocol/messages.hpp"
 #include "Eigen/Dense"
 
-#include "unit_config.hpp"
 #include <cmath>
 #include "chprintf.h"
 

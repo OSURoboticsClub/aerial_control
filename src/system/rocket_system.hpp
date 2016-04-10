@@ -1,6 +1,7 @@
 #ifndef ROCKET_SYSTEM_HPP_
 #define ROCKET_SYSTEM_HPP_
 
+#include "unit_config.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
 

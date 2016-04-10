@@ -3,7 +3,6 @@
 #include <cstdio>
 #include "hal.h"
 
-#include "unit_config.hpp"
 #include "util/time.hpp"
 #include <chprintf.h>
 

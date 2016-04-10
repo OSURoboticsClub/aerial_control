@@ -1,7 +1,5 @@
 #include "drivers/mpu9250.hpp"
 
-#include "unit_config.hpp"
-
 void MPU9250::init() {
   // Reset device.
   txbuf[0] = mpu9250::PWR_MGMT_1;

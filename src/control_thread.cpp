@@ -7,7 +7,6 @@
 #include "filesystem/logger.hpp"
 #include "params/parameter_repository.hpp"
 
-#include "unit_config.hpp"
 #include "variant/platform.hpp"
 #include "variant/sdc_platform.hpp"
 #include "variant/usart_platform.hpp"
