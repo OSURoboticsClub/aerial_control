@@ -75,10 +75,6 @@ private:
   WorldEstimator& estimator;
   InputSource& inputSource;
 
-  ControllerPipeline<ActuatorSetpoint> pipeline;
-
-  ZeroController<ActuatorSetpoint> zeroController;
-
   MotorMapper& motorMapper;
   Platform& platform;
 

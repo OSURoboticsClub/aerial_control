@@ -2,6 +2,7 @@
 #define UNIT_DATA_HPP_
 
 #include "communication/communicator.hpp"
+#include "controller/rocket_angular_acceleration_controller.hpp"
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
@@ -51,6 +52,8 @@ struct UnitData {
           std::experimental::nullopt,
           world, inputSource, motorMapper, communicator, logger,
           platform) {
+
+    params.set(RocketAngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 100.0 * M_PI / 180.0);
   }
 };
 

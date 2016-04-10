@@ -5,6 +5,7 @@
 #include "heartbeat_thread.hpp"
 #include "communication/communicator.hpp"
 #include "controller/angular_acceleration_controller.hpp"
+#include "controller/angular_position_controller.hpp"
 #include "controller/angular_velocity_controller.hpp"
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
@@ -83,7 +84,6 @@ struct UnitData {
     params.set(GlobalParameters::PARAM_DT, 0.001);
     params.set(HeartbeatThread::PARAM_BLINK_FREQUENCY, 5);
 
-    // TODO: Set some real gains
     params.set(AngularPositionController::PARAM_PID_ROLL_KP, 1.2);
     params.set(AngularPositionController::PARAM_PID_ROLL_KI, 0.0);
     params.set(AngularPositionController::PARAM_PID_ROLL_KD, 0.0);
