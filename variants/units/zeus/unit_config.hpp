@@ -1,6 +1,8 @@
 #ifndef UNIT_CONFIG_HPP_
 #define UNIT_CONFIG_HPP_
 
+#include <array>
+
 namespace unit_config {
 
 const float DT = 0.001;

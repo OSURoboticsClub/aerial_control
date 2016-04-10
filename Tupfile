@@ -31,7 +31,6 @@ INCLUDES += -Iinclude
 INCLUDES += -Iinclude/protocol/include
 
 # Platforms
-include variants/platforms/stm32f3discovery/Tupfile
 include variants/platforms/stm32f4discovery/Tupfile
 include variants/platforms/aerial_v3/Tupfile
 include variants/platforms/aerial_v4/Tupfile
@@ -40,16 +39,9 @@ include variants/platforms/rocket_v0.1/Tupfile
 include variants/platforms/rocket_v0.2/Tupfile
 
 # Units
-include variants/units/apollo/Tupfile
 include variants/units/celestep/Tupfile
-include variants/units/celestep2/Tupfile
 include variants/units/celester/Tupfile
-include variants/units/celester2/Tupfile
-include variants/units/helios/Tupfile
-include variants/units/hera/Tupfile
-include variants/units/hestia/Tupfile
 include variants/units/icarus/Tupfile
-include variants/units/speed/Tupfile
 include variants/units/zephyrus/Tupfile
 include variants/units/zeus/Tupfile
 

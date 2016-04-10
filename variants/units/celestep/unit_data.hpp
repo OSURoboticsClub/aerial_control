@@ -28,25 +28,26 @@ struct UnitData {
 
   PayloadSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
+  UnitData(Platform& platform, ParameterRepository &params, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
-        { 7 },                                       // channels
+        { 0 },                                       // channels
         { 0.0f },                                    // offsets
         0.0f, 1.0f,                                  // input range
         MOTOR_PWM_MIN, MOTOR_PWM_MAX, MOTOR_PWM_SAFE // output range
       ),
       motorMapper(motors, communicator, logger),
       location(communicator, logger),
-      attitude(communicator, logger),
+      attitude(params, communicator, logger),
       world(location, attitude, communicator, logger),
       inputSource(communicator),
       system(
           platform.getIdx<Accelerometer>(0),
           std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
           std::experimental::make_optional(&platform.get<Barometer>()),
+          std::experimental::make_optional(&platform.get<Geiger>()),
           std::experimental::make_optional(&platform.get<GPS>()),
           platform.get<Gyroscope>(),
-          std::experimental::nullopt,
+          std::experimental::nullopt,   // No magnetometer
           world, inputSource, motorMapper, communicator, logger,
           platform) {
   }

@@ -33,9 +33,10 @@ struct UnitData {
   PWMDeviceGroup<1> servos;
   MultirotorTriMotorMapper motorMapper;
 
-  WorldEstimator world;
   AtmosphericLocationEstimator location;
   DCMAttitudeEstimator attitude;
+  WorldEstimator world;
+
   PPMInputSourceConfig ppmConfig;
   PPMInputSource inputSource;
 

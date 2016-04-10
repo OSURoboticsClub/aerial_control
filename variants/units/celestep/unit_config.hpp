@@ -1,6 +1,8 @@
 #ifndef UNIT_CONFIG_HPP_
 #define UNIT_CONFIG_HPP_
 
+#include <array>
+
 namespace unit_config {
 
 const float DT = 0.001;
@@ -16,13 +18,13 @@ const float MAX_PITCH_ROLL_VEL = 100.0 * PI / 180.0;
 // Maximum angular acceleration (rad/s^2)
 const float MAX_PITCH_ROLL_ACC = 4.0;   // TODO: calculate properly
 
-// Sensor offsets
-const float GYR_X_OFFSET =  0.016;
-const float GYR_Y_OFFSET =  0.011;
-const float GYR_Z_OFFSET = -0.026;
-const float ACC_X_OFFSET =  0.019;
-const float ACC_Y_OFFSET = -0.012;
-const float ACC_Z_OFFSET = -0.062;
+// Sensor config
+const std::array<int, 3>   GYR_AXES  = {-1,  2, -3};
+const std::array<int, 3>   ACC_AXES  = {-1,  2, -3};
+const std::array<int, 3>   ACCH_AXES = { 1, -2, -3};
+const std::array<float, 3> GYR_OFFSETS  = {0.00834, -0.00471, 0.00461};
+const std::array<float, 3> ACC_OFFSETS  = {-0.015, -0.018, 0.203};
+const std::array<float, 3> ACCH_OFFSETS = {0.396, -0.635, 0.946};
 
 // Initial angular position controller gains
 const float ANGPOS_X_KP = 1.0;

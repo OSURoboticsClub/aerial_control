@@ -28,7 +28,7 @@ struct UnitData {
 
   CanardSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
+  UnitData(Platform& platform, ParameterRepository &params, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
         { 7 },                                       // channels
         { 0.0f },                                    // offsets
@@ -37,10 +37,11 @@ struct UnitData {
       ),
       motorMapper(motors, communicator, logger),
       location(communicator, logger),
-      attitude(communicator, logger),
+      attitude(params, communicator, logger),
       world(location, attitude, communicator, logger),
       inputSource(communicator),
       system(
+          params,
           platform.getIdx<Accelerometer>(0),
           std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
           std::experimental::make_optional(&platform.get<Barometer>()),
