@@ -51,7 +51,7 @@ msg_t ControlThread::main() {
   while(true) {
     deadline += MS2ST(unit_config::DT * 1000);
 
-    loopCounter.update(loopCounter.get() + 1);
+    loopCounter.set(loopCounter.v() + 1);
     unit.getSystem().update();
 
     sleepUntil(deadline);
