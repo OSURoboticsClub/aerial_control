@@ -6,7 +6,7 @@
 #include "util/math.hpp"
 
 AngularVelocityController::AngularVelocityController(ParameterRepository& params)
-    : params(params) {
+  : params(params) {
   params.def(PARAM_PID_ROLL_KP, 0.0);
   params.def(PARAM_PID_ROLL_KI, 0.0);
   params.def(PARAM_PID_ROLL_KD, 0.0);
