@@ -1,5 +1,5 @@
-#ifndef LOGGED_VARIABLE_H_
-#define LOGGED_VARIABLE_H_
+#ifndef LOGGED_VARIABLE_HPP
+#define LOGGED_VARIABLE_HPP
 
 #include "logger/logged_variable_registry.hpp"
 
@@ -8,8 +8,8 @@ class LoggedVariable {
 public:
   LoggedVariable(LoggedVariableRegistry& registry, T value);
 
-  T get();
-  void update(T value);
+  T v();   // Get value
+  void set(T value);
 
 private:
   T value;
@@ -26,13 +26,13 @@ LoggedVariable<double>::LoggedVariable(LoggedVariableRegistry& registry, double 
 }
 
 template <typename T>
-T LoggedVariable<T>::get() {
+T LoggedVariable<T>::v() {
   return value;
 }
 
 template <typename T>
-void LoggedVariable<T>::update(T value) {
+void LoggedVariable<T>::set(T value) {
   this->value = value;
 }
 
-#endif // LOGGED_VARIABLE_H_
+#endif // LOGGED_VARIABLE_HPP

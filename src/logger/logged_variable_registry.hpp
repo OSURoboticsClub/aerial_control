@@ -1,5 +1,5 @@
-#ifndef LOGGED_VARIABLE_REGISTRY_H_
-#define LOGGED_VARIABLE_REGISTRY_H_
+#ifndef LOGGED_VARIABLE_REGISTRY_HPP
+#define LOGGED_VARIABLE_REGISTRY_HPP
 
 #include <vector>
 
@@ -17,4 +17,4 @@ private:
   std::vector<LoggedVariable<double> *> doubles;
 };
 
-#endif // LOGGED_VARIABLE_REGISTRY_H_
+#endif // LOGGED_VARIABLE_REGISTRY_HPP
