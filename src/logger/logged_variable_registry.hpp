@@ -10,11 +10,11 @@ class LoggedVariable;
 class LoggedVariableRegistry {
 public:
   void registerInt(LoggedVariable<int> *variable);
-  void registerDouble(LoggedVariable<double> *variable);
+  void registerFloat(LoggedVariable<float> *variable);
 
 private:
   std::vector<LoggedVariable<int> *> ints;
-  std::vector<LoggedVariable<double> *> doubles;
+  std::vector<LoggedVariable<float> *> floats;
 };
 
 #endif // LOGGED_VARIABLE_REGISTRY_HPP

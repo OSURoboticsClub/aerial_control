@@ -21,8 +21,8 @@ LoggedVariable<int>::LoggedVariable(LoggedVariableRegistry& registry, int value)
 }
 
 template <>
-LoggedVariable<double>::LoggedVariable(LoggedVariableRegistry& registry, double value) : value(value) {
-  registry.registerDouble(this);
+LoggedVariable<float>::LoggedVariable(LoggedVariableRegistry& registry, float value) : value(value) {
+  registry.registerFloat(this);
 }
 
 template <typename T>
