@@ -1,7 +1,7 @@
 #ifndef COMMUNICATOR_HPP_
 #define COMMUNICATOR_HPP_
 
-#include <array>
+#include <vector>
 
 #include "ch.hpp"
 #include "hal.h"
@@ -65,9 +65,7 @@ private:
   protocol::Encoder encoder;
   protocol::Decoder decoder;
 
-  // TODO(kyle): Fixed size array probably isn't good.
-  std::array<MessageListener *, 10> listeners;
-  std::size_t listenersPos;
+  std::vector<MessageListener *> listeners;
 };
 
 #include "communicator.tpp"
