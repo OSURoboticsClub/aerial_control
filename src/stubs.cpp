@@ -1,3 +1,5 @@
+#include <ch.h>
+
 /**
  * These stubs are necessary to make newlib work.
  *
@@ -26,6 +28,6 @@ void *__dso_handle = 0;
 
 namespace __gnu_cxx {
   void __verbose_terminate_handler() {
-    for(;;);
+    chSysHalt();
   }
 }
