@@ -7,6 +7,7 @@
 #include "filesystem/logger.hpp"
 #include "params/parameter_repository.hpp"
 #include "variable_registry/variable.hpp"
+#include "variable_registry/registry.hpp"
 
 #include "variant/platform.hpp"
 #include "variant/sdc_platform.hpp"
@@ -47,7 +48,7 @@ msg_t ControlThread::main() {
 
   // TODO: Test variable to ensure logging infrastructure is functioning.
   VariableRegistry registry;
-  RegisteredVariable<int> loopCounter(registry, 0);
+  //RegisteredVariable<int> loopCounter(registry, 0);
 
   // Loop at a fixed rate forever
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
@@ -55,7 +56,7 @@ msg_t ControlThread::main() {
   while(true) {
     deadline += MS2ST(params.get(GlobalParameters::PARAM_DT) * 1000);
 
-    loopCounter.set(loopCounter.v() + 1);
+    //loopCounter.set(loopCounter.v() + 1);
     unit.getSystem().update();
 
     sleepUntil(deadline);

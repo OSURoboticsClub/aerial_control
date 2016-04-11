@@ -34,7 +34,7 @@ private:
   bool fsReady;
 
   rb_t buf;   // Ringbuffer
-  std::uint8_t _buf[83000];
+  std::uint8_t _buf[60000];
   std::uint8_t writebuf[8000];
 
   protocol::Encoder encoder;
