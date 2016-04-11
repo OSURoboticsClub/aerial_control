@@ -2,8 +2,6 @@
 
 #include <array>
 
-#include "unit_config.hpp"
-
 void LSM303DLHC::init() {
   // Wake up device and enable X, Y, and Z outputs.
   writeRegister(lsm303dlhc::I2C_AD_CTRL_REG1_A, (1 << 7) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0));

@@ -2,19 +2,27 @@
 
 #include <algorithm>
 
-#include <util/math.hpp>
-#include "unit_config.hpp"
+#include "global_parameters.hpp"
+#include "util/math.hpp"
 
-AngularPositionController::AngularPositionController()
-  : rollPosPid(unit_config::ANGPOS_X_KP, unit_config::ANGPOS_X_KI, unit_config::ANGPOS_X_KD),
-    pitchPosPid(unit_config::ANGPOS_Y_KP, unit_config::ANGPOS_Y_KI, unit_config::ANGPOS_Y_KD),
-    yawPosPid(unit_config::ANGPOS_Z_KP, unit_config::ANGPOS_Z_KI, unit_config::ANGPOS_Z_KD) {
+AngularPositionController::AngularPositionController(ParameterRepository& params)
+  : params(params) {
+  params.def(PARAM_PID_ROLL_KP, 0.0);
+  params.def(PARAM_PID_ROLL_KI, 0.0);
+  params.def(PARAM_PID_ROLL_KD, 0.0);
+  params.def(PARAM_PID_PITCH_KP, 0.0);
+  params.def(PARAM_PID_PITCH_KI, 0.0);
+  params.def(PARAM_PID_PITCH_KD, 0.0);
+  params.def(PARAM_PID_YAW_KP, 0.0);
+  params.def(PARAM_PID_YAW_KI, 0.0);
+  params.def(PARAM_PID_YAW_KD, 0.0);
+  params.def(PARAM_MAX_PITCH_ROLL_POS, 0.0);
 }
 
 AngularVelocitySetpoint AngularPositionController::run(const WorldEstimate& world, const AngularPositionSetpoint& input) {
   // Limit to maximum angles
-  float rollPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.rollPos));
-  float pitchPosSp = std::max(-unit_config::MAX_PITCH_ROLL_POS, std::min(unit_config::MAX_PITCH_ROLL_POS, input.pitchPos));
+  float rollPosSp = std::max(-params.get(PARAM_MAX_PITCH_ROLL_POS), std::min(params.get(PARAM_MAX_PITCH_ROLL_POS), input.rollPos));
+  float pitchPosSp = std::max(-params.get(PARAM_MAX_PITCH_ROLL_POS), std::min(params.get(PARAM_MAX_PITCH_ROLL_POS), input.pitchPos));
   float yawPosSp = input.yawPos;
 
   // Favor the short rotation (less than 180 deg) to target
@@ -26,9 +34,9 @@ AngularVelocitySetpoint AngularPositionController::run(const WorldEstimate& worl
   else if (yawPosSp   - world.att.yaw   < -M_PI) yawPosSp   += 2*M_PI;
 
   // Run PID controllers
-  float rollVelSp = rollPosPid.calculate(rollPosSp, world.att.roll, unit_config::DT);
-  float pitchVelSp = pitchPosPid.calculate(pitchPosSp, world.att.pitch, unit_config::DT);
-  float yawVelSp = yawPosPid.calculate(yawPosSp, world.att.yaw, unit_config::DT);
+  float rollVelSp = rollPosPid.calculate(rollPosSp, world.att.roll, params.get(GlobalParameters::PARAM_DT));
+  float pitchVelSp = pitchPosPid.calculate(pitchPosSp, world.att.pitch, params.get(GlobalParameters::PARAM_DT));
+  float yawVelSp = yawPosPid.calculate(yawPosSp, world.att.yaw, params.get(GlobalParameters::PARAM_DT));
 
   // Output
   AngularVelocitySetpoint setpoint {

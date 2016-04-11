@@ -2,23 +2,37 @@
 
 #include <algorithm>
 
-#include "unit_config.hpp"
+#include "global_parameters.hpp"
+#include "util/math.hpp"
 
-AngularAccelerationController::AngularAccelerationController()
-  : rollAccPid(unit_config::ANGACC_X_KP, unit_config::ANGACC_X_KI, unit_config::ANGACC_X_KD),
-    pitchAccPid(unit_config::ANGACC_Y_KP, unit_config::ANGACC_Y_KI, unit_config::ANGACC_Y_KD),
-    yawAccPid(unit_config::ANGACC_Z_KP, unit_config::ANGACC_Z_KI, unit_config::ANGACC_Z_KD) {
+AngularAccelerationController::AngularAccelerationController(ParameterRepository& params)
+  : params(params) {
+  params.def(PARAM_PID_ROLL_KP, 0.0);
+  params.def(PARAM_PID_ROLL_KI, 0.0);
+  params.def(PARAM_PID_ROLL_KD, 0.0);
+  params.def(PARAM_PID_PITCH_KP, 0.0);
+  params.def(PARAM_PID_PITCH_KI, 0.0);
+  params.def(PARAM_PID_PITCH_KD, 0.0);
+  params.def(PARAM_PID_YAW_KP, 0.0);
+  params.def(PARAM_PID_YAW_KI, 0.0);
+  params.def(PARAM_PID_YAW_KD, 0.0);
+  params.def(PARAM_MAX_PITCH_ROLL_ACC, 0.0);
 }
 
 ActuatorSetpoint AngularAccelerationController::run(const WorldEstimate& world, const AngularAccelerationSetpoint& input) {
+  // Update parameters
+  rollAccPid.setGains(params.get(PARAM_PID_ROLL_KP), params.get(PARAM_PID_ROLL_KI), params.get(PARAM_PID_ROLL_KD));
+  pitchAccPid.setGains(params.get(PARAM_PID_PITCH_KP), params.get(PARAM_PID_PITCH_KI), params.get(PARAM_PID_PITCH_KD));
+  yawAccPid.setGains(params.get(PARAM_PID_YAW_KP), params.get(PARAM_PID_YAW_KI), params.get(PARAM_PID_YAW_KD));
+
   // Limit to maximum angular accelerations
-  float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
-  float pitchAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.pitchAcc));
+  float rollAccSp = clip(input.rollAcc, -params.get(PARAM_MAX_PITCH_ROLL_ACC), params.get(PARAM_MAX_PITCH_ROLL_ACC));
+  float pitchAccSp = clip(input.pitchAcc, params.get(PARAM_MAX_PITCH_ROLL_ACC), params.get(PARAM_MAX_PITCH_ROLL_ACC));
 
   // Run PID controllers
-  float rollActuatorSp = rollAccPid.calculate(rollAccSp, world.att.rollAcc, unit_config::DT);
-  float pitchActuatorSp = pitchAccPid.calculate(pitchAccSp, world.att.pitchAcc, unit_config::DT);
-  float yawActuatorSp = yawAccPid.calculate(input.yawAcc, world.att.yawAcc, unit_config::DT);
+  float rollActuatorSp = rollAccPid.calculate(rollAccSp, world.att.rollAcc, params.get(GlobalParameters::PARAM_DT));
+  float pitchActuatorSp = pitchAccPid.calculate(pitchAccSp, world.att.pitchAcc, params.get(GlobalParameters::PARAM_DT));
+  float yawActuatorSp = yawAccPid.calculate(input.yawAcc, world.att.yawAcc, params.get(GlobalParameters::PARAM_DT));
 
   // Output
   ActuatorSetpoint setpoint {
@@ -30,3 +44,4 @@ ActuatorSetpoint AngularAccelerationController::run(const WorldEstimate& world, 
 
   return setpoint;
 }
+

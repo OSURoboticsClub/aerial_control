@@ -4,7 +4,6 @@
 #include <cstring>
 
 #include "chprintf.h"
-#include "unit_config.hpp"
 
 const char NMEA_LF = '\n';
 const char *NMEA_DELIMS = ",\0";

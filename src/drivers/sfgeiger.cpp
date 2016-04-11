@@ -4,7 +4,6 @@
 #include <cstring>
 
 #include "chprintf.h"
-#include "unit_config.hpp"
 
 void SFGeiger::init() {
 }

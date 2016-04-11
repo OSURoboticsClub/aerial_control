@@ -2,13 +2,13 @@
 #define UNIT_DATA_HPP_
 
 #include "communication/communicator.hpp"
+#include "controller/rocket_angular_acceleration_controller.hpp"
 #include "estimator/world_estimator.hpp"
 #include "estimator/atmospheric_location_estimator.hpp"
 #include "estimator/dcm_attitude_estimator.hpp"
 #include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/esra_rocket_motor_mapper.hpp"
-#include "sensor/sensor_measurements.hpp"
 #include "system/canard_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
@@ -28,7 +28,7 @@ struct UnitData {
 
   CanardSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator, Logger& logger)
+  UnitData(Platform& platform, ParameterRepository &params, Communicator& communicator, Logger& logger)
     : motors(platform.get<PWMPlatform>(),
         { 7 },                                       // channels
         { 0.0f },                                    // offsets
@@ -37,10 +37,11 @@ struct UnitData {
       ),
       motorMapper(motors, communicator, logger),
       location(communicator, logger),
-      attitude(communicator, logger),
+      attitude(params, communicator, logger),
       world(location, attitude, communicator, logger),
       inputSource(communicator),
       system(
+          params,
           platform.getIdx<Accelerometer>(0),
           std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
           std::experimental::make_optional(&platform.get<Barometer>()),
@@ -50,6 +51,8 @@ struct UnitData {
           std::experimental::nullopt,
           world, inputSource, motorMapper, communicator, logger,
           platform) {
+
+    params.set(RocketAngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 100.0 * M_PI / 180.0);
   }
 };
 

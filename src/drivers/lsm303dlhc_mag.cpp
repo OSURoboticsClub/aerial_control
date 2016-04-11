@@ -2,8 +2,6 @@
 
 #include <array>
 
-#include "unit_config.hpp"
-
 void LSM303DLHCMag::init() {
   // Set output rate to 220Hz
   writeRegister(lsm303dlhc_mag::I2C_CRA_REG_M, 0x00 | (1 << 2) | (1 << 3) | (1 << 4));

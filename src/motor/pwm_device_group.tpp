@@ -1,7 +1,5 @@
 #include <algorithm>
 
-#include "unit_config.hpp"
-
 template <int device_count>
 PWMDeviceGroup<device_count>::PWMDeviceGroup(PWMPlatform& pwmPlatform,
     std::array<pwmchannel_t, device_count> channels,

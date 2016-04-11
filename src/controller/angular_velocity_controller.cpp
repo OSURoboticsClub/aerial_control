@@ -2,23 +2,37 @@
 
 #include <algorithm>
 
-#include "unit_config.hpp"
+#include "global_parameters.hpp"
+#include "util/math.hpp"
 
-AngularVelocityController::AngularVelocityController()
-  : rollVelPid(unit_config::ANGVEL_X_KP, unit_config::ANGVEL_X_KI, unit_config::ANGVEL_X_KD),
-    pitchVelPid(unit_config::ANGVEL_Y_KP, unit_config::ANGVEL_Y_KI, unit_config::ANGVEL_Y_KD),
-    yawVelPid(unit_config::ANGVEL_Z_KP, unit_config::ANGVEL_Z_KI, unit_config::ANGVEL_Z_KD) {
+AngularVelocityController::AngularVelocityController(ParameterRepository& params)
+  : params(params) {
+  params.def(PARAM_PID_ROLL_KP, 0.0);
+  params.def(PARAM_PID_ROLL_KI, 0.0);
+  params.def(PARAM_PID_ROLL_KD, 0.0);
+  params.def(PARAM_PID_PITCH_KP, 0.0);
+  params.def(PARAM_PID_PITCH_KI, 0.0);
+  params.def(PARAM_PID_PITCH_KD, 0.0);
+  params.def(PARAM_PID_YAW_KP, 0.0);
+  params.def(PARAM_PID_YAW_KI, 0.0);
+  params.def(PARAM_PID_YAW_KD, 0.0);
+  params.def(PARAM_MAX_PITCH_ROLL_VEL, 0.0);
 }
 
 AngularAccelerationSetpoint AngularVelocityController::run(const WorldEstimate& world, const AngularVelocitySetpoint& input) {
+  // Update parameters
+  rollVelPid.setGains(params.get(PARAM_PID_ROLL_KP), params.get(PARAM_PID_ROLL_KI), params.get(PARAM_PID_ROLL_KD));
+  pitchVelPid.setGains(params.get(PARAM_PID_PITCH_KP), params.get(PARAM_PID_PITCH_KI), params.get(PARAM_PID_PITCH_KD));
+  yawVelPid.setGains(params.get(PARAM_PID_YAW_KP), params.get(PARAM_PID_YAW_KI), params.get(PARAM_PID_YAW_KD));
+
   // Limit to maximum angular velocities
-  float rollVelSp = std::max(-unit_config::MAX_PITCH_ROLL_VEL, std::min(unit_config::MAX_PITCH_ROLL_VEL, input.rollVel));
-  float pitchVelSp = std::max(-unit_config::MAX_PITCH_ROLL_VEL, std::min(unit_config::MAX_PITCH_ROLL_VEL, input.pitchVel));
+  float rollVelSp = clip(input.rollVel, -params.get(PARAM_MAX_PITCH_ROLL_VEL), params.get(PARAM_MAX_PITCH_ROLL_VEL));
+  float pitchVelSp = clip(input.pitchVel, params.get(PARAM_MAX_PITCH_ROLL_VEL), params.get(PARAM_MAX_PITCH_ROLL_VEL));
 
   // Run PID controllers
-  float rollAccSp = rollVelPid.calculate(rollVelSp, world.att.rollVel, unit_config::DT);
-  float pitchAccSp = pitchVelPid.calculate(pitchVelSp, world.att.pitchVel, unit_config::DT);
-  float yawAccSp = yawVelPid.calculate(input.yawVel, world.att.yawVel, unit_config::DT);
+  float rollAccSp = rollVelPid.calculate(rollVelSp, world.att.rollVel, params.get(GlobalParameters::PARAM_DT));
+  float pitchAccSp = pitchVelPid.calculate(pitchVelSp, world.att.pitchVel, params.get(GlobalParameters::PARAM_DT));
+  float yawAccSp = yawVelPid.calculate(input.yawVel, world.att.yawVel, params.get(GlobalParameters::PARAM_DT));
 
   // Output
   AngularAccelerationSetpoint setpoint {

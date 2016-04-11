@@ -3,18 +3,16 @@
 #include <algorithm>
 
 #include <util/math.hpp>
-#include "unit_config.hpp"
 #include "chprintf.h"
 
-RocketAngularAccelerationController::RocketAngularAccelerationController()
-  : rollAccPid(unit_config::ANGACC_X_KP, unit_config::ANGACC_X_KI, unit_config::ANGACC_X_KD),
-    pitchAccPid(unit_config::ANGACC_Y_KP, unit_config::ANGACC_Y_KI, unit_config::ANGACC_Y_KD),
-    yawAccPid(unit_config::ANGACC_Z_KP, unit_config::ANGACC_Z_KI, unit_config::ANGACC_Z_KD) {
+RocketAngularAccelerationController::RocketAngularAccelerationController(ParameterRepository& params)
+  : params(params) {
+  params.def(PARAM_MAX_PITCH_ROLL_ACC, 0.0);
 }
 
 ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& est, const AngularAccelerationSetpoint& input) {
   // Limit to maximum angular accelerations
-  float rollAccSp = std::max(-unit_config::MAX_PITCH_ROLL_ACC, std::min(unit_config::MAX_PITCH_ROLL_ACC, input.rollAcc));
+  float rollAccSp = std::max(-params.get(PARAM_MAX_PITCH_ROLL_ACC), std::min(params.get(PARAM_MAX_PITCH_ROLL_ACC), input.rollAcc));
 
   // Constants
   const float F_LE   = M_PI * 7/18;    // Fin leading edge angle (rad)

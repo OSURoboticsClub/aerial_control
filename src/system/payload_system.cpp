@@ -1,3 +1,4 @@
+#include "global_parameters.hpp"
 #include "system/payload_system.hpp"
 #include "util/time.hpp"
 
@@ -18,6 +19,7 @@ PayloadSystem::PayloadSystem(
     MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
     Platform& platform)
   : VehicleSystem(communicator), MessageListener(communicator),
+    params(params),
     accel(accel), accelH(accelH), bar(bar), ggr(ggr), gps(gps), gyr(gyr), mag(mag),
     estimator(estimator), inputSource(inputSource),
     motorMapper(motorMapper), platform(platform),
@@ -272,7 +274,7 @@ PayloadState PayloadSystem::ApogeeState(SensorMeasurements meas, WorldEstimate e
     return PayloadState::MICROGRAVITY;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
   return PayloadState::APOGEE;
 }
 
@@ -307,7 +309,7 @@ PayloadState PayloadSystem::MicrogravityState(SensorMeasurements meas, WorldEsti
     return PayloadState::DESCENT;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
 
   // Outputs
   sp.throttle = throttle;
@@ -338,7 +340,7 @@ PayloadState PayloadSystem::DescentState(SensorMeasurements meas, WorldEstimate 
     return PayloadState::RECOVERY;
   }
 
-  sTime += unit_config::DT;
+  sTime += params.get(GlobalParameters::PARAM_DT);
   return PayloadState::DESCENT;
 }
 
@@ -386,7 +388,7 @@ void PayloadSystem::RGBLED(float freq) {
   else if (dc <= 0.0) {
     dir = 1;
   }
-  dc += dir * (2*freq * unit_config::DT);
+  dc += dir * (2*freq * params.get(GlobalParameters::PARAM_DT));
 
   float dc_ = dc;
   float dir_ = dir;

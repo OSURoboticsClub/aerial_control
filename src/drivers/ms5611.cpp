@@ -1,7 +1,5 @@
 #include "drivers/ms5611.hpp"
 
-#include "unit_config.hpp"
-
 void MS5611::init() {
   // Reset device.
   txbuf[0] = ms5611::CMD_RESET;

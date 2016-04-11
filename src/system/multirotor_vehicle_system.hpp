@@ -1,6 +1,8 @@
 #ifndef MULTIROTOR_SYSTEM_HPP_
 #define MULTIROTOR_SYSTEM_HPP_
 
+#include "global_parameters.hpp"
+#include "params/parameter_repository.hpp"
 #include "system/vehicle_system.hpp"
 #include "util/optional.hpp"
 
@@ -47,6 +49,7 @@ enum class MultirotorControlMode {
 class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(
+      ParameterRepository& params,
       Gyroscope& gyr,
       Accelerometer& acc,
       optional<Barometer *> bar,
@@ -62,6 +65,8 @@ public:
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
+  ParameterRepository& params;
+
   Gyroscope& gyr;
   Accelerometer& acc;
   optional<Barometer *> bar;

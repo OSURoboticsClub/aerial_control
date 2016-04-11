@@ -5,12 +5,13 @@
 
 #include "communication/communicator.hpp"
 #include "filesystem/logger.hpp"
+#include "params/parameter_repository.hpp"
 #include "system/vehicle_system.hpp"
 #include "variant/platform.hpp"
 
 class Unit {
 public:
-  Unit(Platform& platform, Communicator& communicator, Logger& logger);
+  Unit(Platform& platform, ParameterRepository& params, Communicator& communicator, Logger& logger);
 
   VehicleSystem& getSystem();
 

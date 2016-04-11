@@ -2,19 +2,15 @@
 
 #include <algorithm>
 
-#include "unit_config.hpp"
-
-PositionController::PositionController()
-  : latPid(10.0, 0.0, 0.0),
-    lonPid(10.0, 0.0, 0.0),
-    altitudePid(10.0, 0.0, 0.0) {
+PositionController::PositionController(ParameterRepository& params)
+  : params(params) {
 }
 
 AngularPositionSetpoint PositionController::run(const WorldEstimate& world, const PositionSetpoint& input) {
   // TODO(kyle): Weird effects at the poles?
-  float globalRollPosSp = latPid.calculate(input.lat, world.loc.lat, unit_config::DT);
-  float globalPitchPosSp = lonPid.calculate(input.lon, world.loc.lon, unit_config::DT);
-  float throttleSp = altitudePid.calculate(input.alt, world.loc.alt, unit_config::DT);
+  float globalRollPosSp = latPid.calculate(input.lat, world.loc.lat, params.get(GlobalParameters::PARAM_DT));
+  float globalPitchPosSp = lonPid.calculate(input.lon, world.loc.lon, params.get(GlobalParameters::PARAM_DT));
+  float throttleSp = altitudePid.calculate(input.alt, world.loc.alt, params.get(GlobalParameters::PARAM_DT));
 
   // TODO(kyle): Transform from global angular setpoints to local angular
   // setpoints.

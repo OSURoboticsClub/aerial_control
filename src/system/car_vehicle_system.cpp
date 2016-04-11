@@ -4,14 +4,16 @@
 
 #include "util/optional.hpp"
 
-CarVehicleSystem::CarVehicleSystem(Gyroscope& gyroscope, Accelerometer& accelerometer,
-    PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
+CarVehicleSystem::CarVehicleSystem(ParameterRepository& params, Gyroscope& gyroscope,
+    Accelerometer& accelerometer, PWMDeviceGroup<4>& motorDevices, PWMDeviceGroup<4>& servoDevices,
     Communicator& communicator, Logger& logger)
   : VehicleSystem(communicator), MessageListener(communicator),
     gyroscope(gyroscope), accelerometer(accelerometer),
-    locEstimator(communicator, logger), attEstimator(communicator, logger),
+    locEstimator(communicator, logger), attEstimator(params, communicator, logger),
     worldEstimator(locEstimator, attEstimator, communicator, logger),
-    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator, logger) {
+    inputSource(communicator), motorMapper(motorDevices, servoDevices, communicator, logger),
+    attVelController(params),
+    attAccController(params) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);

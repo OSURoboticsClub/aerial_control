@@ -28,7 +28,7 @@ struct UnitData {
 
   MultirotorVehicleSystem system;
 
-  UnitData(Platform& platform, Communicator& communicator)
+  UnitData(Platform& platform, ParameterRepository &params, Communicator& communicator)
     : motors(platform.get<PWMPlatform>(),
         { 0, 1, 2, 3 },                              // channels
         { 0.0f, 0.0f, 0.0f, 0.0f },                  // offsets
@@ -37,10 +37,11 @@ struct UnitData {
       ),
       motorMapper(motors, communicator),
       location(communicator),
-      attitude(communicator),
+      attitude(params, communicator),
       world(location, attitude, communicator),
       inputSource(communicator),
-      system(platform.get<Gyroscope>(), platform.get<Accelerometer>(),
+      system(params,
+             platform.get<Gyroscope>(), platform.get<Accelerometer>(),
              std::experimental::nullopt,
              std::experimental::nullopt,
              world, inputSource, motorMapper, communicator) {

@@ -1,9 +1,11 @@
 #include "system/multirotor_vehicle_system.hpp"
 
-#include <input/ppm_input_source.hpp>
-#include <util/math.hpp>
+#include "unit_config.hpp"
+#include "input/ppm_input_source.hpp"
+#include "util/math.hpp"
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
+    ParameterRepository& params,
     Gyroscope& gyr,
     Accelerometer& acc,
     optional<Barometer *> bar,
@@ -17,9 +19,14 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     Platform& platform)
   : VehicleSystem(communicator),
     MessageListener(communicator),
+    params(params),
     gyr(gyr), acc(acc), bar(bar), gps(gps), mag(mag),
     estimator(estimator),
     inputSource(inputSource),
+    posController(params),
+    attPosController(params),
+    attVelController(params),
+    attAccController(params),
     motorMapper(motorMapper),
     platform(platform),
     stream(communicator, 10), logger(logger),
@@ -210,7 +217,7 @@ void MultirotorVehicleSystem::AngularRateMode(SensorMeasurements meas, WorldEsti
 
 void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   SetLED(0,0,1);
-  yawPosSp += M_PI * input.yaw * unit_config::DT;
+  yawPosSp += M_PI * input.yaw * params.get(GlobalParameters::PARAM_DT);
   if (yawPosSp > M_PI)  {yawPosSp -= 2*M_PI;}
   if (yawPosSp < -M_PI) {yawPosSp += 2*M_PI;}
 
@@ -240,7 +247,7 @@ void MultirotorVehicleSystem::AngularPosMode(SensorMeasurements meas, WorldEstim
 
 void MultirotorVehicleSystem::PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   SetLED(0,1,1);
-  yawPosSp += input.yaw * unit_config::DT;
+  yawPosSp += input.yaw * params.get(GlobalParameters::PARAM_DT);
   if (yawPosSp > M_PI)  {yawPosSp -= 2*M_PI;}
   if (yawPosSp < -M_PI) {yawPosSp += 2*M_PI;}
 
@@ -288,7 +295,7 @@ void MultirotorVehicleSystem::RGBLED(float freq) {
   else if (dc <= 0.0) {
     dir = 1;
   }
-  dc += dir * (2*freq * unit_config::DT);
+  dc += dir * (2*freq * params.get(GlobalParameters::PARAM_DT));
 
   float dc_ = dc;
   float dir_ = dir;

@@ -1,12 +1,13 @@
 #include "control_thread.hpp"
 
+#include "global_parameters.hpp"
 #include "heartbeat_thread.hpp"
 #include "communication/communicator.hpp"
 #include "filesystem/filesystem.hpp"
 #include "filesystem/logger.hpp"
+#include "params/parameter_repository.hpp"
 #include "variable_registry/variable.hpp"
 
-#include "unit_config.hpp"
 #include "variant/platform.hpp"
 #include "variant/sdc_platform.hpp"
 #include "variant/usart_platform.hpp"
@@ -19,8 +20,11 @@ msg_t ControlThread::main() {
 
   auto& primaryStream = platform.get<USARTPlatform>().getPrimaryStream();
 
+  ParameterRepository params;
+  GlobalParameters globalParams(params);
+
   // Start the background threads
-  static HeartbeatThread heartbeatThread;
+  static HeartbeatThread heartbeatThread(params);
   //static Registry registry();   // TODO(syoo): merge #46
 
   // Set up communicator
@@ -39,7 +43,7 @@ msg_t ControlThread::main() {
   logger.start(HIGHPRIO-1);
 
   // Build the unit
-  Unit unit(platform, communicator, logger);
+  Unit unit(platform, params, communicator, logger);
 
   // TODO: Test variable to ensure logging infrastructure is functioning.
   VariableRegistry registry;
@@ -49,7 +53,7 @@ msg_t ControlThread::main() {
   // NOTE: If the deadline is ever missed then the loop will hang indefinitely.
   systime_t deadline = chibios_rt::System::getTime();
   while(true) {
-    deadline += MS2ST(unit_config::DT * 1000);
+    deadline += MS2ST(params.get(GlobalParameters::PARAM_DT) * 1000);
 
     loopCounter.set(loopCounter.v() + 1);
     unit.getSystem().update();

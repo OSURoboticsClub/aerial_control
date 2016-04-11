@@ -1,6 +1,5 @@
 #include "drivers/h3lis331dl.hpp"
 
-#include "unit_config.hpp"
 #include "chprintf.h"
 
 void H3LIS331DL::init() {

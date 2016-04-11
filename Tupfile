@@ -13,7 +13,6 @@ INCLUDES += -I$(CHIBIOS)/os/various
 INCLUDES += -I$(CHIBIOS)/os/various/cpp_wrappers
 
 # Control files
-CSRCS += src/stubs.c
 CXXSRCS += src/*.cpp
 CXXSRCS += src/communication/*.cpp
 CXXSRCS += src/controller/*.cpp
@@ -23,6 +22,7 @@ CXXSRCS += src/filesystem/*.cpp
 CXXSRCS += src/input/*.cpp
 CXXSRCS += src/variable_registry/*.cpp
 CXXSRCS += src/motor/*.cpp
+CXXSRCS += src/params/*.cpp
 CXXSRCS += src/sensor/*.cpp
 CXXSRCS += src/system/*.cpp
 
@@ -32,7 +32,6 @@ INCLUDES += -Iinclude
 INCLUDES += -Iinclude/protocol/include
 
 # Platforms
-include variants/platforms/stm32f3discovery/Tupfile
 include variants/platforms/stm32f4discovery/Tupfile
 include variants/platforms/aerial_v3/Tupfile
 include variants/platforms/aerial_v4/Tupfile
@@ -41,16 +40,9 @@ include variants/platforms/rocket_v0.1/Tupfile
 include variants/platforms/rocket_v0.2/Tupfile
 
 # Units
-include variants/units/apollo/Tupfile
 include variants/units/celestep/Tupfile
-include variants/units/celestep2/Tupfile
 include variants/units/celester/Tupfile
-include variants/units/celester2/Tupfile
-include variants/units/helios/Tupfile
-include variants/units/hera/Tupfile
-include variants/units/hestia/Tupfile
 include variants/units/icarus/Tupfile
-include variants/units/speed/Tupfile
 include variants/units/zephyrus/Tupfile
 include variants/units/zeus/Tupfile
 
