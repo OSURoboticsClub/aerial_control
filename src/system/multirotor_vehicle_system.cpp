@@ -30,10 +30,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     motorMapper(motorMapper),
     platform(platform),
     stream(communicator, 10), logger(logger),
-    mode(MultirotorControlMode::DISARMED),
-    calibrated(false),
-    altSp(0.0),
-    yawPosSp(0.0) {
+    mode(MultirotorControlMode::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
