@@ -6,11 +6,7 @@
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     ParameterRepository& params,
-    Gyroscope& gyr,
-    Accelerometer& acc,
-    optional<Barometer *> bar,
-    optional<GPS *> gps,
-    optional<Magnetometer *> mag,
+    Sensors& sensors,
     WorldEstimator& estimator,
     InputSource& inputSource,
     MotorMapper& motorMapper,
@@ -20,7 +16,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
   : VehicleSystem(communicator),
     MessageListener(communicator),
     params(params),
-    gyr(gyr), acc(acc), bar(bar), gps(gps), mag(mag),
+    sensors(sensors),
     estimator(estimator),
     inputSource(inputSource),
     posController(params),
@@ -34,34 +30,16 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
-  gyr.setAxisConfig(unit_config::GYR_AXES);
-  acc.setAxisConfig(unit_config::ACC_AXES);
-  gyr.setOffsets(unit_config::GYR_OFFSETS);
-  acc.setOffsets(unit_config::ACC_OFFSETS);
+  // TODO:
+  /* gyr.setAxisConfig(unit_config::GYR_AXES); */
+  /* acc.setAxisConfig(unit_config::ACC_AXES); */
+  /* gyr.setOffsets(unit_config::GYR_OFFSETS); */
+  /* acc.setOffsets(unit_config::ACC_OFFSETS); */
 }
 
 void MultirotorVehicleSystem::update() {
   // Poll sensors
-  GyroscopeReading gyroReading = gyr.readGyro();
-  AccelerometerReading accelReading = acc.readAccel();
-  optional<BarometerReading> barReading;
-  optional<GPSReading> gpsReading;
-  optional<MagnetometerReading> magReading;
-
-  if (bar) barReading = (*bar)->readBar();
-  if (gps) gpsReading = (*gps)->readGPS();
-  if (mag) magReading = (*mag)->readMag();
-
-  // TODO: Currently copying all readings
-  SensorMeasurements meas {
-    .accel  = std::experimental::make_optional(accelReading),
-    .accelH = std::experimental::nullopt,
-    .bar    = barReading,
-    .ggr    = std::experimental::nullopt,
-    .gps    = gpsReading,
-    .gyro   = std::experimental::make_optional(gyroReading),
-    .mag    = magReading
-  };
+  SensorMeasurements meas = sensors.readAvailableSensors();
 
   // Update world estimate
   WorldEstimate estimate = estimator.update(meas);
@@ -129,21 +107,7 @@ void MultirotorVehicleSystem::update() {
 }
 
 bool MultirotorVehicleSystem::healthy() const {
-  bool healthy = gyr.healthy() && acc.healthy();
-
-  if(bar) {
-    healthy &= (*bar)->healthy();
-  }
-
-  if(gps) {
-    healthy &= (*gps)->healthy();
-  }
-
-  if(mag) {
-    healthy &= (*mag)->healthy();
-  }
-
-  return healthy;
+  return sensors.healthy();
 }
 
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {
@@ -173,7 +137,8 @@ void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
 
   // Run calibration for 5 seconds
   if (calibCount == 5000) {
-    gyr.setOffsets(gyrOffsets);
+    // TODO
+    /* gyr.setOffsets(gyrOffsets); */
     protocol::message::sensor_calibration_response_message_t m_gyrcal {
       .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
       .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}

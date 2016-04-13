@@ -33,10 +33,7 @@
 #include "estimator/world_estimator.hpp"
 
 // Sensors
-#include "sensor/accelerometer.hpp"
-#include "sensor/gps.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/magnetometer.hpp"
+#include "sensor/sensors.hpp"
 
 enum class MultirotorControlMode {
   DISARMED,
@@ -50,11 +47,7 @@ class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(
       ParameterRepository& params,
-      Gyroscope& gyr,
-      Accelerometer& acc,
-      optional<Barometer *> bar,
-      optional<GPS *> gps,
-      optional<Magnetometer *> mag, // TODO: Use reference_wrapper?
+      Sensors& sensors,
       WorldEstimator& estimator, InputSource& inputSource,
       MotorMapper& motorMapper, Communicator& communicator,
       Logger& logger, Platform& platform);
@@ -67,12 +60,7 @@ public:
 private:
   ParameterRepository& params;
 
-  Gyroscope& gyr;
-  Accelerometer& acc;
-  optional<Barometer *> bar;
-  optional<GPS *> gps;
-  optional<Magnetometer *> mag;
-
+  Sensors& sensors;
   WorldEstimator& estimator;
   InputSource& inputSource;
 

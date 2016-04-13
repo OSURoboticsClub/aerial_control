@@ -14,6 +14,7 @@
 #include "input/ppm_input_source.hpp"
 #include "motor/multirotor_tri_motor_mapper.hpp"
 #include "params/parameter_repository.hpp"
+#include "sensor/sensors.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "util/math.hpp"
@@ -41,6 +42,7 @@ struct UnitData {
   PPMInputSourceConfig ppmConfig;
   PPMInputSource inputSource;
 
+  Sensors sensors;
   MultirotorVehicleSystem system;
 
   UnitData(Platform& platform, ParameterRepository& params, Communicator& communicator, Logger& logger)
@@ -74,11 +76,15 @@ struct UnitData {
         .channelControlMode = 5
       },
       inputSource(ppmConfig),
+      sensors(std::experimental::make_optional(&platform.get<Accelerometer>()),
+              std::experimental::nullopt,   // No high-range accelerometer
+              std::experimental::make_optional(&platform.get<Gyroscope>()),
+              std::experimental::make_optional(&platform.get<Barometer>()),
+              std::experimental::make_optional(&platform.get<GPS>()),
+              std::experimental::nullopt    // No magnetometer
+      ),
       system(params,
-             platform.get<Gyroscope>(), platform.get<Accelerometer>(),
-             std::experimental::make_optional(&platform.get<Barometer>()),
-             std::experimental::make_optional(&platform.get<GPS>()),
-             std::experimental::nullopt,   // No magnetometer
+             sensors,
              world, inputSource, motorMapper, communicator, logger, platform) {
 
     params.set(GlobalParameters::PARAM_DT, 0.001);
