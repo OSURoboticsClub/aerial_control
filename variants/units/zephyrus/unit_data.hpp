@@ -3,6 +3,7 @@
 
 #include "global_parameters.hpp"
 #include "heartbeat_thread.hpp"
+#include "unit_config.hpp"
 #include "communication/communicator.hpp"
 #include "controller/angular_acceleration_controller.hpp"
 #include "controller/angular_position_controller.hpp"
@@ -122,6 +123,14 @@ struct UnitData {
     params.set(AngularAccelerationController::PARAM_PID_YAW_KI, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_YAW_KD, 0.0);
     params.set(AngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 100.0);
+
+    Accelerometer& accelerometer = platform.get<Accelerometer>();
+    accelerometer.setAxisConfig(unit_config::ACC_AXES);
+    accelerometer.setOffsets(unit_config::ACC_OFFSETS);
+
+    Gyroscope& gyroscope = platform.get<Gyroscope>();
+    gyroscope.setAxisConfig(unit_config::GYR_AXES);
+    gyroscope.setOffsets(unit_config::GYR_OFFSETS);
   }
 };
 
