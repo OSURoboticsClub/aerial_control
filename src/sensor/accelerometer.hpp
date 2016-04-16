@@ -16,4 +16,4 @@ public:
   virtual AccelerometerReading readAccel() = 0;
 };
 
-#endif
+#endif // ACCELEROMETER_HPP_

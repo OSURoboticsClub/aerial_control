@@ -25,4 +25,4 @@ public:
   }
 };
 
-#endif
+#endif // GPS_HPP_
