@@ -128,7 +128,7 @@ void MultirotorVehicleSystem::update() {
   motorMapper.run(isArmed(), actuatorSp);
 }
 
-bool MultirotorVehicleSystem::healthy() {
+bool MultirotorVehicleSystem::healthy() const {
   bool healthy = gyr.healthy() && acc.healthy();
 
   if(bar) {

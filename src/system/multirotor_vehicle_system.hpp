@@ -60,7 +60,7 @@ public:
       Logger& logger, Platform& platform);
 
   void update() override;
-  bool healthy();
+  bool healthy() const;
 
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
