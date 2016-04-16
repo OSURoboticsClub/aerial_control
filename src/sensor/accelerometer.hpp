@@ -11,7 +11,6 @@ struct AccelerometerReading {
 
 class Accelerometer : public Sensor<> {
 public:
-  using Sensor::Sensor;
   virtual void init() = 0;
   virtual AccelerometerReading readAccel() = 0;
 };

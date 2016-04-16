@@ -11,7 +11,6 @@ struct GyroscopeReading {
 
 class Gyroscope : public Sensor<> {
 public:
-  using Sensor::Sensor;
   virtual void init() = 0;
   virtual GyroscopeReading readGyro() = 0;
 
