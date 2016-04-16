@@ -29,7 +29,7 @@ public:
    *
    * @see #calibrateStep()
    */
-  virtual bool calibrated() {
+  virtual bool calibrated() const {
     // Default do-nothing impl
     return true;
   }

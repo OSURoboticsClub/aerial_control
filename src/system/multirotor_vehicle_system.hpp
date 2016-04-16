@@ -86,9 +86,6 @@ private:
 
   MultirotorControlMode mode;
 
-  bool calibrated;
-  void calibrate(SensorMeasurements meas);
-
   float altSp;
   float yawPosSp;
 

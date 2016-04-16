@@ -16,7 +16,10 @@ public:
   virtual GyroscopeReading readGyro() = 0;
 
   virtual void calibrateStep();
-  virtual bool calibrated();
+  virtual bool calibrated() const;
+
+private:
+  unsigned int calibrationCount = 0;
 };
 
 #endif

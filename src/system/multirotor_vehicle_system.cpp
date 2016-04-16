@@ -26,7 +26,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     motorMapper(motorMapper),
     platform(platform),
     stream(communicator, 10), logger(logger),
-    mode(MultirotorControlMode::DISARMED) {
+    mode(MultirotorControlMode::CALIBRATING) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -46,7 +46,7 @@ void MultirotorVehicleSystem::update() {
   // if sensors become unhealthy.
   // TODO(syoo): Checking health at 1kHz is expensive. Fix.
   if (input.valid) {
-    if (healthy() && calibrated) {
+    if (healthy() && sensors.calibrated()) {
       setArmed(input.armed);
     }
     else if (input.armed == false) {
@@ -73,8 +73,9 @@ void MultirotorVehicleSystem::update() {
         mode = MultirotorControlMode::ANGULAR_POS;
       }
     }
-  }
-  else {
+  } else if(!sensors.calibrated()) {
+    mode = MultirotorControlMode::CALIBRATING;
+  } else {
     mode = MultirotorControlMode::DISARMED;
   }
 
@@ -112,45 +113,9 @@ void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_
   setArmed(m.armed);
 }
 
-void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
-  PulseLED(0,1,0,2);   // FIXME: This interferes with disarmed mode LED stuff..
-  static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
-
-  // Calibrate ground altitude
-  //groundAltitude = est.loc.alt;
-
-  // Calibrate gyroscope
-  for (int i=0; i<3; i++) {
-    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
-  }
-  calibCount++;
-
-  // Reset calibration on excessive gyration
-  if (fabs((*meas.gyro).axes[0] > 0.1) ||
-      fabs((*meas.gyro).axes[1] > 0.1) ||
-      fabs((*meas.gyro).axes[2] > 0.1)) {
-    calibCount = 0;
-  }
-
-  // Run calibration for 5 seconds
-  if (calibCount == 5000) {
-    // TODO
-    /* gyr.setOffsets(gyrOffsets); */
-    protocol::message::sensor_calibration_response_message_t m_gyrcal {
-      .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
-      .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
-    };
-    logger.write(m_gyrcal);
-    if (stream.ready()) {
-      stream.publish(m_gyrcal);
-    }
-
-    calibrated = true;
-  }
-}
-
 void MultirotorVehicleSystem::CalibrateMode() {
+  PulseLED(0,1,0,2);   // FIXME: This interferes with disarmed mode LED stuff..
+
   sensors.calibrateStep();
   if (sensors.calibrated()) {
     mode = MultirotorControlMode::DISARMED;
@@ -159,10 +124,6 @@ void MultirotorVehicleSystem::CalibrateMode() {
 
 void MultirotorVehicleSystem::DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   PulseLED(0,1,0,1);
-  if (!calibrated) {
-    calibrate(meas);
-  }
-
   // Run the zero controller
   ActuatorSetpoint zSp = {0, 0, 0, 0};
   sp = zeroController.run(est, zSp);
