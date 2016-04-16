@@ -3,6 +3,7 @@
 #include <cmath>
 
 void Gyroscope::calibrateStep() {
+  // Don't continue to average if acceptable offsets have already been computed.
   if (calibrated()) {
     return;
   }
