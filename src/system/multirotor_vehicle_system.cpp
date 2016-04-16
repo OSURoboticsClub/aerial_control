@@ -81,6 +81,9 @@ void MultirotorVehicleSystem::update() {
   // Run the controllers
   ActuatorSetpoint actuatorSp = {0, 0, 0, 0};
   switch (mode) {
+    case MultirotorControlMode::CALIBRATING:
+      CalibrateMode();
+      break;
     case MultirotorControlMode::DISARMED:
       DisarmedMode(meas, estimate, input, actuatorSp);
       break;
@@ -144,6 +147,13 @@ void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
     }
 
     calibrated = true;
+  }
+}
+
+void MultirotorVehicleSystem::CalibrateMode() {
+  sensors.calibrateStep();
+  if (sensors.calibrated()) {
+    mode = MultirotorControlMode::DISARMED;
   }
 }
 

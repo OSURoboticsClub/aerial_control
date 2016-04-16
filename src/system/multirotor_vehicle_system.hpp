@@ -36,6 +36,7 @@
 #include "sensor/sensors.hpp"
 
 enum class MultirotorControlMode {
+  CALIBRATING,
   DISARMED,
   POSITION,
   VELOCITY,
@@ -58,6 +59,12 @@ public:
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
+  void CalibrateMode();
+  void DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+
   ParameterRepository& params;
 
   Sensors& sensors;
@@ -84,11 +91,6 @@ private:
 
   float altSp;
   float yawPosSp;
-
-  void DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
-  void AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
-  void AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
-  void PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
 
   /**
    * RGB LED stuff.
