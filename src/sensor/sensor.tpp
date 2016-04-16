@@ -1,4 +1,3 @@
-
 template <int axes_count>
 Sensor<axes_count>::Sensor() {
   // Default to device axes and zero offsets.
@@ -11,7 +10,7 @@ Sensor<axes_count>::Sensor() {
 
 template <int axes_count>
 void Sensor<axes_count>::setAxisConfig(
-    std::array<int, axes_count> newAxisConfig) {
+    const std::array<int, axes_count>& newAxisConfig) {
   for (std::size_t i = 0; i < axes_count; i++) {
     signs[i] = (newAxisConfig[i] > 0) ? 1 : -1;
     axes[i] = signs[i] * newAxisConfig[i] - 1;
@@ -19,13 +18,14 @@ void Sensor<axes_count>::setAxisConfig(
 }
 
 template <int axes_count>
-void Sensor<axes_count>::setOffsets(std::array<float, axes_count> newOffsets) {
+void Sensor<axes_count>::setOffsets(
+    const std::array<float, axes_count>& newOffsets) {
   for (std::size_t i = 0; i < axes_count; i++) {
     offsets[i] = newOffsets[i];
   }
 }
 
 template <int axes_count>
-std::array<float, axes_count> Sensor<axes_count>::getOffsets(void) {
+const std::array<float, axes_count>& Sensor<axes_count>::getOffsets() const {
   return offsets;
 }

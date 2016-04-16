@@ -43,9 +43,11 @@ public:
    * Example input of {3, -1, 2} here will interpret the chip's X axis as Z,
    * Y axis as negative X, and Z as Y.
    */
-  void setAxisConfig(std::array<int, axes_count> newAxisConfig);
-  void setOffsets(std::array<float, axes_count> newOffsets);
-  std::array<float, axes_count> getOffsets(void);
+  void setAxisConfig(const std::array<int, axes_count>& newAxisConfig);
+
+  void setOffsets(const std::array<float, axes_count>& newOffsets);
+
+  const std::array<float, axes_count>& getOffsets() const;
 
 protected:
   std::array<int, axes_count> axes;
