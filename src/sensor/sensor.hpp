@@ -3,6 +3,7 @@
 
 #include <array>
 
+template <int axes_count = 3>
 class Sensor {
 public:
   Sensor();
@@ -42,14 +43,16 @@ public:
    * Example input of {3, -1, 2} here will interpret the chip's X axis as Z,
    * Y axis as negative X, and Z as Y.
    */
-  void setAxisConfig(std::array<int, 3> newAxisConfig);
-  void setOffsets(std::array<float, 3> newOffsets);
-  std::array<float, 3> getOffsets(void);
+  void setAxisConfig(std::array<int, axes_count> newAxisConfig);
+  void setOffsets(std::array<float, axes_count> newOffsets);
+  std::array<float, axes_count> getOffsets(void);
 
 protected:
-  std::array<int, 3> axes;
-  std::array<int, 3> signs;
-  std::array<float, 3> offsets;
+  std::array<int, axes_count> axes;
+  std::array<int, axes_count> signs;
+  std::array<float, axes_count> offsets;
 };
+
+#include "sensor/sensor.tpp"
 
 #endif // SENSOR_HPP_

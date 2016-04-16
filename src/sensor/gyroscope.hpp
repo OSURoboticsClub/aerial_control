@@ -9,7 +9,7 @@ struct GyroscopeReading {
   std::array<float, 3> axes;
 };
 
-class Gyroscope : public Sensor {
+class Gyroscope : public Sensor<> {
 public:
   using Sensor::Sensor;
   virtual void init() = 0;
