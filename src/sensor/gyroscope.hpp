@@ -21,4 +21,4 @@ private:
   unsigned int calibrationCount = 0;
 };
 
-#endif
+#endif // GYROSCOPE_HPP_

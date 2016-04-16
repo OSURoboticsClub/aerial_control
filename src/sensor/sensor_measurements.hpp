@@ -20,4 +20,4 @@ struct SensorMeasurements {
   optional<MagnetometerReading> mag;
 };
 
-#endif
+#endif // SENSOR_MEASUREMENTS_HPP_

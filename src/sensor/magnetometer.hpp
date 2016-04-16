@@ -15,4 +15,4 @@ public:
   virtual MagnetometerReading readMag() = 0;
 };
 
-#endif
+#endif // MAGNETOMETER_HPP_

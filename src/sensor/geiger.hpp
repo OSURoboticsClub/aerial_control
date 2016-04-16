@@ -15,4 +15,4 @@ public:
   virtual GeigerReading readGeiger() = 0;
 };
 
-#endif
+#endif // GEIGER_HPP_

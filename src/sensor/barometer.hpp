@@ -16,4 +16,4 @@ public:
   virtual BarometerReading readBar() = 0;
 };
 
-#endif
+#endif // BAROMETER_HPP_

@@ -33,4 +33,4 @@ private:
   optional<Magnetometer *> magnetometer;
 };
 
-#endif
+#endif // SENSORS_HPP_
