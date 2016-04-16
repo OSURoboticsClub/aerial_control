@@ -26,6 +26,15 @@ SensorMeasurements Sensors::readAvailableSensors() {
   return measurements;
 }
 
+void Sensors::calibrateStep() {
+  if(accelerometer) (*accelerometer)->calibrateStep();
+  if(accelerometerHighRange) (*accelerometerHighRange)->calibrateStep();
+  if(gyroscope) (*gyroscope)->calibrateStep();
+  if(barometer) (*barometer)->calibrateStep();
+  if(gps) (*gps)->calibrateStep();
+  if(magnetometer) (*magnetometer)->calibrateStep();
+}
+
 bool Sensors::healthy() {
   bool healthy = true;
 
@@ -37,4 +46,17 @@ bool Sensors::healthy() {
   if(magnetometer) healthy &= (*magnetometer)->healthy();
 
   return healthy;
+}
+
+bool Sensors::calibrated() {
+  bool calibrated = true;
+
+  if(accelerometer) calibrated &= (*accelerometer)->calibrated();
+  if(accelerometerHighRange) calibrated &= (*accelerometerHighRange)->calibrated();
+  if(gyroscope) calibrated &= (*gyroscope)->calibrated();
+  if(barometer) calibrated &= (*barometer)->calibrated();
+  if(gps) calibrated &= (*gps)->calibrated();
+  if(magnetometer) calibrated &= (*magnetometer)->calibrated();
+
+  return calibrated;
 }

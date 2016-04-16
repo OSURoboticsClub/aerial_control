@@ -14,6 +14,9 @@ public:
   using Sensor::Sensor;
   virtual void init() = 0;
   virtual GyroscopeReading readGyro() = 0;
+
+  virtual void calibrateStep();
+  virtual bool calibrated();
 };
 
 #endif

@@ -19,8 +19,10 @@ public:
           optional<Magnetometer *> magnetometer);
 
   SensorMeasurements readAvailableSensors();
+  void calibrateStep();
 
   bool healthy();
+  bool calibrated();
 
 private:
   optional<Gyroscope *> gyroscope;
