@@ -10,10 +10,10 @@ struct BarometerReading {
   float temperature;
 };
 
-class Barometer : public Sensor {
+class Barometer : public Sensor<> {
 public:
   virtual void init() = 0;
   virtual BarometerReading readBar() = 0;
 };
 
-#endif
+#endif // BAROMETER_HPP_

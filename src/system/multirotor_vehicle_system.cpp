@@ -6,11 +6,7 @@
 
 MultirotorVehicleSystem::MultirotorVehicleSystem(
     ParameterRepository& params,
-    Gyroscope& gyr,
-    Accelerometer& acc,
-    optional<Barometer *> bar,
-    optional<GPS *> gps,
-    optional<Magnetometer *> mag,
+    Sensors& sensors,
     WorldEstimator& estimator,
     InputSource& inputSource,
     MotorMapper& motorMapper,
@@ -20,7 +16,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
   : VehicleSystem(communicator),
     MessageListener(communicator),
     params(params),
-    gyr(gyr), acc(acc), bar(bar), gps(gps), mag(mag),
+    sensors(sensors),
     estimator(estimator),
     inputSource(inputSource),
     posController(params),
@@ -30,38 +26,15 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     motorMapper(motorMapper),
     platform(platform),
     stream(communicator, 10), logger(logger),
-    mode(MultirotorControlMode::DISARMED) {
+    mode(MultirotorControlMode::CALIBRATION) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
-  gyr.setAxisConfig(unit_config::GYR_AXES);
-  acc.setAxisConfig(unit_config::ACC_AXES);
-  gyr.setOffsets(unit_config::GYR_OFFSETS);
-  acc.setOffsets(unit_config::ACC_OFFSETS);
 }
 
 void MultirotorVehicleSystem::update() {
   // Poll sensors
-  GyroscopeReading gyroReading = gyr.readGyro();
-  AccelerometerReading accelReading = acc.readAccel();
-  optional<BarometerReading> barReading;
-  optional<GPSReading> gpsReading;
-  optional<MagnetometerReading> magReading;
-
-  if (bar) barReading = (*bar)->readBar();
-  if (gps) gpsReading = (*gps)->readGPS();
-  if (mag) magReading = (*mag)->readMag();
-
-  // TODO: Currently copying all readings
-  SensorMeasurements meas {
-    .accel  = std::experimental::make_optional(accelReading),
-    .accelH = std::experimental::nullopt,
-    .bar    = barReading,
-    .ggr    = std::experimental::nullopt,
-    .gps    = gpsReading,
-    .gyro   = std::experimental::make_optional(gyroReading),
-    .mag    = magReading
-  };
+  SensorMeasurements meas = sensors.readAvailableSensors();
 
   // Update world estimate
   WorldEstimate estimate = estimator.update(meas);
@@ -73,7 +46,7 @@ void MultirotorVehicleSystem::update() {
   // if sensors become unhealthy.
   // TODO(syoo): Checking health at 1kHz is expensive. Fix.
   if (input.valid) {
-    if (healthy() && calibrated) {
+    if (healthy() && sensors.calibrated()) {
       setArmed(input.armed);
     }
     else if (input.armed == false) {
@@ -100,14 +73,18 @@ void MultirotorVehicleSystem::update() {
         mode = MultirotorControlMode::ANGULAR_POS;
       }
     }
-  }
-  else {
+  } else if(!sensors.calibrated()) {
+    mode = MultirotorControlMode::CALIBRATION;
+  } else {
     mode = MultirotorControlMode::DISARMED;
   }
 
   // Run the controllers
   ActuatorSetpoint actuatorSp = {0, 0, 0, 0};
   switch (mode) {
+    case MultirotorControlMode::CALIBRATION:
+      CalibrationMode();
+      break;
     case MultirotorControlMode::DISARMED:
       DisarmedMode(meas, estimate, input, actuatorSp);
       break;
@@ -128,71 +105,25 @@ void MultirotorVehicleSystem::update() {
   motorMapper.run(isArmed(), actuatorSp);
 }
 
-bool MultirotorVehicleSystem::healthy() {
-  bool healthy = gyr.healthy() && acc.healthy();
-
-  if(bar) {
-    healthy &= (*bar)->healthy();
-  }
-
-  if(gps) {
-    healthy &= (*gps)->healthy();
-  }
-
-  if(mag) {
-    healthy &= (*mag)->healthy();
-  }
-
-  return healthy;
+bool MultirotorVehicleSystem::healthy() const {
+  return sensors.healthy();
 }
 
 void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_t& m) {
   setArmed(m.armed);
 }
 
-void MultirotorVehicleSystem::calibrate(SensorMeasurements meas) {
+void MultirotorVehicleSystem::CalibrationMode() {
   PulseLED(0,1,0,2);   // FIXME: This interferes with disarmed mode LED stuff..
-  static int calibCount = 0;
-  static std::array<float, 3> gyrOffsets = unit_config::GYR_OFFSETS;
 
-  // Calibrate ground altitude
-  //groundAltitude = est.loc.alt;
-
-  // Calibrate gyroscope
-  for (int i=0; i<3; i++) {
-    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
-  }
-  calibCount++;
-
-  // Reset calibration on excessive gyration
-  if (fabs((*meas.gyro).axes[0] > 0.1) ||
-      fabs((*meas.gyro).axes[1] > 0.1) ||
-      fabs((*meas.gyro).axes[2] > 0.1)) {
-    calibCount = 0;
-  }
-
-  // Run calibration for 5 seconds
-  if (calibCount == 5000) {
-    gyr.setOffsets(gyrOffsets);
-    protocol::message::sensor_calibration_response_message_t m_gyrcal {
-      .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
-      .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
-    };
-    logger.write(m_gyrcal);
-    if (stream.ready()) {
-      stream.publish(m_gyrcal);
-    }
-
-    calibrated = true;
+  sensors.calibrateStep();
+  if (sensors.calibrated()) {
+    mode = MultirotorControlMode::DISARMED;
   }
 }
 
 void MultirotorVehicleSystem::DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp) {
   PulseLED(0,1,0,1);
-  if (!calibrated) {
-    calibrate(meas);
-  }
-
   // Run the zero controller
   ActuatorSetpoint zSp = {0, 0, 0, 0};
   sp = zeroController.run(est, zSp);

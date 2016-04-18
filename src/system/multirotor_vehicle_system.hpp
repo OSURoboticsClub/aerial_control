@@ -33,12 +33,10 @@
 #include "estimator/world_estimator.hpp"
 
 // Sensors
-#include "sensor/accelerometer.hpp"
-#include "sensor/gps.hpp"
-#include "sensor/gyroscope.hpp"
-#include "sensor/magnetometer.hpp"
+#include "sensor/sensors.hpp"
 
 enum class MultirotorControlMode {
+  CALIBRATION,
   DISARMED,
   POSITION,
   VELOCITY,
@@ -50,29 +48,26 @@ class MultirotorVehicleSystem : public VehicleSystem, public MessageListener {
 public:
   MultirotorVehicleSystem(
       ParameterRepository& params,
-      Gyroscope& gyr,
-      Accelerometer& acc,
-      optional<Barometer *> bar,
-      optional<GPS *> gps,
-      optional<Magnetometer *> mag, // TODO: Use reference_wrapper?
+      Sensors& sensors,
       WorldEstimator& estimator, InputSource& inputSource,
       MotorMapper& motorMapper, Communicator& communicator,
       Logger& logger, Platform& platform);
 
   void update() override;
-  bool healthy();
+  bool healthy() const;
 
   void on(const protocol::message::set_arm_state_message_t& m) override;
 
 private:
+  void CalibrationMode();
+  void DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+  void PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
+
   ParameterRepository& params;
 
-  Gyroscope& gyr;
-  Accelerometer& acc;
-  optional<Barometer *> bar;
-  optional<GPS *> gps;
-  optional<Magnetometer *> mag;
-
+  Sensors& sensors;
   WorldEstimator& estimator;
   InputSource& inputSource;
 
@@ -91,16 +86,8 @@ private:
 
   MultirotorControlMode mode;
 
-  bool calibrated;
-  void calibrate(SensorMeasurements meas);
-
   float altSp;
   float yawPosSp;
-
-  void DisarmedMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
-  void AngularRateMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
-  void AngularPosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
-  void PosMode(SensorMeasurements meas, WorldEstimate est, ControllerInput input, ActuatorSetpoint& sp);
 
   /**
    * RGB LED stuff.
