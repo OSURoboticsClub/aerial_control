@@ -1,5 +1,5 @@
-#ifndef MULTIROTOR_SYSTEM_HPP_
-#define MULTIROTOR_SYSTEM_HPP_
+#ifndef MULTIROTOR_VEHICLE_SYSTEM_HPP_
+#define MULTIROTOR_VEHICLE_SYSTEM_HPP_
 
 #include "global_parameters.hpp"
 #include "params/parameter_repository.hpp"
@@ -98,4 +98,4 @@ private:
   void RGBLED(float freq);
 };
 
-#endif
+#endif // MULTIROTOR_VEHICLE_SYSTEM_HPP_
