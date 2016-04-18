@@ -26,7 +26,7 @@ MultirotorVehicleSystem::MultirotorVehicleSystem(
     motorMapper(motorMapper),
     platform(platform),
     stream(communicator, 10), logger(logger),
-    mode(MultirotorControlMode::CALIBRATING) {
+    mode(MultirotorControlMode::CALIBRATION) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
   setArmed(false);
@@ -74,7 +74,7 @@ void MultirotorVehicleSystem::update() {
       }
     }
   } else if(!sensors.calibrated()) {
-    mode = MultirotorControlMode::CALIBRATING;
+    mode = MultirotorControlMode::CALIBRATION;
   } else {
     mode = MultirotorControlMode::DISARMED;
   }
@@ -82,8 +82,8 @@ void MultirotorVehicleSystem::update() {
   // Run the controllers
   ActuatorSetpoint actuatorSp = {0, 0, 0, 0};
   switch (mode) {
-    case MultirotorControlMode::CALIBRATING:
-      CalibrateMode();
+    case MultirotorControlMode::CALIBRATION:
+      CalibrationMode();
       break;
     case MultirotorControlMode::DISARMED:
       DisarmedMode(meas, estimate, input, actuatorSp);
@@ -113,7 +113,7 @@ void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_
   setArmed(m.armed);
 }
 
-void MultirotorVehicleSystem::CalibrateMode() {
+void MultirotorVehicleSystem::CalibrationMode() {
   PulseLED(0,1,0,2);   // FIXME: This interferes with disarmed mode LED stuff..
 
   sensors.calibrateStep();
