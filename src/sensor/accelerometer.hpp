@@ -9,11 +9,10 @@ struct AccelerometerReading {
   std::array<float, 3> axes;
 };
 
-class Accelerometer : public Sensor {
+class Accelerometer : public Sensor<> {
 public:
-  using Sensor::Sensor;
   virtual void init() = 0;
   virtual AccelerometerReading readAccel() = 0;
 };
 
-#endif
+#endif // ACCELEROMETER_HPP_

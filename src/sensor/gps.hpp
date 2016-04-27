@@ -11,7 +11,7 @@ struct GPSReading {
   float utc;
 };
 
-class GPS : public Sensor {
+class GPS : public Sensor<> {
 public:
   virtual void init() = 0;
   virtual GPSReading readGPS() = 0;
@@ -25,4 +25,4 @@ public:
   }
 };
 
-#endif
+#endif // GPS_HPP_

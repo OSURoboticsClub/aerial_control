@@ -3,6 +3,7 @@
 
 #include "global_parameters.hpp"
 #include "heartbeat_thread.hpp"
+#include "unit_config.hpp"
 #include "communication/communicator.hpp"
 #include "controller/angular_acceleration_controller.hpp"
 #include "controller/angular_position_controller.hpp"
@@ -14,6 +15,7 @@
 #include "input/ppm_input_source.hpp"
 #include "motor/multirotor_tri_motor_mapper.hpp"
 #include "params/parameter_repository.hpp"
+#include "sensor/sensors.hpp"
 #include "sensor/sensor_measurements.hpp"
 #include "system/multirotor_vehicle_system.hpp"
 #include "util/math.hpp"
@@ -41,6 +43,7 @@ struct UnitData {
   PPMInputSourceConfig ppmConfig;
   PPMInputSource inputSource;
 
+  Sensors sensors;
   MultirotorVehicleSystem system;
 
   UnitData(Platform& platform, ParameterRepository& params, Communicator& communicator, Logger& logger)
@@ -74,11 +77,15 @@ struct UnitData {
         .channelControlMode = 5
       },
       inputSource(ppmConfig),
+      sensors(std::experimental::make_optional(&platform.get<Accelerometer>()),
+              std::experimental::nullopt,   // No high-range accelerometer
+              std::experimental::make_optional(&platform.get<Gyroscope>()),
+              std::experimental::make_optional(&platform.get<Barometer>()),
+              std::experimental::make_optional(&platform.get<GPS>()),
+              std::experimental::nullopt    // No magnetometer
+      ),
       system(params,
-             platform.get<Gyroscope>(), platform.get<Accelerometer>(),
-             std::experimental::make_optional(&platform.get<Barometer>()),
-             std::experimental::make_optional(&platform.get<GPS>()),
-             std::experimental::nullopt,   // No magnetometer
+             sensors,
              world, inputSource, motorMapper, communicator, logger, platform) {
 
     params.set(GlobalParameters::PARAM_DT, 0.001);
@@ -116,6 +123,14 @@ struct UnitData {
     params.set(AngularAccelerationController::PARAM_PID_YAW_KI, 0.0);
     params.set(AngularAccelerationController::PARAM_PID_YAW_KD, 0.0);
     params.set(AngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 100.0);
+
+    Accelerometer& accelerometer = platform.get<Accelerometer>();
+    accelerometer.setAxisConfig(unit_config::ACC_AXES);
+    accelerometer.setOffsets(unit_config::ACC_OFFSETS);
+
+    Gyroscope& gyroscope = platform.get<Gyroscope>();
+    gyroscope.setAxisConfig(unit_config::GYR_AXES);
+    gyroscope.setOffsets(unit_config::GYR_OFFSETS);
   }
 };
 

@@ -1,12 +1,9 @@
 #pragma once
 
-#include <array>
-#include <utility>
+#include <unordered_map>
 
 class ParameterRepository {
 public:
-  constexpr static std::size_t MAX_PARAMETERS = 100;
-
   /**
    * Inserts a default value into the repository, if an actual value has not
    * yet been inserted. This allows modules to establish default values that
@@ -36,6 +33,5 @@ public:
   float get(char const *name) const;
 
 private:
-  std::array<std::pair<char const*, float>, MAX_PARAMETERS> parameters;
-  std::size_t parameterIdx = 0;
+  std::unordered_map<char const*, float> parameters;
 };

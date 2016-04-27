@@ -42,8 +42,8 @@ struct UnitData {
       inputSource(communicator),
       system(
           params,
-          platform.getIdx<Accelerometer>(0),
-          std::experimental::make_optional(&platform.getIdx<Accelerometer>(1)),
+          platform.get<Accelerometer>(),
+          std::experimental::nullopt,
           std::experimental::make_optional(&platform.get<Barometer>()),
           std::experimental::nullopt,
           std::experimental::make_optional(&platform.get<GPS>()),
