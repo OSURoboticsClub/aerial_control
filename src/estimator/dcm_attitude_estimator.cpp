@@ -10,9 +10,15 @@
 DCMAttitudeEstimator::DCMAttitudeEstimator(ParameterRepository& params, Communicator& communicator, Logger& logger)
   : params(params),
     dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 10),
+    attitudeMessageStream(communicator, 30),
     logger(logger),
-    accelFilter(100.0), gyroFilter(100.0) {
+    // This estimator treats the acceleration vector as purely the negative
+    // gravity vector because we lack a feed-forward model of any of our
+    // actuators and the architecture to include one in the control loop. With
+    // a perfect gyro, we should never see the gravity vector move, so we set
+    // the acceleration cutoff frequency very low until feed-forward models can
+    // be incorporated into the estimators. TODO(kylc,syoo)
+    accelFilter(1.0), gyroFilter(100.0) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
