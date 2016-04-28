@@ -1,5 +1,7 @@
 #include "sensor/sensors.hpp"
 
+#include "unit_config.hpp"
+
 Sensors::Sensors(optional<Accelerometer *> accelerometer,
                  optional<Accelerometer *> accelerometerHighRange,
                  optional<Gyroscope *> gyroscope,
@@ -12,6 +14,20 @@ Sensors::Sensors(optional<Accelerometer *> accelerometer,
     barometer(barometer),
     gps(gps),
     magnetometer(magnetometer) {
+  if (gyroscope) {
+    (*gyroscope)->setAxisConfig(unit_config::GYR_AXES);
+    (*gyroscope)->setOffsets(unit_config::GYR_OFFSETS);
+  }
+  if (accelerometer) {
+    (*accelerometer)->setAxisConfig(unit_config::ACC_AXES);
+    (*accelerometer)->setOffsets(unit_config::ACC_OFFSETS);
+  }
+  if (accelerometerHighRange) {
+    (*accelerometerHighRange)->setAxisConfig(unit_config::ACCH_AXES);
+    (*accelerometerHighRange)->setOffsets(unit_config::ACCH_OFFSETS);
+  }
+  // TODO(syoo): Add initial configs for other sensors. May want to rethink
+  // this before adding too many new sensors, though.
 }
 
 SensorMeasurements Sensors::readAvailableSensors() {

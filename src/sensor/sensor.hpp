@@ -40,8 +40,8 @@ public:
   /**
    * Configure sensor axes.
    *
-   * Example input of {3, -1, 2} here will interpret the chip's X axis as Z,
-   * Y axis as negative X, and Z as Y.
+   * Example input of {3, -1, -2} will get the body's X, Y, and Z from the
+   * chip's +Z, -X, and -Y axes.
    */
   void setAxisConfig(const std::array<int, axes_count>& newAxisConfig);
 
