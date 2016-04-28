@@ -114,7 +114,7 @@ void MultirotorVehicleSystem::on(const protocol::message::set_arm_state_message_
 }
 
 void MultirotorVehicleSystem::CalibrationMode() {
-  PulseLED(0,1,0,2);   // FIXME: This interferes with disarmed mode LED stuff..
+  PulseLED(0,1,0,4);   // FIXME: This interferes with disarmed mode LED stuff..
 
   sensors.calibrateStep();
   if (sensors.calibrated()) {
