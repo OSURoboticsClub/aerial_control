@@ -1,6 +1,8 @@
 #ifndef UNIT_DATA_HPP_
 #define UNIT_DATA_HPP_
 
+#include "heartbeat_thread.hpp"
+#include "unit_config.hpp"
 #include "communication/communicator.hpp"
 #include "controller/rocket_angular_acceleration_controller.hpp"
 #include "estimator/world_estimator.hpp"
@@ -9,6 +11,7 @@
 #include "filesystem/logger.hpp"
 #include "input/offboard_input_source.hpp"
 #include "motor/esra_rocket_motor_mapper.hpp"
+#include "sensor/sensors.hpp"
 #include "system/canard_system.hpp"
 #include "util/optional.hpp"
 #include "variant/platform.hpp"
@@ -26,6 +29,7 @@ struct UnitData {
   DCMAttitudeEstimator attitude;
   OffboardInputSource inputSource;
 
+  Sensors sensors;
   CanardSystem system;
 
   UnitData(Platform& platform, ParameterRepository &params, Communicator& communicator, Logger& logger)
@@ -40,19 +44,28 @@ struct UnitData {
       attitude(params, communicator, logger),
       world(location, attitude, communicator, logger),
       inputSource(communicator),
-      system(
-          params,
-          platform.get<Accelerometer>(),
-          std::experimental::nullopt,
-          std::experimental::make_optional(&platform.get<Barometer>()),
-          std::experimental::nullopt,
-          std::experimental::make_optional(&platform.get<GPS>()),
-          platform.get<Gyroscope>(),
-          std::experimental::nullopt,
-          world, inputSource, motorMapper, communicator, logger,
-          platform) {
+      sensors(std::experimental::make_optional(&platform.get<Accelerometer>()),
+              std::experimental::nullopt,   // No high-range accelerometer
+              std::experimental::make_optional(&platform.get<Gyroscope>()),
+              std::experimental::make_optional(&platform.get<Barometer>()),
+              std::experimental::make_optional(&platform.get<GPS>()),
+              std::experimental::nullopt   // No magnetometer
+      ),
+      system(params,
+             sensors,
+             world, inputSource, motorMapper, communicator, logger, platform) {
+
+    params.set(HeartbeatThread::PARAM_BLINK_FREQUENCY, 3);
 
     params.set(RocketAngularAccelerationController::PARAM_MAX_PITCH_ROLL_ACC, 100.0 * M_PI / 180.0);
+
+    Accelerometer& accelerometer = platform.get<Accelerometer>();
+    accelerometer.setAxisConfig(unit_config::ACC_AXES);
+    accelerometer.setOffsets(unit_config::ACC_OFFSETS);
+
+    Gyroscope& gyroscope = platform.get<Gyroscope>();
+    gyroscope.setAxisConfig(unit_config::GYR_AXES);
+    gyroscope.setOffsets(unit_config::GYR_OFFSETS);
   }
 };
 
