@@ -33,13 +33,12 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   if(meas.accel) {
     //static Eigen::Vector3f accel({0,0,0});
     Eigen::Vector3f accel((*meas.accel).axes.data());
-    accel = accelFilter.apply(params.get(GlobalParameters::PARAM_DT), accel);
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
 
     accel.normalize();
-    corr += dcm.col(2).cross(-accel) * accelWeight;
+    corr += accelFilter.apply(params.get(GlobalParameters::PARAM_DT), dcm.col(2).cross(-accel)) * accelWeight;
   }
 
   // If a magnetometer is available, use the provided north vector to correct
