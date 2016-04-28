@@ -75,7 +75,7 @@ void CanardSystem::update() {
   WorldEstimate estimate = estimator.update(meas);
 
   // Run the controllers
-  ActuatorSetpoint actuatorSp = {0,0,0,0};
+  ActuatorSetpoint actuatorSp = {0,0,0.5,0};
 
   // Run state machine
   switch (state) {
@@ -103,6 +103,10 @@ void CanardSystem::update() {
   default:
     break;
   }
+
+  // DEBUG
+  //AngularPositionSetpoint posSp {0, 0, 0, 0};
+  //actuatorSp = pipeline.run(estimate, posSp, attPosController, attVelController, attAccController);
 
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
@@ -220,7 +224,7 @@ CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
       break;
     }
   }
-  sp.roll = finCheckDutyCycle;
+  sp.yaw = finCheckDutyCycle;
 
   // Proceed to PRE_ARM if calibration done
   if (calibrated && finCheckComplete) {
@@ -242,7 +246,7 @@ CanardState CanardSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
     return CanardState::ARMED;
   }
 
-  sp.roll = 0.3;
+  sp.yaw = 0.3;
   return CanardState::PRE_ARM;
 }
 
@@ -253,19 +257,19 @@ CanardState CanardSystem::ArmedState(SensorMeasurements meas, WorldEstimate est,
   platform.get<PWMPlatform>().set(PIN_BUZZER, 0);
 
   static int count = 10;
-  count = ((*meas.accel).axes[0] > 1.2) ? (count-1) : 10;
+  count = ((*meas.accel).axes[2] > 1.2) ? (count-1) : 10;
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(healthy() && isArmed())) {
     return CanardState::PRE_ARM;
   }
 
-  // Proceed to FLIGHT on 1.2g sense on X axis.
+  // Proceed to FLIGHT on 1.2g sense on Z axis.
   if (count == 0) {
     return CanardState::FLIGHT;
   }
 
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::ARMED;
 }
 
@@ -276,25 +280,25 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   // Check for motor cutoff. We should see negative acceleration due to drag.
   if (powered) {
     static int count = 100;
-    count = ((*meas.accel).axes[0] < -0.05) ? (count-1) : 100;
+    count = ((*meas.accel).axes[2] < -0.05) ? (count-1) : 100;
     powered = (count == 0) ? false : true;
   }
 
   // Apogee occurs after motor cutoff
   if (!powered &&
       est.loc.dAlt < 2.0 &&
-      (*meas.accel).axes[0] > -0.05) {
+      (*meas.accel).axes[2] > -0.05) {
     return CanardState::APOGEE;
   }
 
   // Run controller
   static float flightTime = 0.0;
   if (flightTime < 3.0) {
-    AngularVelocitySetpoint velSp { 3.14159, 0, 0, 0 };
+    AngularVelocitySetpoint velSp { 0, 0, 3.14159, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
   }
   else if (flightTime < 6.0) {
-    AngularVelocitySetpoint velSp { -3.14159, 0, 0, 0 };
+    AngularVelocitySetpoint velSp { 0, 0, -3.14159, 0 };
     sp = pipeline.run(est, velSp, attVelController, attAccController);
   }
   else if (flightTime < 10.0) {
@@ -318,7 +322,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   // TODO(yoos): We might still see this if partially deployed and spinning
   // around..
   static float drogueTime = 0.0;
-  if ((*meas.accel).axes[0] < -0.3) {
+  if ((*meas.accel).axes[2] < -0.3) {
     drogueTime += params.get(GlobalParameters::PARAM_DT);
   }
   else {
@@ -337,7 +341,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   }
 
   sTime += params.get(GlobalParameters::PARAM_DT);
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::APOGEE;
 }
 
@@ -364,7 +368,7 @@ CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate es
   }
 
   sTime += params.get(GlobalParameters::PARAM_DT);
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::DESCENT;
 }
 
@@ -381,7 +385,7 @@ CanardState CanardSystem::RecoveryState(SensorMeasurements meas, WorldEstimate e
   }
   buzzcount = (buzzcount+1) % 2000;
 
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::RECOVERY;
 }
 
