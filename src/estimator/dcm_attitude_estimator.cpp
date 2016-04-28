@@ -18,7 +18,7 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(ParameterRepository& params, Communic
     // a perfect gyro, we should never see the gravity vector move, so we set
     // the acceleration cutoff frequency very low until feed-forward models can
     // be incorporated into the estimators. TODO(kylc,syoo)
-    accelFilter(1.0), gyroFilter(100.0) {
+    accelFilter(5.0), gyroFilter(100.0) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
