@@ -30,7 +30,7 @@ CanardSystem::CanardSystem(
     state(CanardState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
-  setArmed(false);
+  setArmed(true);
 }
 
 void CanardSystem::update() {
