@@ -188,14 +188,14 @@ CanardState CanardSystem::ArmedState(SensorMeasurements meas, WorldEstimate est,
   platform.get<PWMPlatform>().set(PIN_BUZZER, 0);
 
   static int count = 10;
-  count = ((*meas.accel).axes[2] > 1.2) ? (count-1) : 10;
+  count = ((*meas.accel).axes[2] > 2.0) ? (count-1) : 10;
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(healthy() && isArmed())) {
     return CanardState::PRE_ARM;
   }
 
-  // Proceed to FLIGHT on 1.2g sense on Z axis.
+  // Proceed to FLIGHT on 2.0g sense on Z axis.
   if (count == 0) {
     return CanardState::FLIGHT;
   }
