@@ -4,7 +4,7 @@
 
 // UART2 configuration (XBee)
 static const SerialConfig UART2_CONFIG {
-  38400,
+  460800,
   0,
   USART_CR2_STOP1_BITS | USART_CR2_LINEN,
   0
