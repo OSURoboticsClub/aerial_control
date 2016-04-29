@@ -19,7 +19,7 @@
 #include "variant/platform.hpp"
 
 static const float MOTOR_PWM_MIN = 0.300f;
-static const float MOTOR_PWM_MAX = 0.440f;
+static const float MOTOR_PWM_MAX = 0.405f;
 static const float MOTOR_PWM_SAFE = 0.370f;
 
 struct UnitData {
