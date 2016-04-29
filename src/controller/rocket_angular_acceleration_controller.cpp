@@ -18,7 +18,7 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   const float F_LE   = M_PI * 7/18;    // Fin leading edge angle (rad)
   const float F_TR   = 0;              // Fin trailing edge distance past fin base (m)
   const float F_LEN  = 0.123;          // Fin length (m)
-  const float F_AREA = 0.0027552;      // Fin area (m^2)
+  const float F_AREA = 0.003075;       // Fin area (m^2)
   const float F_CP   = 0.33 * F_LEN;   // Fin Cp (m)
   const float F_NUM  = 2;              // Number of fins
   const float F_D    = 0.06477;        // Distance from roll axis to fin Cp (m)
@@ -80,10 +80,10 @@ ActuatorSetpoint RocketAngularAccelerationController::run(const WorldEstimate& e
   alpha = std::max(-M_PI/18, std::min(M_PI/18, alpha));   // [-pi/18, pi/18]
 
   // PWM duty cycle offset
-  // Scale factor was obtained by measuring fin angle at 0.1 duty cycle away
-  // from center. Further scaled to duty cycle range of 0.14. Clusterfucky,
-  // I know.
-  float dc_offset = alpha * 0.1 / 0.422854 / 0.14;   // [-0.5, 0.5]
+  // Scale factor was obtained by measuring fin angle at 0.5 duty cycle away
+  // from center. I.e., 0.5 duty cycle change corresponds to 9.7 degrees of fin
+  // movement. Small angle approximation.
+  float dc_offset = alpha * 0.5/(9.7*M_PI/180);   // [-0.5, 0.5]
 
   // Fin controller
   float rollActuatorSp = 0.5 + dc_offset;
