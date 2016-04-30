@@ -12,7 +12,7 @@ FsWriterThread::FsWriterThread(SDCDriver& sdcd, Communicator& communicator)
 }
 
 msg_t FsWriterThread::main() {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Filesystem thread online.\r\n");
 
   while (!fs.connect()) chThdSleepMilliseconds(10);
