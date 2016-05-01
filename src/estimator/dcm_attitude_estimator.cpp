@@ -10,7 +10,7 @@
 DCMAttitudeEstimator::DCMAttitudeEstimator(ParameterRepository& params, Communicator& communicator, Logger& logger)
   : params(params),
     dcm(Eigen::Matrix3f::Identity()),
-    attitudeMessageStream(communicator, 30),
+    attitudeMessageStream(communicator, 10),
     logger(logger),
     // This estimator treats the acceleration vector as purely the negative
     // gravity vector because we lack a feed-forward model of any of our
