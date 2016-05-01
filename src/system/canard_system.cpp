@@ -225,16 +225,13 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   // Run controller
   static float flightTime = 0.0;
   if (flightTime < 3.0) {
-    AngularVelocitySetpoint velSp { 0, 0, 3.14159, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
+    sp.yaw = 0.0;
   }
-  else if (flightTime < 6.0) {
-    AngularVelocitySetpoint velSp { 0, 0, -3.14159, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  else if (flightTime < 5.0) {
+    sp.yaw = 1.0;
   }
-  else if (flightTime < 10.0) {
-    AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  else if (flightTime < 7.0) {
+    sp.yaw = 0.5;
   }
   else {
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
