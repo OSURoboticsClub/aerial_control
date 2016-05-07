@@ -7,36 +7,30 @@
 
 CanardSystem::CanardSystem(
     ParameterRepository& params,
-    Accelerometer& accel,
-    optional<Accelerometer *> accelH,
-    optional<Barometer *> bar,
-    optional<Geiger *> ggr,
-    optional<GPS *> gps,
-    Gyroscope& gyr,
-    optional<Magnetometer *> mag,
-    WorldEstimator& estimator, InputSource& inputSource,
-    MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
+    Sensors& sensors,
+    WorldEstimator& estimator,
+    InputSource& inputSource,
+    MotorMapper& motorMapper,
+    Communicator& communicator,
+    Logger& logger,
     Platform& platform)
-  : VehicleSystem(communicator), MessageListener(communicator),
+  : VehicleSystem(communicator),
+    MessageListener(communicator),
     params(params),
-    accel(accel), accelH(accelH), bar(bar), ggr(ggr), gps(gps), gyr(gyr), mag(mag),
-    estimator(estimator), inputSource(inputSource),
+    sensors(sensors),
+    estimator(estimator),
+    inputSource(inputSource),
     attPosController(params),
     attVelController(params),
     attAccController(params),
-    motorMapper(motorMapper), platform(platform),
+    motorMapper(motorMapper),
+    platform(platform),
     systemStream(communicator, 10),
     logger(logger),
     state(CanardState::DISARMED) {
   // Disarm by default. A set_arm_state_message_t message is required to enable
   // the control pipeline.
-  setArmed(false);
-  gyr.setAxisConfig(unit_config::GYR_AXES);
-  accel.setAxisConfig(unit_config::ACC_AXES);
-  (*accelH)->setAxisConfig(unit_config::ACCH_AXES);
-  gyr.setOffsets(unit_config::GYR_OFFSETS);
-  accel.setOffsets(unit_config::ACC_OFFSETS);
-  (*accelH)->setOffsets(unit_config::ACCH_OFFSETS);
+  setArmed(true);
 }
 
 void CanardSystem::update() {
@@ -47,35 +41,13 @@ void CanardSystem::update() {
   //time = (time+1) % 1000;
 
   // Poll the gyroscope and accelerometer
-  AccelerometerReading accelReading = accel.readAccel();
-  GyroscopeReading gyrReading = gyr.readGyro();
-  optional<AccelerometerReading> accelHReading;
-  optional<BarometerReading> barReading;
-  optional<GeigerReading> ggrReading;
-  optional<GPSReading> gpsReading;
-  optional<MagnetometerReading> magReading;
-
-  if (accelH) accelHReading = (*accelH)->readAccel();
-  if (bar)    barReading    = (*bar)->readBar();
-  if (ggr)    ggrReading    = (*ggr)->readGeiger();
-  if (gps)    gpsReading    = (*gps)->readGPS();
-  //if (mag)    magReading    = (*mag)->readMag();
-
-  SensorMeasurements meas {
-    .accel  = std::experimental::make_optional(accelReading),
-    .accelH = accelHReading,
-    .bar    = barReading,
-    .ggr    = ggrReading,
-    .gps    = gpsReading,
-    .gyro   = std::experimental::make_optional(gyrReading),
-    .mag    = magReading
-  };
+  SensorMeasurements meas = sensors.readAvailableSensors();
 
   // Update the world estimate
   WorldEstimate estimate = estimator.update(meas);
 
   // Run the controllers
-  ActuatorSetpoint actuatorSp = {0,0,0,0};
+  ActuatorSetpoint actuatorSp = {0,0,0.5,0};
 
   // Run state machine
   switch (state) {
@@ -104,6 +76,10 @@ void CanardSystem::update() {
     break;
   }
 
+  // DEBUG
+  //AngularPositionSetpoint posSp {0, 0, 0, 0};
+  //actuatorSp = pipeline.run(estimate, posSp, attPosController, attVelController, attAccController);
+
   // Update motor outputs
   motorMapper.run(isArmed(), actuatorSp);
 
@@ -115,29 +91,7 @@ void CanardSystem::update() {
 }
 
 bool CanardSystem::healthy() {
-  bool healthy = accel.healthy() && gyr.healthy();
-
-  if(accelH) {
-    healthy &= (*accelH)->healthy();
-  }
-
-  if(bar) {
-    healthy &= (*bar)->healthy();
-  }
-
-  if(ggr) {
-    healthy &= (*ggr)->healthy();
-  }
-
-  if(gps) {
-    healthy &= (*gps)->healthy();
-  }
-
-  if(mag) {
-    healthy &= (*mag)->healthy();
-  }
-
-  return healthy;
+  return sensors.healthy();
 }
 
 void CanardSystem::on(const protocol::message::set_arm_state_message_t& m) {
@@ -166,28 +120,9 @@ CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
   // Calibrate ground altitude
   groundAltitude = est.loc.alt;
 
-  // Calibrate gyroscope
-  for (int i=0; i<3; i++) {
-    gyrOffsets[i] = (gyrOffsets[i]*calibCount + (*meas.gyro).axes[i]+unit_config::GYR_OFFSETS[i])/(calibCount+1);
-  }
-  calibCount++;
-
-  // Reset calibration on excessive gyration
-  if (fabs((*meas.gyro).axes[0] > 0.1) ||
-      fabs((*meas.gyro).axes[1] > 0.1) ||
-      fabs((*meas.gyro).axes[2] > 0.1)) {
-    calibCount = 0;
-  }
-
-  // Run calibration for 5 seconds
-  if (calibCount == 5000) {
-    gyr.setOffsets(gyrOffsets);
-    protocol::message::sensor_calibration_response_message_t m_gyrcal {
-      .type = protocol::message::sensor_calibration_response_message_t::SensorType::GYRO,
-      .offsets = {gyrOffsets[0], gyrOffsets[1], gyrOffsets[2]}
-    };
-    logger.write(m_gyrcal);
-
+  // Calibrate sensors
+  sensors.calibrateStep();
+  if (sensors.calibrated()) {
     calibrated = true;
   }
 
@@ -220,7 +155,7 @@ CanardState CanardSystem::DisarmedState(SensorMeasurements meas, WorldEstimate e
       break;
     }
   }
-  sp.roll = finCheckDutyCycle;
+  sp.yaw = finCheckDutyCycle;
 
   // Proceed to PRE_ARM if calibration done
   if (calibrated && finCheckComplete) {
@@ -242,7 +177,7 @@ CanardState CanardSystem::PreArmState(SensorMeasurements meas, WorldEstimate est
     return CanardState::ARMED;
   }
 
-  sp.roll = 0.3;
+  sp.yaw = 0.3;
   return CanardState::PRE_ARM;
 }
 
@@ -253,19 +188,19 @@ CanardState CanardSystem::ArmedState(SensorMeasurements meas, WorldEstimate est,
   platform.get<PWMPlatform>().set(PIN_BUZZER, 0);
 
   static int count = 10;
-  count = ((*meas.accel).axes[0] > 1.2) ? (count-1) : 10;
+  count = ((*meas.accel).axes[2] > 2.0) ? (count-1) : 10;
 
   // Revert to PRE_ARM if any sensors are unhealthy or disarm signal received
   if (!(healthy() && isArmed())) {
     return CanardState::PRE_ARM;
   }
 
-  // Proceed to FLIGHT on 1.2g sense on X axis.
+  // Proceed to FLIGHT on 2.0g sense on Z axis.
   if (count == 0) {
     return CanardState::FLIGHT;
   }
 
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::ARMED;
 }
 
@@ -276,30 +211,27 @@ CanardState CanardSystem::FlightState(SensorMeasurements meas, WorldEstimate est
   // Check for motor cutoff. We should see negative acceleration due to drag.
   if (powered) {
     static int count = 100;
-    count = ((*meas.accel).axes[0] < -0.05) ? (count-1) : 100;
+    count = ((*meas.accel).axes[2] < -0.05) ? (count-1) : 100;
     powered = (count == 0) ? false : true;
   }
 
   // Apogee occurs after motor cutoff
   if (!powered &&
       est.loc.dAlt < 2.0 &&
-      (*meas.accel).axes[0] > -0.05) {
+      (*meas.accel).axes[2] > -0.05) {
     return CanardState::APOGEE;
   }
 
   // Run controller
   static float flightTime = 0.0;
   if (flightTime < 3.0) {
-    AngularVelocitySetpoint velSp { 3.14159, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
+    sp.yaw = 0.0;
   }
-  else if (flightTime < 6.0) {
-    AngularVelocitySetpoint velSp { -3.14159, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  else if (flightTime < 5.0) {
+    sp.yaw = 1.0;
   }
-  else if (flightTime < 10.0) {
-    AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
-    sp = pipeline.run(est, velSp, attVelController, attAccController);
+  else if (flightTime < 7.0) {
+    sp.yaw = 0.5;
   }
   else {
     AngularVelocitySetpoint velSp { 0, 0, 0, 0 };
@@ -318,7 +250,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   // TODO(yoos): We might still see this if partially deployed and spinning
   // around..
   static float drogueTime = 0.0;
-  if ((*meas.accel).axes[0] < -0.3) {
+  if ((*meas.accel).axes[2] < -0.3) {
     drogueTime += params.get(GlobalParameters::PARAM_DT);
   }
   else {
@@ -337,7 +269,7 @@ CanardState CanardSystem::ApogeeState(SensorMeasurements meas, WorldEstimate est
   }
 
   sTime += params.get(GlobalParameters::PARAM_DT);
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::APOGEE;
 }
 
@@ -364,7 +296,7 @@ CanardState CanardSystem::DescentState(SensorMeasurements meas, WorldEstimate es
   }
 
   sTime += params.get(GlobalParameters::PARAM_DT);
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::DESCENT;
 }
 
@@ -381,7 +313,7 @@ CanardState CanardSystem::RecoveryState(SensorMeasurements meas, WorldEstimate e
   }
   buzzcount = (buzzcount+1) % 2000;
 
-  sp.roll = 0.5;
+  sp.yaw = 0.5;
   return CanardState::RECOVERY;
 }
 

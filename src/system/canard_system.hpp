@@ -33,7 +33,7 @@
 #include "estimator/world_estimator.hpp"
 
 // Sensors
-#include "sensor/sensor_measurements.hpp"
+#include "sensor/sensors.hpp"
 
 enum class CanardState {
   DISARMED,
@@ -50,16 +50,10 @@ class CanardSystem : public VehicleSystem, public MessageListener {
 public:
   CanardSystem(
       ParameterRepository& params,
-      Accelerometer& accel,
-      optional<Accelerometer *> accelH,
-      optional<Barometer *> bar,
-      optional<Geiger *> ggr,
-      optional<GPS *> gps,
-      Gyroscope& gyr,
-      optional<Magnetometer *> mag,
+      Sensors& sensors,
       WorldEstimator& estimator, InputSource& inputSource,
-      MotorMapper& motorMapper, Communicator& communicator, Logger& logger,
-      Platform& platform);
+      MotorMapper& motorMapper, Communicator& communicator,
+      Logger& logger, Platform& platform);
 
   void update() override;
   bool healthy();
@@ -68,13 +62,7 @@ public:
 
 private:
   ParameterRepository& params;
-  Accelerometer& accel;
-  optional<Accelerometer *> accelH;
-  optional<Barometer *> bar;
-  optional<Geiger *> ggr;
-  optional<GPS *> gps;
-  Gyroscope& gyr;
-  optional<Magnetometer *> mag;
+  Sensors& sensors;
 
   WorldEstimator& estimator;
   InputSource& inputSource;

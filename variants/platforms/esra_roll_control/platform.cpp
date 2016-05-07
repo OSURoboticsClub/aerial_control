@@ -2,27 +2,20 @@
 
 #include "hal.h"
 
-#include "drivers/h3lis331dl.hpp"
-#include "drivers/mpu6000.hpp"
+#include "drivers/mpu9250.hpp"
 #include "drivers/ms5611.hpp"
 #include "drivers/ublox_neo7.hpp"
+
 #include "variant/digital_platform.hpp"
 #include "variant/i2c_platform.hpp"
+#include "variant/icu_platform.hpp"
 #include "variant/pwm_platform.hpp"
 #include "variant/sdc_platform.hpp"
 #include "variant/spi_platform.hpp"
 #include "variant/usart_platform.hpp"
 
-// H3LIS331DL SPI configuration
-static const SPIConfig H3LIS331DL_CONFIG {
-  NULL,
-  GPIOC,
-  15,
-  SPI_CR1_BR_1   // 21000000/2^2 = 5250000
-};
-
-// MPU6000 SPI configuration
-static const SPIConfig MPU6000_CONFIG {
+// MPU9250 SPI configuration
+static const SPIConfig MPU9250_CONFIG {
   NULL,
   GPIOC,
   14,
@@ -41,14 +34,8 @@ Platform::Platform() {
 }
 
 template <>
-H3LIS331DL& Platform::get() {
-  static H3LIS331DL acc(&SPID3, &H3LIS331DL_CONFIG);
-  return acc;
-}
-
-template <>
-MPU6000& Platform::get() {
-  static MPU6000 imu(&SPID3, &MPU6000_CONFIG);
+MPU9250& Platform::get() {
+  static MPU9250 imu(&SPID3, &MPU9250_CONFIG);
   return imu;
 }
 
@@ -58,20 +45,16 @@ MS5611& Platform::get() {
   return bar;
 }
 
-
 template <>
 UBloxNEO7& Platform::get() {
   static UBloxNEO7 gps(&SD6);
   return gps;
 }
 
-template <> Accelerometer& Platform::getIdx(int idx) {
-  if (idx == 1)                           { return get<H3LIS331DL>(); }
-  else                                    { return get<MPU6000>(); }
-}
-template <> Barometer&    Platform::get() { return get<MS5611>(); }
-template <> GPS&          Platform::get() { return get<UBloxNEO7>(); }
-template <> Gyroscope&    Platform::get() { return get<MPU6000>(); }
+template <> Accelerometer& Platform::get() { return get<MPU9250>(); }
+template <> Barometer&     Platform::get() { return get<MS5611>(); }
+template <> GPS&           Platform::get() { return get<UBloxNEO7>(); }
+template <> Gyroscope&     Platform::get() { return get<MPU9250>(); }
 
 template <>
 DigitalPlatform& Platform::get() {
@@ -81,6 +64,11 @@ DigitalPlatform& Platform::get() {
 template <>
 I2CPlatform& Platform::get() {
   return I2CPlatform::getInstance();
+}
+
+template <>
+ICUPlatform& Platform::get() {
+  return ICUPlatform::getInstance();
 }
 
 template <>
@@ -106,15 +94,15 @@ USARTPlatform& Platform::get() {
 void Platform::init() {
   get<DigitalPlatform>();
   get<I2CPlatform>();
+  get<ICUPlatform>();
   get<PWMPlatform>();
   get<SPIPlatform>();
-  get<USARTPlatform>();   // Do this last so the 500ms delay hack doesn't mess with other stuff.
+  get<USARTPlatform>();
 
   get<SDCPlatform>();   // Initialize SDIO after SPI.
 
   // Initialize sensors
-  get<H3LIS331DL>().init();
-  get<MPU6000>().init();
+  get<MPU9250>().init();
   get<MS5611>().init();
   get<UBloxNEO7>().init();
 }

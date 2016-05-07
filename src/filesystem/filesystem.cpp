@@ -13,7 +13,7 @@ FileSystem::FileSystem(SDCDriver& sdcd)
 }
 
 bool FileSystem::connect(void) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Trying to connect SDIO...");
   if (sdcConnect(&sdcd)) {
     // TODO(yoos): set FS error flag
@@ -26,7 +26,7 @@ bool FileSystem::connect(void) {
 }
 
 bool FileSystem::disconnect(void) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Disconnecting from SDIO...");
   if (sdcDisconnect(&sdcd)) {
     chprintf(chp, " failed\r\n");
@@ -38,7 +38,7 @@ bool FileSystem::disconnect(void) {
 }
 
 bool FileSystem::mount(void) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Registering FS working area...");
   err = f_mount(0, &SDC_FS);
   if (err != FR_OK) {
@@ -64,7 +64,7 @@ bool FileSystem::mount(void) {
 }
 
 bool FileSystem::umount(void) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Unmounting filesystem...");
   f_mount(0, NULL);
   if (err != FR_OK) {
@@ -77,13 +77,13 @@ bool FileSystem::umount(void) {
 }
 
 bool FileSystem::openNew(void) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Generating filename...");
   uint16_t idx = 0;
   char fn[255];
   while (err != FR_NO_FILE) {
     chprintf(chp, ".");
-    sprintf(fn, "celeste_%03d.log", idx++);
+    sprintf(fn, "telem_%03d.dat", idx++);
     err = f_stat(fn, &filinfo);
 
     if (idx == 1000) {
@@ -97,7 +97,7 @@ bool FileSystem::openNew(void) {
 }
 
 bool FileSystem::open(char *fn) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Opening file %s...", fn);
 
   char fn_full[255];
@@ -114,7 +114,7 @@ bool FileSystem::open(char *fn) {
 }
 
 bool FileSystem::close(void) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   chprintf(chp, "Closing file...");
   err = f_close(&FileObject);
   if (err != FR_OK) {
@@ -132,7 +132,7 @@ void FileSystem::read(uint8_t c) {
 }
 
 void FileSystem::write(uint8_t *buf, uint16_t len) {
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
   uint8_t teststring[] = {"This is a test file\r\n"};
   err = f_write(&FileObject, buf, len, (unsigned int*)&bytes_written);
   if (err != FR_OK) {
@@ -165,7 +165,7 @@ uint32_t FileSystem::getFileSize(void) {
 
 bool FileSystem::healthy(void) {
   uint32_t i=0;
-  BaseSequentialStream *chp = (BaseSequentialStream*)&SD1;
+  BaseSequentialStream *chp = (BaseSequentialStream*)&SD4;
 
   connect();
 

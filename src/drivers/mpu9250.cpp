@@ -46,16 +46,22 @@ void MPU9250::init() {
 }
 
 GyroscopeReading MPU9250::readGyro() {
-  GyroscopeReading reading;
-
   // Poll gyro
   txbuf[0] = mpu9250::GYRO_XOUT_H | (1<<7);
   exchange(7);
 
   // TODO(yoos): correct for thermal bias.
-  reading.axes[Gyroscope::axes[0]] = Gyroscope::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[0];
-  reading.axes[Gyroscope::axes[1]] = Gyroscope::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[1];
-  reading.axes[Gyroscope::axes[2]] = Gyroscope::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0 - Gyroscope::offsets[2];
+  // Poll chip axes
+  std::array<float, 3> _axes;
+  _axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 16.384 * 3.1415926535 / 180.0;
+  _axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 16.384 * 3.1415926535 / 180.0;
+  _axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 16.384 * 3.1415926535 / 180.0;
+
+  // Remap and offset axes
+  GyroscopeReading reading;
+  reading.axes[0] = Gyroscope::signs[0] * _axes[Gyroscope::axes[0]] - Gyroscope::offsets[0];
+  reading.axes[1] = Gyroscope::signs[1] * _axes[Gyroscope::axes[1]] - Gyroscope::offsets[1];
+  reading.axes[2] = Gyroscope::signs[2] * _axes[Gyroscope::axes[2]] - Gyroscope::offsets[2];
 
   // Poll temp
   txbuf[0] = mpu9250::TEMP_OUT_H | (1<<7);
@@ -79,19 +85,17 @@ AccelerometerReading MPU9250::readAccel() {
   txbuf[0] = mpu9250::ACCEL_XOUT_H | (1<<7);
   exchange(7);
 
-  AccelerometerReading meas;
-  meas.axes[Accelerometer::axes[0]] = Accelerometer::signs[0] * ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0 - Accelerometer::offsets[0];
-  meas.axes[Accelerometer::axes[1]] = Accelerometer::signs[1] * ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0 - Accelerometer::offsets[1];
-  meas.axes[Accelerometer::axes[2]] = Accelerometer::signs[2] * ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0 - Accelerometer::offsets[2];
+  // Poll chip axes
+  std::array<float, 3> _axes;
+  _axes[0] = ((int16_t) ((rxbuf[1]<<8) | rxbuf[2])) / 8192.0;
+  _axes[1] = ((int16_t) ((rxbuf[3]<<8) | rxbuf[4])) / 8192.0;
+  _axes[2] = ((int16_t) ((rxbuf[5]<<8) | rxbuf[6])) / 8192.0;
 
-  // Low-pass filter
-  const float ALPHA = 0.5;   // TODO(yoos): make configurable
-  static AccelerometerReading reading {
-    .axes = {0,0,0}
-  };
-  for (int i=0; i<3; i++) {
-    reading.axes[Accelerometer::axes[i]] = ALPHA * meas.axes[Accelerometer::axes[i]] + (1-ALPHA) * reading.axes[Accelerometer::axes[i]];
-  }
+  // Remap and offset axes
+  AccelerometerReading reading;
+  reading.axes[0] = Accelerometer::signs[0] * _axes[Accelerometer::axes[0]] - Accelerometer::offsets[0];
+  reading.axes[1] = Accelerometer::signs[1] * _axes[Accelerometer::axes[1]] - Accelerometer::offsets[1];
+  reading.axes[2] = Accelerometer::signs[2] * _axes[Accelerometer::axes[2]] - Accelerometer::offsets[2];
 
   return reading;
 }

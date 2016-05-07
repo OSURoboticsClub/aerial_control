@@ -9,10 +9,10 @@ struct GeigerReading {
   uint8_t blips;
 };
 
-class Geiger : public Sensor {
+class Geiger : public Sensor<> {
 public:
   virtual void init() = 0;
   virtual GeigerReading readGeiger() = 0;
 };
 
-#endif
+#endif // GEIGER_HPP_

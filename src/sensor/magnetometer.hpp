@@ -9,10 +9,10 @@ struct MagnetometerReading {
   std::array<float, 3> axes;
 };
 
-class Magnetometer : public Sensor {
+class Magnetometer : public Sensor<> {
 public:
   virtual void init() = 0;
   virtual MagnetometerReading readMag() = 0;
 };
 
-#endif
+#endif // MAGNETOMETER_HPP_

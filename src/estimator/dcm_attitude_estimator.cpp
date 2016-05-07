@@ -11,7 +11,14 @@ DCMAttitudeEstimator::DCMAttitudeEstimator(ParameterRepository& params, Communic
   : params(params),
     dcm(Eigen::Matrix3f::Identity()),
     attitudeMessageStream(communicator, 10),
-    logger(logger) {
+    logger(logger),
+    // This estimator treats the acceleration vector as purely the negative
+    // gravity vector because we lack a feed-forward model of any of our
+    // actuators and the architecture to include one in the control loop. With
+    // a perfect gyro, we should never see the gravity vector move, so we set
+    // the acceleration cutoff frequency very low until feed-forward models can
+    // be incorporated into the estimators. TODO(kylc,syoo)
+    accelFilter(5.0), gyroFilter(100.0) {
 }
 
 AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
@@ -26,13 +33,12 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   if(meas.accel) {
     //static Eigen::Vector3f accel({0,0,0});
     Eigen::Vector3f accel((*meas.accel).axes.data());
-    //accel = 0.999*accel + 0.001*newAccel;   // Prevent orientation drift under vibration
 
     // Calculate accelerometer weight before normalization
     accelWeight = getAccelWeight(accel);
 
     accel.normalize();
-    corr += dcm.col(2).cross(-accel) * accelWeight;
+    corr += accelFilter.apply(params.get(GlobalParameters::PARAM_DT), dcm.col(2).cross(-accel)) * accelWeight;
   }
 
   // If a magnetometer is available, use the provided north vector to correct
@@ -60,6 +66,7 @@ AttitudeEstimate DCMAttitudeEstimator::update(const SensorMeasurements& meas) {
   // add it to the correction vector.
   if(meas.gyro) {
     Eigen::Vector3f gyro((*meas.gyro).axes.data());
+    gyro = gyroFilter.apply(params.get(GlobalParameters::PARAM_DT), gyro);
     corr += gyro * params.get(GlobalParameters::PARAM_DT) * (1.0f - accelWeight - magWeight);
   }
 

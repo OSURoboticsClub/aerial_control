@@ -19,6 +19,7 @@ CXXSRCS += src/controller/*.cpp
 CXXSRCS += src/drivers/*.cpp
 CXXSRCS += src/estimator/*.cpp
 CXXSRCS += src/filesystem/*.cpp
+CXXSRCS += src/filter/*.cpp
 CXXSRCS += src/input/*.cpp
 CXXSRCS += src/variable_registry/*.cpp
 CXXSRCS += src/motor/*.cpp

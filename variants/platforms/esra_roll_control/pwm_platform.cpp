@@ -11,8 +11,8 @@ static const PWMConfig PWMD1_CONFIG {
   {
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
-    {PWM_OUTPUT_DISABLED, NULL},
-    {PWM_OUTPUT_DISABLED, NULL}
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL}
   },   // Channel configurations
   0,0   // HW dependent
 };
@@ -35,8 +35,8 @@ static const PWMConfig PWMD4_CONFIG {
   2000,      // PWM period 4.0 ms.
   NULL,      // No callback.
   {
-    {PWM_OUTPUT_DISABLED, NULL},
-    {PWM_OUTPUT_DISABLED, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+    {PWM_OUTPUT_ACTIVE_HIGH, NULL},
     {PWM_OUTPUT_ACTIVE_HIGH, NULL},
     {PWM_OUTPUT_ACTIVE_HIGH, NULL}
   },   // Channel configurations
@@ -48,6 +48,8 @@ PWMPlatform::PWMPlatform() {
   pwmStart(&PWMD1, &PWMD1_CONFIG);
   palSetPadMode(GPIOA, 8, PAL_MODE_ALTERNATE(1));
   palSetPadMode(GPIOA, 9, PAL_MODE_ALTERNATE(1));
+  palSetPadMode(GPIOA, 10, PAL_MODE_ALTERNATE(1));
+  palSetPadMode(GPIOA, 11, PAL_MODE_ALTERNATE(1));
 
   // TIM3
   pwmStart(&PWMD3, &PWMD3_CONFIG);
@@ -58,6 +60,8 @@ PWMPlatform::PWMPlatform() {
 
   // TIM4
   pwmStart(&PWMD4, &PWMD4_CONFIG);
+  palSetPadMode(GPIOB, 6, PAL_MODE_ALTERNATE(2));
+  palSetPadMode(GPIOB, 7, PAL_MODE_ALTERNATE(2));
   palSetPadMode(GPIOB, 8, PAL_MODE_ALTERNATE(2));
   palSetPadMode(GPIOB, 9, PAL_MODE_ALTERNATE(2));
 }
