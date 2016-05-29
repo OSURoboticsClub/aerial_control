@@ -214,29 +214,45 @@ void MultirotorVehicleSystem::PulseLED(float r, float g, float b, float freq) {
   count = (count+1) % period;
 }
 
-void MultirotorVehicleSystem::RGBLED(float freq) {
-  static float dc = 0.0;
-  static int dir = 1;
-  if (dc >= 1.0) {
-    dir = -1;
-  }
-  else if (dc <= 0.0) {
-    dir = 1;
-  }
-  dc += dir * (2*freq * params.get(GlobalParameters::PARAM_DT));
+float sawtooth(float x) {
+  float y;
+  while (x < 0) {x += 1;}
+  while (x >= 1) {x -= 1;}
 
-  float dc_ = dc;
-  float dir_ = dir;
+  const float m = 6;
+  const float P1 = 1/m;
+  const float P2 = 2/m;
+  const float P3 = 3/m;
+  const float P4 = 4/m;
+  const float P5 = 5/m;
+  const float P6 = 6/m;
+
+  if (x < P1)
+    y = m*x;
+  else if (x < P2)
+    y = 1;
+  else if (x < P4)
+    y = 1-m*(x-P2);
+  else if (x < P5)
+    y = -1;
+  else if (x < P6)
+    y = -1+m*(x-P5);
+
+  y *= 2/3.0f;
+  y += 1/3.0f;
+  if (y<0) y=0;
+  return y;
+}
+
+void MultirotorVehicleSystem::RGBLED(float freq) {
+  static float x = 0.0;
+
   for (int i=0; i<3; i++) {
-    dc_ += dir_ * 0.666;
-    if (dc_ > 1.0) {
-      dc_ = 2.0 - dc_;
-      dir_ = -1;
-    }
-    else if (dc_ < 0.0) {
-      dc_ = 0.0 - dc_;
-      dir_ = 1;
-    }
-    platform.get<PWMPlatform>().set(9+i, dc_);
+    float dc = sawtooth(x+i/3.0f);
+    if (dc < 0) dc = 0;
+    platform.get<PWMPlatform>().set(9+i, dc);
   }
+
+  x += freq * params.get(GlobalParameters::PARAM_DT);
+  if (x >= 1.0) x = 0;
 }
