@@ -102,7 +102,7 @@ void CanardSystem::updateStreams(SensorMeasurements meas, WorldEstimate est, Act
   protocol::message::system_message_t m {
     .time = ST2MS(chibios_rt::System::getTime()),
     .state = (uint8_t) state,
-    .motorDC = sp.throttle
+    .motorDC = sp.yaw
   };
   logger.write(m);
   if (systemStream.ready()) {
